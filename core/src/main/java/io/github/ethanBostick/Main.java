@@ -1,53 +1,47 @@
 package io.github.ethanBostick;
 
-// Input
-import io.github.ethanBostick.input.InputRouter;
-import io.github.ethanBostick.input.MenuInputAdapter;
-import io.github.ethanBostick.input.MapInputAdapter;
-import io.github.ethanBostick.input.PopupInputAdapter;
-// UI
-import io.github.ethanBostick.ui.GameHUD;
+// Screens
+import io.github.ethanBostick.screens.GameScreen;
+import io.github.ethanBostick.screens.MenuScreen;
 
 //GDX stuff
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.ashley.core.Engine;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
-    private SpriteBatch batch;
-    private Texture image;
 
-	//temp testing
-	private Stage stage;
+	public AssetManager assetManager;
+	public Engine engine;
+	//Ashley ECS will go here
+	//public Engine engine;
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
+		//init asset manager
+		this.assetManager = new AssetManager();
 
-		//init basic input router
-		InputRouter theInputRouter = new InputRouter(new MenuInputAdapter());
-		Gdx.input.setInputProcessor(theInputRouter.getMultiplexer());
+		//load global textures/fonts if needed
 
-		//init ui systems
-		GameHUD theGameHUD = new GameHUD();
-		theInputRouter.addProcessorAt(0,theGameHUD.stage);
-		this.stage = theGameHUD.stage;
+		//init Ashley ECS
+		this.engine = new Engine();
+
+		//init screen
+		this.setScreen(new MenuScreen(this)); //initialized with the Game
     }
 
     @Override
     public void render() {
-		super.render();
+
+		super.render(); //delegates rendering to active screen
     }
 
     @Override
     public void dispose() {
-        batch.dispose();
-        image.dispose();
+		//big clean everything
+		if (screen != null) screen.dispose();
+		assetManager.dispose();
     }
 }
+
