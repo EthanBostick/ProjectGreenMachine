@@ -1,32 +1,47 @@
 package io.github.ethanBostick;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
+// Screens
+import io.github.ethanBostick.screens.GameScreen;
+import io.github.ethanBostick.screens.MenuScreen;
+
+//GDX stuff
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.ashley.core.Engine;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class Main extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture image;
+public class Main extends Game {
+
+	public AssetManager assetManager;
+	public Engine engine;
+	//Ashley ECS will go here
+	//public Engine engine;
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
+		//init asset manager
+		this.assetManager = new AssetManager();
+
+		//load global textures/fonts if needed
+
+		//init Ashley ECS
+		this.engine = new Engine();
+
+		//init screen
+		this.setScreen(new MenuScreen(this)); //initialized with the Game
     }
 
     @Override
     public void render() {
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        batch.begin();
-        batch.draw(image, 140, 210);
-        batch.end();
+
+		super.render(); //delegates rendering to active screen
     }
 
     @Override
     public void dispose() {
-        batch.dispose();
-        image.dispose();
+		//big clean everything
+		if (screen != null) screen.dispose();
+		assetManager.dispose();
     }
 }
+
