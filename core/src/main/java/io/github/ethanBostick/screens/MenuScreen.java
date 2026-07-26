@@ -16,18 +16,14 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class MenuScreen implements Screen {
 
-	private final Main theGame;
-
 	private MenuHUD menuHUD;
 	private InputRouter inputRouter;
 
-	public MenuScreen(Main game){
-		this.theGame = game;
-	}
+	public MenuScreen(){}
 
 	@Override
 	public void show() {
-		this.menuHUD = new MenuHUD(this.theGame);
+		this.menuHUD = new MenuHUD();
 		this.inputRouter = new InputRouter(this.menuHUD.stage); //ui stage index 0
 		this.inputRouter.addProcessor(new MenuInputAdapter());
 
