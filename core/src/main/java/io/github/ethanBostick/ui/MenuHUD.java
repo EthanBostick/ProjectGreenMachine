@@ -2,13 +2,12 @@ package io.github.ethanBostick.ui;
 
 import io.github.ethanBostick.events.ScreenChangeEvent;
 import io.github.ethanBostick.core.EventBus;
+import io.github.ethanBostick.events.EventFactory;
 
 //other screen
 import io.github.ethanBostick.screens.GameScreen;
 
 // gdx stuff
-import com.badlogic.gdx.utils.Pool.Poolable;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -17,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.Screen;
 
 public class MenuHUD {
     // Expose the stage so your Main class can render it and pass it to the Multiplexer
@@ -44,7 +42,7 @@ public class MenuHUD {
         startButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-				ScreenChangeEvent screenChangeEvent = Pools.obtain(ScreenChangeEvent.class);
+				ScreenChangeEvent screenChangeEvent = EventFactory.instance().screenChangeEventPool.obtain();
 				screenChangeEvent.targetScreen = new GameScreen();
 				EventBus.instance().publish(screenChangeEvent);			
             }

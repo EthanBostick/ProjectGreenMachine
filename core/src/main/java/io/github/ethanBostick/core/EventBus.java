@@ -2,11 +2,11 @@ package io.github.ethanBostick.core;
 
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventType;
+import io.github.ethanBostick.events.EventFactory;
 import io.github.ethanBostick.events.ScreenChangeEvent;
 
 //GDX stuff
 import com.badlogic.gdx.utils.Pool.Poolable;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -18,15 +18,6 @@ public class EventBus{
 
 	private EventBus(){
 		this.observers = new ObjectMap<>(2); //argue estimated size
-
-		//define the event pool for screenChangedEvents
-		Pool<ScreenChangeEvent> screenEventPool = new Pool<ScreenChangeEvent>() {
-			@Override
-			protected ScreenChangeEvent newObject() {
-				return new ScreenChangeEvent();
-			}
-		};
-		Pools.set(ScreenChangeEvent.class, screenEventPool);
 	}
 
 	public static EventBus instance(){
@@ -56,8 +47,8 @@ public class EventBus{
 			}
 		}
 
-		if (event instanceof Poolable){
-			Pools.free(event); //calls the events reset()
+		if (event instanceof ScreenChangeEvent){
+			EventFactory.instance().screenChangeEventPool.free((ScreenChangeEvent)event); //calls the events reset()
 		}
 	}
 }
