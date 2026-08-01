@@ -1,9 +1,5 @@
 package io.github.ethanBostick.input;
 
-import io.github.ethanBostick.input.MenuInputAdapter;
-import io.github.ethanBostick.input.MapInputAdapter;
-import io.github.ethanBostick.input.PopupInputAdapter;
-
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.InputMultiplexer;
