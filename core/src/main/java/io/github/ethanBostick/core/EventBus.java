@@ -6,8 +6,6 @@ import io.github.ethanBostick.events.EventFactory;
 import io.github.ethanBostick.events.ScreenChangeEvent;
 
 //GDX stuff
-import com.badlogic.gdx.utils.Pool.Poolable;
-import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
