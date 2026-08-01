@@ -6,28 +6,16 @@ import io.github.ethanBostick.ui.GameHUD;
 // Input
 import io.github.ethanBostick.input.MapInputAdapter;
 import io.github.ethanBostick.input.InputRouter;
-//main ref
-import io.github.ethanBostick.Main;
-
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.ashley.core.Engine;
 
 public class GameScreen implements Screen {
 
-	private final Main theGame;
-	private final Engine engine;
+	private GameHUD gameHUD = null;
+	private InputRouter inputRouter = null;
 
-	private GameHUD gameHUD;
-	private InputRouter inputRouter;
-
-	public GameScreen(Main game){
-		this.theGame = game;
-		this.engine = this.theGame.engine;
-
-		//set ECS init state
-	}
+	public GameScreen(){}
 
 	@Override
 	public void show() {
@@ -43,8 +31,6 @@ public class GameScreen implements Screen {
 		//standard screen wipe
 		Gdx.gl.glClearColor(0.1f,0.1f,0.1f,1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-		this.theGame.engine.update(delta);
 
 		this.gameHUD.stage.act(delta);
 		this.gameHUD.stage.draw();
