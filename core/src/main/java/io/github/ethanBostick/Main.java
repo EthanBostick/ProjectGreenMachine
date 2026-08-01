@@ -8,8 +8,7 @@ import io.github.ethanBostick.events.ScreenChangeEvent;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventType;
 
-// Screens
-import io.github.ethanBostick.screens.GameScreen;
+// init Screen
 import io.github.ethanBostick.screens.MenuScreen;
 
 //GDX stuff

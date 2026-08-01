@@ -5,14 +5,10 @@ import io.github.ethanBostick.ui.MenuHUD;
 // Input
 import io.github.ethanBostick.input.MenuInputAdapter;
 import io.github.ethanBostick.input.InputRouter;
-//main
-import io.github.ethanBostick.Main;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class MenuScreen implements Screen {
 

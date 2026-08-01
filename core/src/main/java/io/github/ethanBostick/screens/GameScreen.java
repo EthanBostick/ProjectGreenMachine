@@ -6,14 +6,9 @@ import io.github.ethanBostick.ui.GameHUD;
 // Input
 import io.github.ethanBostick.input.MapInputAdapter;
 import io.github.ethanBostick.input.InputRouter;
-//main ref
-import io.github.ethanBostick.Main;
-
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class GameScreen implements Screen {
 

@@ -1,6 +1,5 @@
 package io.github.ethanBostick.core;
 
-import io.github.ethanBostick.core.Observer;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventType;
 import io.github.ethanBostick.events.ScreenChangeEvent;
