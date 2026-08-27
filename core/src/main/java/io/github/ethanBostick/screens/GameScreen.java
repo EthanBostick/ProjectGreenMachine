@@ -5,33 +5,29 @@ import io.github.ethanBostick.ui.GameHUD;
 
 // Input
 import io.github.ethanBostick.input.MapInputAdapter;
-import io.github.ethanBostick.input.InputRouter;
+import io.github.ethanBostick.input.InputManager;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 
 public class GameScreen implements Screen {
 
 	private GameHUD gameHUD = null;
-	private InputRouter inputRouter = null;
+	private InputManager inputManager = null;
 
 	public GameScreen(){}
 
 	@Override
 	public void show() {
 		this.gameHUD = new GameHUD();
-		this.inputRouter = new InputRouter(this.gameHUD.stage); //ui stage index 0
-		this.inputRouter.addProcessor(new MapInputAdapter());
+		this.inputManager = new InputManager(this.gameHUD.stage); //ui stage index 0
+		this.inputManager.addProcessor(new MapInputAdapter());
 
-		Gdx.input.setInputProcessor(this.inputRouter.getMultiplexer());
+		Gdx.input.setInputProcessor(this.inputManager.getMultiplexer());
 	}
 
     @Override
     public void render(float delta) {
-		//standard screen wipe
-		Gdx.gl.glClearColor(0.1f,0.1f,0.1f,1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+        this.inputManager.poll();
 		this.gameHUD.stage.act(delta);
 		this.gameHUD.stage.draw();
     }
