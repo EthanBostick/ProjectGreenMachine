@@ -1,27 +1,49 @@
 package io.github.ethanBostick.utils;
 
 import io.github.ethanBostick.ecs.Position;
-import java.util.ArrayList;
+import com.badlogic.gdx.utils.IntArray;
 
 public class HexUtils {
-    private static double SIZE = 30.0; //adjust this later, dist between center to each corner 
+    private static double SIZE = 30; //dist between center to each corner (should be equal across each corner) 
     
     //cube coords to pixel coords
     public static int getPixelX(Position p){
-        return (int)(SIZE * ((3.0/2.0) *p.x));
+        return (int)(SIZE * ((3.0/2.0) *p.q));
     }
     public static int getPixelY(Position p){
-        return (int) (SIZE * (Math.sqrt(3.0)*(p.z + (p.x/2.0))));
+        return (int) (SIZE * (Math.sqrt(3.0)*(p.r + (p.q/2.0))));
     }
 
-    public static ArrayList<int[]> getNeighborsPositions(Position p){
-        ArrayList<int[]> neighbors = new ArrayList<int[]>(); 
-        neighbors.add(new int[] {p.x+1,p.y-1,p.z});
-        neighbors.add(new int[] {p.x+1,p.y,p.z-1});
-        neighbors.add(new int[] {p.x-1,p.y+1,p.z});
-        neighbors.add(new int[] {p.x,p.y+1,p.z-1});
-        neighbors.add(new int[] {p.x-1,p.y,p.z+1});
-        neighbors.add(new int[] {p.x,p.y-1,p.z+1});
+    public static IntArray getNeighborsPositions(Position p){
+        IntArray neighbors = new IntArray(12); 
+        neighbors.add(p.q+1);
+        neighbors.add(p.r);
+        neighbors.add(p.q+1);
+        neighbors.add(p.r-1);
+        neighbors.add(p.q-1);
+        neighbors.add(p.r);
+        neighbors.add(p.q);
+        neighbors.add(p.r-1);
+        neighbors.add(p.q-1);
+        neighbors.add(p.r+1);
+        neighbors.add(p.q);
+        neighbors.add(p.r+1);
+        return neighbors;
+    }
+    public static IntArray getNeighborsPositions(int q, int r){
+        IntArray neighbors = new IntArray(12); 
+        neighbors.add(q+1);
+        neighbors.add(r);
+        neighbors.add(q+1);
+        neighbors.add(r-1);
+        neighbors.add(q-1);
+        neighbors.add(r);
+        neighbors.add(q);
+        neighbors.add(r-1);
+        neighbors.add(q-1);
+        neighbors.add(r+1);
+        neighbors.add(q);
+        neighbors.add(r+1);
         return neighbors;
     }
 }

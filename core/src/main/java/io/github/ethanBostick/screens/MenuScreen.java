@@ -4,34 +4,29 @@ package io.github.ethanBostick.screens;
 import io.github.ethanBostick.ui.MenuHUD;
 // Input
 import io.github.ethanBostick.input.MenuInputAdapter;
-import io.github.ethanBostick.input.InputRouter;
+import io.github.ethanBostick.input.InputManager;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 
 public class MenuScreen implements Screen {
 
 	private MenuHUD menuHUD;
-	private InputRouter inputRouter;
+	private InputManager inputManager;
 
 	public MenuScreen(){}
 
 	@Override
 	public void show() {
 		this.menuHUD = new MenuHUD();
-		this.inputRouter = new InputRouter(this.menuHUD.stage); //ui stage index 0
-		this.inputRouter.addProcessor(new MenuInputAdapter());
+		this.inputManager = new InputManager(this.menuHUD.stage); //ui stage index 0
+		this.inputManager.addProcessor(new MenuInputAdapter());
 
-		Gdx.input.setInputProcessor(this.inputRouter.getMultiplexer());
+		Gdx.input.setInputProcessor(this.inputManager.getMultiplexer());
 	}
 
     @Override
     public void render(float delta) {
-		//standard screen wipe
-		Gdx.gl.glClearColor(0.1f,0.1f,0.1f,1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
 		this.menuHUD.stage.act(delta);
 		this.menuHUD.stage.draw();
     }

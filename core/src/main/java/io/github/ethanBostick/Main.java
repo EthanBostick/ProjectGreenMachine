@@ -1,6 +1,7 @@
 package io.github.ethanBostick;
 
 import io.github.ethanBostick.core.Observer;
+import io.github.ethanBostick.ecs.RenderSystem;
 import io.github.ethanBostick.core.EventBus;
 
 //events
@@ -15,8 +16,15 @@ import io.github.ethanBostick.screens.MenuScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+
+//testing
+import io.github.ethanBostick.map.Map;
+import io.github.ethanBostick.core.HexFactory;
+//end testing
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game implements Observer {
@@ -36,6 +44,10 @@ public class Main extends Game implements Observer {
 
 		//init Ashley ECS
 		this.engine = new Engine();
+		this.engine.addSystem(new RenderSystem(new SpriteBatch()));
+		HexFactory hexFactory = HexFactory.instance(engine);
+		Map map = Map.instance();
+		map.generateMap(5);
 
 		//init screen
 		this.setScreen(new MenuScreen()); //initialized ui
@@ -44,8 +56,15 @@ public class Main extends Game implements Observer {
     @Override
     public void render() {
 		float delta = Gdx.graphics.getDeltaTime();
+		//standard screen wipe
+		Gdx.gl.glClearColor(0.1f,0.1f,0.1f,1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		this.engine.update(delta);
+		//dont render entities until on the gamescreen
+		if (!(this.getScreen() instanceof MenuScreen)){
+			this.engine.update(delta);
+		}
+
 		super.render(); //delegates rendering to active screen
     }
 

@@ -2,6 +2,7 @@ package io.github.ethanBostick.input;
 
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Gdx;
 
 public class MapInputAdapter extends InputAdapter{
 
@@ -29,16 +30,16 @@ public class MapInputAdapter extends InputAdapter{
 
 		switch(keycode){
 			case Input.Keys.W:
-				System.out.println("W");
+				System.out.println("W down");
 				break;
 			case Input.Keys.S:
-				System.out.println("S");
+				System.out.println("S down");
 				break;
 			case Input.Keys.A:
-				System.out.println("A");
+				System.out.println("A down");
 				break;
 			case Input.Keys.D:
-				System.out.println("D");
+				System.out.println("D down");
 				break;
 		}
 		return true;

@@ -4,15 +4,15 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.ashley.core.Component;
 
 public class Position implements Component, Poolable{
-    public int x = 0;
-    public int y = 0;
-    public int z = 0;
+    public int q = 0;
+    public int r = 0;
 
+    public Position(){}
+    
 	@Override
 	public void reset(){
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
+        this.q = 0;
+        this.r = 0;
 	}
 
 }
