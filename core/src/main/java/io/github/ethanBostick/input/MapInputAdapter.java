@@ -1,8 +1,11 @@
 package io.github.ethanBostick.input;
 
+import io.github.ethanBostick.events.EventBus;
+import io.github.ethanBostick.events.EventFactory;
+import io.github.ethanBostick.events.ZoomEvent;
+
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Gdx;
 
 public class MapInputAdapter extends InputAdapter{
 
@@ -42,7 +45,7 @@ public class MapInputAdapter extends InputAdapter{
 				System.out.println("D down");
 				break;
 		}
-		return true;
+		return false;
 	}
 
 	//scroll wheel reading
@@ -51,10 +54,16 @@ public class MapInputAdapter extends InputAdapter{
 
 		if (amountY > 0){
 			System.out.printf("scrolled %f\n",amountY);
+			ZoomEvent zoomEvent = EventFactory.instance().zoomEventPool.obtain();
+			zoomEvent.amount = amountY;
+			EventBus.instance().publish(zoomEvent);			
 			return true;
 		}
 		else if (amountY < 0){
 			System.out.printf("scrolled %f\n",amountY);
+			ZoomEvent zoomEvent = EventFactory.instance().zoomEventPool.obtain();
+			zoomEvent.amount = amountY;
+			EventBus.instance().publish(zoomEvent);			
 			return true;
 		}
 		return false;

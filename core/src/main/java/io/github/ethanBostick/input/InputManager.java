@@ -1,19 +1,28 @@
 package io.github.ethanBostick.input;
 
+import io.github.ethanBostick.core.CameraController;
+
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.InputMultiplexer;
-
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Gdx;
 
 public class InputManager{
 	private InputMultiplexer multiplexer;
+	private CameraController cameraController;
 
 	//make a singleton
 	public InputManager(InputAdapter adapter){
 		this.multiplexer = new InputMultiplexer();
 		this.multiplexer.addProcessor(0,adapter); //the ui stage added first (typically)
+	}
+
+	public void setupCameraController(int width, int height, OrthographicCamera camera){
+		this.cameraController = new CameraController(width, height, camera);
+	}
+
+	public void resizeCameraController(int width, int height){
+		this.cameraController.resize(width, height);;
 	}
 
 	public void addProcessor(InputProcessor p){
@@ -36,9 +45,8 @@ public class InputManager{
 		return this.multiplexer;
 	}
 
-	public void poll(){
-		if(Gdx.input.isKeyPressed(Input.Keys.W)){
-			System.out.println("W");
-		}
+	public void poll(float delta){
+		this.cameraController.handleKeyboardInput(delta);
+		this.cameraController.update(delta);
 	}
 }

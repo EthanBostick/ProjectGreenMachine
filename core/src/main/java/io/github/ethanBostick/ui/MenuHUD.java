@@ -1,7 +1,7 @@
 package io.github.ethanBostick.ui;
 
 import io.github.ethanBostick.events.ScreenChangeEvent;
-import io.github.ethanBostick.core.EventBus;
+import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventFactory;
 
 //other screen

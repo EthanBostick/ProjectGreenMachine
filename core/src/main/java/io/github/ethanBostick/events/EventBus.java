@@ -1,13 +1,10 @@
-package io.github.ethanBostick.core;
-
-import io.github.ethanBostick.events.Event;
-import io.github.ethanBostick.events.EventType;
-import io.github.ethanBostick.events.EventFactory;
-import io.github.ethanBostick.events.ScreenChangeEvent;
+package io.github.ethanBostick.events;
 
 //GDX stuff
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+
+import io.github.ethanBostick.core.Observer;
 
 public class EventBus{
 
@@ -47,6 +44,9 @@ public class EventBus{
 
 		if (event instanceof ScreenChangeEvent){
 			EventFactory.instance().screenChangeEventPool.free((ScreenChangeEvent)event); //calls the events reset()
+		}
+		else if (event instanceof ZoomEvent){
+			EventFactory.instance().zoomEventPool.free((ZoomEvent)event);
 		}
 	}
 }

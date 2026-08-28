@@ -7,27 +7,33 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 
 public class RenderSystem extends IteratingSystem{
     private final SpriteBatch batch;
+    private OrthographicCamera camera = null;
 
     private ComponentMapper<Position> pMap = ComponentMapper.getFor(Position.class);
     private ComponentMapper<Sprite> sMap = ComponentMapper.getFor(Sprite.class);
 
-    public RenderSystem(SpriteBatch batch) {
+    public RenderSystem(SpriteBatch batch, OrthographicCamera camera) {
         super(Family.all(Position.class, Sprite.class).get());
         this.batch = batch;
+        this.camera = camera;
     }
 
     @Override
     public void update(float deltaTime) {
-        // Set up the batch with the camera projection before iterating
-        batch.begin();
+
+        if (this.camera != null){
+            this.batch.setProjectionMatrix(this.camera.combined);
+        }
+        this.batch.begin();
         
         // IteratingSystem runs processEntity() on all matching entities
         super.update(deltaTime);
         
-        batch.end();
+        this.batch.end();
     }
 
     @Override
@@ -38,7 +44,7 @@ public class RenderSystem extends IteratingSystem{
 
         // Apply the logic
         if (sprite.texture != null){
-            batch.draw(sprite.texture,HexUtils.getPixelX(position),HexUtils.getPixelY(position));
+            this.batch.draw(sprite.texture,HexUtils.getPixelX(position),HexUtils.getPixelY(position));
         }
     }
 }
