@@ -1,8 +1,17 @@
 # GreenMachine
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+This project is part of a 16 week independent study with the aim of producing and publishing a game onto the Steam store page. 
+Due to the 16 week constraint for publishing, the scope and time need to be carefully considered during development; for those reasons the game is built on the LibGDX Java framework to maintain low-level development while avoiding building a complete game engine from scratch. 
+### PROJECTED PUBLISH DATE: *Nov 27-28th, 2026* *(subject to change)*
 
-This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
+## Running The Project
+
+This repo has a makefile included for ease of use
+##### (important) targets:
+- `complete_build` - builds the project files
+- `run` - runs the project
+
+A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
 
 ## Platforms
 
