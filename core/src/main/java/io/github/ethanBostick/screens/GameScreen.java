@@ -4,6 +4,8 @@ import io.github.ethanBostick.ui.GameHUD;
 import io.github.ethanBostick.input.MapInputAdapter;
 import io.github.ethanBostick.input.InputManager;
 import io.github.ethanBostick.ecs.RenderSystem;
+import io.github.ethanBostick.core.CameraController;
+
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
@@ -20,6 +22,7 @@ public class GameScreen implements Screen {
 
 	private GameHUD gameHUD = null;
 	private InputManager inputManager = null;
+	private CameraController cameraController = null;
 	public Engine engine;
 
 	public GameScreen(){}
@@ -30,7 +33,7 @@ public class GameScreen implements Screen {
 		this.inputManager = new InputManager(this.gameHUD.stage); //ui stage index 0
 		this.inputManager.addProcessor(new MapInputAdapter());
         OrthographicCamera camera = new OrthographicCamera();
-        this.inputManager.setupCameraController(1000, 1000, camera);
+		this.cameraController = new CameraController(500, 500, camera);
 
 		//init Ashley ECS
 		this.engine = new Engine();
@@ -44,7 +47,11 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        this.inputManager.poll(delta);
+        //camera control updates
+		this.cameraController.handleKeyboardInput(delta);
+		this.cameraController.update(delta);
+
+        //engine systems update
 		this.engine.update(delta);
 		this.gameHUD.stage.act(delta);
 		this.gameHUD.stage.draw();
@@ -52,7 +59,7 @@ public class GameScreen implements Screen {
 	@Override
     public void resize(int width, int height) {
         this.gameHUD.resize(width, height);
-        this.inputManager.resizeCameraController(width, height);
+        this.cameraController.resize(width, height);
     }
 
     @Override
