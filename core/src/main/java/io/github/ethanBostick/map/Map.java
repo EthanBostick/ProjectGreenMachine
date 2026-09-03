@@ -32,14 +32,15 @@ public class Map {
 					int rInt = random.nextInt(7);
 					int rock = random.nextInt(4);
 					
-					if (rock == 1){
-						hexFactory.createHex(q,r, "rock.png");
-					}
 					if (rInt > 1 && rInt < 4){
 						hexFactory.createHex(q,r, "grass.png");
 					}
 					else if (rInt > 3){
 						hexFactory.createHex(q,r, "sand.png");
+					}
+
+					if (rock == 1){
+						hexFactory.createHex(q,r, "rock.png");
 					}
 				}
 			}

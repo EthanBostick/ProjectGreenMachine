@@ -5,6 +5,7 @@ import io.github.ethanBostick.utils.HexUtils;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -38,13 +39,19 @@ public class RenderSystem extends IteratingSystem{
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        // Extract the data
         Position position = pMap.get(entity);
         Sprite sprite = sMap.get(entity);
 
-        // Apply the logic
         if (sprite.texture != null){
-            this.batch.draw(sprite.texture,HexUtils.getPixelX(position),HexUtils.getPixelY(position));
+            float pixelX = HexUtils.getPixelX(position);
+            float pixelY = HexUtils.getPixelY(position);
+            float width = 64;
+            float height = 52;
+
+            // Only draw if the sprite's bounding box intersects the camera's view
+            if (camera.frustum.boundsInFrustum(pixelX + width/2f, pixelY + height/2f, 0, width/2f, height/2f, 0)) {
+                batch.draw(sprite.texture, pixelX, pixelY);
+            }
         }
     }
 }
