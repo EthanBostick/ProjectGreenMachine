@@ -2,18 +2,26 @@ package io.github.ethanBostick.map;
 
 import io.github.ethanBostick.core.HexFactory;
 import io.github.ethanBostick.utils.HexUtils;
+import io.github.ethanBostick.core.Observer;
+import io.github.ethanBostick.events.Event;
+import io.github.ethanBostick.events.EventBus;
+import io.github.ethanBostick.events.EventType;
 
 import java.lang.Math;
 import java.util.Random;
 
+import com.badlogic.ashley.core.Entity;
 //GDX stuff
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.ObjectMap;
 
-public class Map {
+public class Map implements Observer{
 	private static Map theInstance = null;
 	private int size = 0;
 	private static Random random = null;
+	private 
+	//private ObjectMap<, Array<Entity>> map;
 
 	private Map(){}
 
@@ -55,4 +63,16 @@ public class Map {
 		}
 		return Map.theInstance;
 	}
+
+    @Override
+    public void onEvent(Event event){
+		switch (event.getType()){
+			case ZOOM:
+                ZoomEvent zm = (ZoomEvent) event;
+                this.zoom(zm.amount);
+				break;
+			default:
+				System.out.println("unknown event");
+		}
+    }
 }
