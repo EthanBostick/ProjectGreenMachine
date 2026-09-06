@@ -2,29 +2,45 @@ package io.github.ethanBostick.ecs;
 
 import io.github.ethanBostick.utils.HexUtils;
 
-import com.badlogic.ashley.systems.IteratingSystem;
+import java.util.Comparator;
+
+import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
-public class RenderSystem extends IteratingSystem{
+public class RenderSystem extends SortedIteratingSystem{
     private final SpriteBatch batch;
     private OrthographicCamera camera = null;
 
-    private ComponentMapper<Position> pMap = ComponentMapper.getFor(Position.class);
-    private ComponentMapper<Sprite> sMap = ComponentMapper.getFor(Sprite.class);
+    private static ComponentMapper<Position> pMap = ComponentMapper.getFor(Position.class);
+    private static ComponentMapper<Sprite> sMap = ComponentMapper.getFor(Sprite.class);
+
+    //inline class to sort entities by layer
+    private static class LayerComparator implements Comparator<Entity> {
+        @Override
+        public int compare(Entity e1, Entity e2) {
+            //invert the layer values so lowest renders first
+            int layer1 = -pMap.get(e1).layer;
+            int layer2 = -pMap.get(e2).layer;
+            
+            return Integer.compare(layer2, layer1);
+        }
+    }
 
     public RenderSystem(SpriteBatch batch, OrthographicCamera camera) {
-        super(Family.all(Position.class, Sprite.class).get());
+        super(Family.all(Position.class, Sprite.class).get(), new LayerComparator());
         this.batch = batch;
         this.camera = camera;
     }
 
     @Override
     public void update(float deltaTime) {
+
+        //resorts the entities, only needs to be done if an entity moves layers
+        //forceSort();
 
         if (this.camera != null){
             this.batch.setProjectionMatrix(this.camera.combined);

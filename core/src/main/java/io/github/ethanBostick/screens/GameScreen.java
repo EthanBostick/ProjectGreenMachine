@@ -15,7 +15,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 //testing
 import io.github.ethanBostick.map.Map;
-import io.github.ethanBostick.core.HexFactory;
+import io.github.ethanBostick.core.EntityBuilder;
 //end testing
 
 public class GameScreen implements Screen {
@@ -38,9 +38,9 @@ public class GameScreen implements Screen {
 		//init Ashley ECS
 		this.engine = new Engine();
 		this.engine.addSystem(new RenderSystem(new SpriteBatch(),camera));
-		HexFactory hexFactory = HexFactory.instance(engine);
+		EntityBuilder entityBuilder = EntityBuilder.instance(engine);
 		Map map = Map.instance();
-		map.generateMap(15);
+		map.initMap(30);
 
 		Gdx.input.setInputProcessor(this.inputManager.getMultiplexer());
 	}

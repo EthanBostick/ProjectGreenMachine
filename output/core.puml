@@ -94,15 +94,15 @@ class CameraController {
   +getViewport(): Viewport
 }
 
-class HexFactory {
-  -{static} theInstance: HexFactory = null
+class EntityBuilder {
+  -{static} theInstance: EntityBuilder = null
   -engine: Engine = null
   -textureMap: ObjectMap<String, Texture>
   --
-  -HexFactory(e: Engine)
+  -EntityBuilder(e: Engine)
   +createHex(q: int, r: int, texturePath: String): void
-  +{static} instance(e: Engine): HexFactory
-  +{static} instance(): HexFactory
+  +{static} instance(e: Engine): EntityBuilder
+  +{static} instance(): EntityBuilder
 }
 
 class RenderSystem {
@@ -220,7 +220,7 @@ MenuScreen *-- InputManager
 Observer ..> Event
 CameraController ..|> Observer
 CameraController ..> Event
-HexFactory *-- HexFactory
+EntityBuilder *-- EntityBuilder
 RenderSystem o-- Position
 RenderSystem o-- Sprite
 Map *-- Map
