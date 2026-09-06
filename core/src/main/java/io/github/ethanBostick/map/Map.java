@@ -6,6 +6,7 @@ import io.github.ethanBostick.core.Observer;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventType;
+import io.github.ethanBostick.events.ZoomEvent;
 
 import java.lang.Math;
 import java.util.Random;
@@ -13,25 +14,14 @@ import java.util.Random;
 import com.badlogic.ashley.core.Entity;
 //GDX stuff
 import com.badlogic.gdx.utils.Array;
-<<<<<<< HEAD
-=======
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.ObjectMap;
->>>>>>> e7fcbfae8b1747592887535f2ffbc699234e6598
 
 public class Map implements Observer{
 	private static Map theInstance = null;
 	private int size = 0;
-<<<<<<< HEAD
 	private int w = 0;
 	private Random random = null;
 	private Array<Entity>[] map;
 	private EntityBuilder entityBuilder = null;
-=======
-	private static Random random = null;
-	private 
-	//private ObjectMap<, Array<Entity>> map;
->>>>>>> e7fcbfae8b1747592887535f2ffbc699234e6598
 
 	private Map(){
 		this.random = new Random();
