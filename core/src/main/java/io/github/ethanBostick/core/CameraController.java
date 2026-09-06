@@ -1,6 +1,5 @@
 package io.github.ethanBostick.core;
 
-import io.github.ethanBostick.core.Observer;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventType;
 import io.github.ethanBostick.events.ZoomEvent;
@@ -11,7 +10,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
