@@ -3,6 +3,7 @@ package io.github.ethanBostick.screens;
 import io.github.ethanBostick.ui.GameHUD;
 import io.github.ethanBostick.input.MapInputAdapter;
 import io.github.ethanBostick.input.InputManager;
+import io.github.ethanBostick.ecs.MapGenerationSystem;
 import io.github.ethanBostick.ecs.RenderSystem;
 import io.github.ethanBostick.core.CameraController;
 
@@ -38,9 +39,11 @@ public class GameScreen implements Screen {
 		//init Ashley ECS
 		this.engine = new Engine();
 		this.engine.addSystem(new RenderSystem(new SpriteBatch(),camera));
+
 		EntityBuilder entityBuilder = EntityBuilder.instance(engine);
 		Map map = Map.instance();
 		map.initMap(30);
+		
 
 		Gdx.input.setInputProcessor(this.inputManager.getMultiplexer());
 	}
