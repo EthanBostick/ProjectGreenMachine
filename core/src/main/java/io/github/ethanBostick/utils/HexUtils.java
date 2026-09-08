@@ -19,6 +19,33 @@ public final class HexUtils {
         return Math.round(Y_SCALE * (p.r + 0.5f * p.q));
     }
 
+    public static IntArray getAreaAround(Position p,int size, IntArray output) {
+        int centerQ = p.q;
+        int centerR = p.r;
+        output.clear();
+
+		for (int q = -size ; q < size ; q ++){
+			for (int r = Math.max(-size, -q - size); r < Math.min(size, -q + size); r ++){
+                output.add(q+centerQ);
+                output.add(r+centerR);
+            }
+        }
+
+        return output;
+    }
+    public static IntArray getAreaAround(int centerQ, int centerR, int size, IntArray output) {
+        output.clear();
+
+		for (int q = -size ; q <= size ; q ++){
+			for (int r = Math.max(-size, -q - size); r <= Math.min(size, -q + size); r ++){
+                output.add(q+centerQ);
+                output.add(r+centerR);
+            }
+        }
+
+        return output;
+    }
+
     public static IntArray getNeighborsPositions(Position p, IntArray output) {
         int q = p.q;
         int r = p.r;

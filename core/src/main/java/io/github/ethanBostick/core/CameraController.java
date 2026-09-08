@@ -20,7 +20,7 @@ public class CameraController implements Observer{
     // Movement speeds & limits
     private float moveSpeed = 400f; // pixels per second
     private float minZoom = 0.5f;
-    private float maxZoom = 2.0f;
+    private float maxZoom = 4.0f;
     private final Vector2 targetPosition = new Vector2();
 
     public CameraController(float virtualWidth, float virtualHeight, OrthographicCamera camera) {

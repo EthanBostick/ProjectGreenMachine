@@ -3,7 +3,6 @@ package io.github.ethanBostick.screens;
 import io.github.ethanBostick.ui.GameHUD;
 import io.github.ethanBostick.input.MapInputAdapter;
 import io.github.ethanBostick.input.InputManager;
-import io.github.ethanBostick.ecs.MapGenerationSystem;
 import io.github.ethanBostick.ecs.RenderSystem;
 import io.github.ethanBostick.core.CameraController;
 
@@ -42,10 +41,14 @@ public class GameScreen implements Screen {
 
 		EntityBuilder entityBuilder = EntityBuilder.instance(engine);
 		Map map = Map.instance();
-		map.initMap(100);
-
-		this.engine.addSystem(new MapGenerationSystem(0.75, map));
-		
+		double[] concentrations = new double[6];
+		concentrations[0] = 0.4;
+		concentrations[1] = 0.49;
+		concentrations[2] = 0.58;
+		concentrations[3] = 0.67;
+		concentrations[4] = 0.76;
+		concentrations[5] = 0.85;
+		map.initMap(100,concentrations,0.75,8);
 
 		Gdx.input.setInputProcessor(this.inputManager.getMultiplexer());
 	}
