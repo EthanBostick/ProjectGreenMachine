@@ -44,11 +44,9 @@ public class Map implements Observer{
 
 	public Entity getEntityAt(int q, int r, TilePosition t){
 
-		if(Math.abs(q) >= this.size || Math.abs(r) >= Math.min(this.size, -q + this.size)){
+		if(Math.abs(q) >= this.size || Math.abs(r) >= this.size || Math.abs(q+r) >= this.size){
 			return null;
 		}
-		System.out.println(q);
-		System.out.println(r);
 
 		int i = getIndex(q, r);
 		return this.map[i].get(t);
@@ -67,26 +65,38 @@ public class Map implements Observer{
 				this.map[index] = new ObjectMap<TilePosition,Entity>(2); 
 
 				// entityBuilder.createHex(q,r, "hex_template.png");
-				int rInt = this.random.nextInt(8);
+				int rInt = this.random.nextInt(16);
 				int rock = this.random.nextInt(4);
 				
 				Entity tileEntity = null;
 				Entity rockEntity = null;
 
-				if (rInt <= 1){
+				if (rInt <= 3){
 					tileEntity = entityBuilder.createRenderable(q,r,0, "hex_template.png");
 					entityBuilder.addBiome(BiomeType.BLANK, tileEntity);
 				}
-				else if (rInt <= 3){
+				else if (rInt <= 5){
 					tileEntity = entityBuilder.createRenderable(q,r, 0, "sand.png");
 					entityBuilder.addBiome(BiomeType.DESERT, tileEntity);
 				}
-				else if (rInt <= 5){
-					tileEntity = entityBuilder.createRenderable(q,r,0, "dirt.png");
+				else if (rInt <= 7){
+					tileEntity = entityBuilder.createRenderable(q,r,0, "grass.png");
 					entityBuilder.addBiome(BiomeType.FOREST, tileEntity);
 				}
+				else if (rInt <= 9){
+					tileEntity = entityBuilder.createRenderable(q,r,0, "taiga.png");
+					entityBuilder.addBiome(BiomeType.TAIGA, tileEntity);
+				}
+				else if (rInt <= 11){
+					tileEntity = entityBuilder.createRenderable(q,r,0, "boreal.png");
+					entityBuilder.addBiome(BiomeType.BOREAL, tileEntity);
+				}
+				else if (rInt <= 13){
+					tileEntity = entityBuilder.createRenderable(q,r,0, "mountain.png");
+					entityBuilder.addBiome(BiomeType.MOUNTAIN, tileEntity);
+				}
 				else{
-					tileEntity = entityBuilder.createRenderable(q,r,0, "grass.png");
+					tileEntity = entityBuilder.createRenderable(q,r,0, "grassLand.png");
 					entityBuilder.addBiome(BiomeType.GRASS_LAND, tileEntity);
 				}
 

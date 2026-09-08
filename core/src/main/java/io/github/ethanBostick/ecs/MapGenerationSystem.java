@@ -63,14 +63,14 @@ public class MapGenerationSystem extends IteratingSystem{
                 int neighborTemp = neighborBiome.temp;
 
                 if (neighborTemp != -1){
-                    int diff = Math.abs(selfTemp - neighborTemp);
-                    double simularity = Math.max(0,1-(diff/100));
+                    double diff = Math.abs(selfTemp - neighborTemp);
+                    double simularity = Math.max(0.0,1.0-(diff/100.0));
                     simularitySum += simularity;
                     numNeighbors ++;
                 }
             }
         }
-        return (simularitySum/numNeighbors);
+        return (numNeighbors == 0) ? 0 : simularitySum/numNeighbors;
     }
 
     private void swapTiles(Entity self, Entity target){
@@ -86,6 +86,9 @@ public class MapGenerationSystem extends IteratingSystem{
 
         this.map.setEntityAt(targetPosition.q, targetPosition.r, target, TilePosition.TILE);
         this.map.setEntityAt(selfPosition.q, selfPosition.r, self, TilePosition.TILE);
+
+        this.blankTiles[this.map.getIndex(selfPosition.q,selfPosition.r)] = null;
+        this.blankTiles[this.map.getIndex(targetPosition.q,targetPosition.r)] = target;
     }
 
     @Override
@@ -113,6 +116,7 @@ public class MapGenerationSystem extends IteratingSystem{
         }
 
         if (this.getHappiness(entity) < this.thresh){
+
             Entity blankTile = getRandomBlank();
             if(blankTile != null){
                 this.swapTiles(entity, blankTile);
