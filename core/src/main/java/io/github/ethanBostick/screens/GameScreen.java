@@ -43,6 +43,8 @@ public class GameScreen implements Screen {
 		EntityBuilder entityBuilder = EntityBuilder.instance(engine);
 		Map map = Map.instance();
 		map.initMap(30);
+
+		this.engine.addSystem(new MapGenerationSystem(0.75, map));
 		
 
 		Gdx.input.setInputProcessor(this.inputManager.getMultiplexer());

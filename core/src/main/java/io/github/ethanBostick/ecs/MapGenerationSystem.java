@@ -3,7 +3,6 @@ package io.github.ethanBostick.ecs;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.HexUtils;
-import com.badlogic.gdx.math.MathUtils;
 
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.core.Entity;
@@ -13,7 +12,7 @@ import com.badlogic.gdx.utils.IntArray;
 
 
 public class MapGenerationSystem extends IteratingSystem{
-    private int thresh;
+    private double thresh;
     private Map map;
     private Entity[] blankTiles;
     private IntArray tempNeighbors = null;
@@ -22,7 +21,7 @@ public class MapGenerationSystem extends IteratingSystem{
     private static ComponentMapper<Position> pMap = ComponentMapper.getFor(Position.class);
     private static ComponentMapper<Biome> bMap = ComponentMapper.getFor(Biome.class);
 
-    public MapGenerationSystem(int thresh, Map map) {
+    public MapGenerationSystem(double thresh, Map map) {
         super(Family.all(Position.class, Biome.class).get());
         this.thresh = thresh;
         this.map = map;
@@ -44,28 +43,49 @@ public class MapGenerationSystem extends IteratingSystem{
         }
         return selected; 
     }
-    private int getHappiness(Position p){
+    private double getHappiness(Entity self){
         if(this.tempNeighbors == null){
             this.tempNeighbors = new IntArray();
         }
+        Biome selfBiome = bMap.get(self);
+        int selfTemp = selfBiome.temp;
 
-        HexUtils.getNeighborsPositions(p, this.tempNeighbors);
+        HexUtils.getNeighborsPositions(pMap.get(self), this.tempNeighbors);
         int numNeighbors = 0;
-        int simularitySum = 0;
+        double simularitySum = 0;
 
         for (int i = 0 ; i < tempNeighbors.size; i += 2){
-            Entity neighbor = this.map.getMapPosition(this.tempNeighbors.items[i],this.tempNeighbors.items[i+1], TilePosition.TILE);
+            Entity neighbor = this.map.getEntityAt(this.tempNeighbors.items[i],this.tempNeighbors.items[i+1], TilePosition.TILE);
 
             if(neighbor == null) continue;
             else{
-                Position neighborPosition = pMap.get(neighbor);
-                Biome neighBiome = bMap.get(neighbor);
+                Biome neighborBiome = bMap.get(neighbor);
+                int neighborTemp = neighborBiome.temp;
 
-                numNeighbors ++;
+                if (neighborTemp != -1){
+                    int diff = Math.abs(selfTemp - neighborTemp);
+                    double simularity = Math.max(0,1-(diff/100));
+                    simularitySum += simularity;
+                    numNeighbors ++;
+                }
             }
         }
+        return (simularitySum/numNeighbors);
+    }
 
-        return 0;
+    private void swapTiles(Entity self, Entity target){
+        Position selfPosition = pMap.get(self);
+        Position targetPosition = pMap.get(target);
+        int tempQ, tempR;
+        tempQ = selfPosition.q;
+        tempR = selfPosition.r;
+        selfPosition.q = targetPosition.q;
+        selfPosition.r = targetPosition.r;
+        targetPosition.q = tempQ;
+        targetPosition.r = tempR;
+
+        this.map.setEntityAt(targetPosition.q, targetPosition.r, target, TilePosition.TILE);
+        this.map.setEntityAt(selfPosition.q, selfPosition.r, self, TilePosition.TILE);
     }
 
     @Override
@@ -92,9 +112,11 @@ public class MapGenerationSystem extends IteratingSystem{
             return;
         }
 
-        Entity blankTile = getRandomBlank();
-        if(blankTile != null){
-
+        if (this.getHappiness(entity) < this.thresh){
+            Entity blankTile = getRandomBlank();
+            if(blankTile != null){
+                this.swapTiles(entity, blankTile);
+            }
         }
     }
 }

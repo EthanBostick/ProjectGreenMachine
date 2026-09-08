@@ -3,6 +3,7 @@ package io.github.ethanBostick.map;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.core.Observer;
+import io.github.ethanBostick.ecs.BiomeType;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventType;
@@ -28,7 +29,7 @@ public class Map implements Observer{
 		this.entityBuilder = EntityBuilder.instance();
 	}
 
-	public void setMapPosition(int q, int r, Entity e, TilePosition t){
+	public void setEntityAt(int q, int r, Entity e, TilePosition t){
 		int i = getIndex(q, r);
 		this.map[i].put(t, e);
 	}
@@ -41,16 +42,19 @@ public class Map implements Observer{
 		return (q + this.size) + ((r+this.size) * w);
 	}
 
-	public Entity getMapPosition(int q, int r, TilePosition t){
+	public Entity getEntityAt(int q, int r, TilePosition t){
 
 		if(Math.abs(q) >= this.size || Math.abs(r) >= Math.min(this.size, -q + this.size)){
 			return null;
 		}
+		System.out.println(q);
+		System.out.println(r);
 
 		int i = getIndex(q, r);
 		return this.map[i].get(t);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void initMap(int size){
 		this.size = size;
 		this.w = (size*2) + 1;
@@ -63,30 +67,37 @@ public class Map implements Observer{
 				this.map[index] = new ObjectMap<TilePosition,Entity>(2); 
 
 				// entityBuilder.createHex(q,r, "hex_template.png");
-				int rInt = this.random.nextInt(7);
+				int rInt = this.random.nextInt(8);
 				int rock = this.random.nextInt(4);
 				
 				Entity tileEntity = null;
 				Entity rockEntity = null;
 
-				if (rInt > 1 && rInt < 4){
-					tileEntity = entityBuilder.createRenderable(q,r,1, "grass.png");
+				if (rInt <= 1){
+					tileEntity = entityBuilder.createRenderable(q,r,0, "hex_template.png");
+					entityBuilder.addBiome(BiomeType.BLANK, tileEntity);
 				}
-				else if (rInt > 3){
+				else if (rInt <= 3){
 					tileEntity = entityBuilder.createRenderable(q,r, 0, "sand.png");
+					entityBuilder.addBiome(BiomeType.DESERT, tileEntity);
+				}
+				else if (rInt <= 5){
+					tileEntity = entityBuilder.createRenderable(q,r,0, "dirt.png");
+					entityBuilder.addBiome(BiomeType.FOREST, tileEntity);
 				}
 				else{
-					tileEntity = entityBuilder.createRenderable(q,r,0, "dirt.png");
+					tileEntity = entityBuilder.createRenderable(q,r,0, "grass.png");
+					entityBuilder.addBiome(BiomeType.GRASS_LAND, tileEntity);
 				}
 
 					this.entityBuilder.addToEngine(tileEntity);
 					this.map[index].put(TilePosition.TILE,tileEntity);
 
-				if (rock == 1){
-					rockEntity = entityBuilder.createRenderable(q,r, 2, "rock.png");
-					this.map[index].put(TilePosition.ENTITY, rockEntity);
-					this.entityBuilder.addToEngine(rockEntity);
-				}
+				// if (rock == 1){
+				// 	rockEntity = entityBuilder.createRenderable(q,r, 2, "rock.png");
+				// 	this.map[index].put(TilePosition.ENTITY, rockEntity);
+				// 	this.entityBuilder.addToEngine(rockEntity);
+				// }
 
 				if (q == 0 && r == 0){
 					//do not track, for visual only

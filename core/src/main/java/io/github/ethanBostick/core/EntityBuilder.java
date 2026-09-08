@@ -1,6 +1,9 @@
 package io.github.ethanBostick.core;
 
 import com.badlogic.ashley.core.Entity;
+
+import io.github.ethanBostick.ecs.Biome;
+import io.github.ethanBostick.ecs.BiomeType;
 import io.github.ethanBostick.ecs.Position;
 import io.github.ethanBostick.ecs.Sprite;
 
@@ -36,6 +39,35 @@ public class EntityBuilder {
 
 		return entity;
     }
+
+	public void addBiome(BiomeType b, Entity e){
+		Biome biome = this.engine.createComponent(Biome.class);
+		biome.biomeType = b;
+		switch (b){
+			case GRASS_LAND:
+				biome.temp = 75;
+				break;
+			case DESERT:
+				biome.temp = 100;
+				break;
+			case FOREST:
+				biome.temp = 65;
+				break;
+			case TAIGA:
+				biome.temp = 15;
+				break;
+			case BOREAL:
+				biome.temp = 35;
+				break;
+			case MOUNTAIN:
+				biome.temp = 50;
+				break;
+			case BLANK:
+				biome.temp = -1;
+				break;
+		}
+		e.add(biome);
+	}
 
 	public void addToEngine(Entity e){
 		this.engine.addEntity(e);
