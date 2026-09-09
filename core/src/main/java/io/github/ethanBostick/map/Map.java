@@ -102,13 +102,12 @@ public class Map implements Observer{
 				Entity tileEntity = null;
 				switch(initGrid[index]){
 					case 65:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "grass.png");
+						tileEntity = entityBuilder.createRenderable(q,r,0, "forestFloor.png");
 						entityBuilder.addBiome(BiomeType.FOREST, tileEntity);
 
 						if (rInt <= 0.45){
 							Entity treeEntity = entityBuilder.createRenderable(q,r,1, "trees2.png");
-							this.map[index].put(TilePosition.ENTITY,tileEntity);
-							this.map[index].put(TilePosition.ENTITY,tileEntity);
+							this.map[index].put(TilePosition.ENTITY,treeEntity);
 							this.entityBuilder.addToEngine(treeEntity);
 						}
 						break;
@@ -117,8 +116,13 @@ public class Map implements Observer{
 						entityBuilder.addBiome(BiomeType.DESERT, tileEntity);
 						break;
 					case 75:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "grassLand.png");
+						tileEntity = entityBuilder.createRenderable(q,r,0, "grassFloor.png");
 						entityBuilder.addBiome(BiomeType.GRASS_LAND, tileEntity);
+						if (rInt <= 0.6){
+							Entity grassEntity = entityBuilder.createRenderable(q,r,1, "grass.png");
+							this.map[index].put(TilePosition.ENTITY,grassEntity);
+							this.entityBuilder.addToEngine(grassEntity);
+						}
 						break;
 					case 50:
 						tileEntity = entityBuilder.createRenderable(q,r,0, "mountain.png");
@@ -129,8 +133,7 @@ public class Map implements Observer{
 						entityBuilder.addBiome(BiomeType.TAIGA, tileEntity);
 						if (rInt <= 0.25){
 							Entity treeEntity = entityBuilder.createRenderable(q,r,1, "pineTrees1.png");
-							this.map[index].put(TilePosition.ENTITY,tileEntity);
-							this.map[index].put(TilePosition.ENTITY,tileEntity);
+							this.map[index].put(TilePosition.ENTITY,treeEntity);
 							this.entityBuilder.addToEngine(treeEntity);
 						}
 						break;
@@ -139,7 +142,7 @@ public class Map implements Observer{
 						entityBuilder.addBiome(BiomeType.BOREAL, tileEntity);
 						if (rInt <= 0.7){
 							Entity treeEntity = entityBuilder.createRenderable(q,r,1, "pineTrees1.png");
-							this.map[index].put(TilePosition.ENTITY,tileEntity);
+							this.map[index].put(TilePosition.ENTITY,treeEntity);
 							this.entityBuilder.addToEngine(treeEntity);
 						}
 						break;
