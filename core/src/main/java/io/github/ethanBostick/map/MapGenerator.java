@@ -155,7 +155,6 @@ public class MapGenerator {
         return writeGrid;
     }
 
-    // Helper method to ensure we only use your specific temperature buckets
     private int snapToClosestTemp(int target, int[] validTemps) {
         int closest = validTemps[0];
         int minDiff = Math.abs(target - closest);
