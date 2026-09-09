@@ -12,6 +12,12 @@ public class EventFactory {
             return new ScreenChangeEvent();
         }
     };
+    public final Pool<ZoomEvent> zoomEventPool = new Pool<ZoomEvent>() {
+        @Override
+        protected ZoomEvent newObject() {
+            return new ZoomEvent();
+        }
+    };
 
 	private EventFactory(){}
 

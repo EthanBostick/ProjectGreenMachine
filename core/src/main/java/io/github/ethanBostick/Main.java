@@ -1,12 +1,10 @@
 package io.github.ethanBostick;
 
 import io.github.ethanBostick.core.Observer;
-import io.github.ethanBostick.ecs.RenderSystem;
-import io.github.ethanBostick.core.EventBus;
-
 //events
 import io.github.ethanBostick.events.ScreenChangeEvent;
 import io.github.ethanBostick.events.Event;
+import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventType;
 
 // init Screen
@@ -16,21 +14,14 @@ import io.github.ethanBostick.screens.MenuScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
-//testing
-import io.github.ethanBostick.map.Map;
-import io.github.ethanBostick.core.HexFactory;
-//end testing
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game implements Observer {
 
 	public AssetManager assetManager;
-	public Engine engine;
 
     @Override
     public void create() {
@@ -42,12 +33,6 @@ public class Main extends Game implements Observer {
 
 		//load global textures/fonts if needed
 
-		//init Ashley ECS
-		this.engine = new Engine();
-		this.engine.addSystem(new RenderSystem(new SpriteBatch()));
-		HexFactory hexFactory = HexFactory.instance(engine);
-		Map map = Map.instance();
-		map.generateMap(5);
 
 		//init screen
 		this.setScreen(new MenuScreen()); //initialized ui
@@ -62,7 +47,6 @@ public class Main extends Game implements Observer {
 
 		//dont render entities until on the gamescreen
 		if (!(this.getScreen() instanceof MenuScreen)){
-			this.engine.update(delta);
 		}
 
 		super.render(); //delegates rendering to active screen

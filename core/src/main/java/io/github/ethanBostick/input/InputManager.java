@@ -4,9 +4,6 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.InputMultiplexer;
 
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Gdx;
-
 public class InputManager{
 	private InputMultiplexer multiplexer;
 
@@ -34,11 +31,5 @@ public class InputManager{
 
 	public InputMultiplexer	getMultiplexer(){
 		return this.multiplexer;
-	}
-
-	public void poll(){
-		if(Gdx.input.isKeyPressed(Input.Keys.W)){
-			System.out.println("W");
-		}
 	}
 }
