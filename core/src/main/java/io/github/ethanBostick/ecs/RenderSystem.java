@@ -15,16 +15,13 @@ public class RenderSystem extends SortedIteratingSystem{
     private final SpriteBatch batch;
     private OrthographicCamera camera = null;
 
-    private static ComponentMapper<Position> pMap = ComponentMapper.getFor(Position.class);
-    private static ComponentMapper<Sprite> sMap = ComponentMapper.getFor(Sprite.class);
-
     //inline class to sort entities by layer
     private static class LayerComparator implements Comparator<Entity> {
         @Override
         public int compare(Entity e1, Entity e2) {
             //invert the layer values so lowest renders first
-            int layer1 = -pMap.get(e1).layer;
-            int layer2 = -pMap.get(e2).layer;
+            int layer1 = -Mappers.positionCMap.get(e1).layer;
+            int layer2 = -Mappers.positionCMap.get(e2).layer;
             
             return Integer.compare(layer2, layer1);
         }
@@ -55,8 +52,8 @@ public class RenderSystem extends SortedIteratingSystem{
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        Position position = pMap.get(entity);
-        Sprite sprite = sMap.get(entity);
+        Position position = Mappers.positionCMap.get(entity);
+        Sprite sprite = Mappers.spriteCMap.get(entity);
 
         if (sprite.texture != null){
             float pixelX = HexUtils.getPixelX(position);

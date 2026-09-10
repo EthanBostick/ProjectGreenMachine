@@ -3,12 +3,8 @@ package io.github.ethanBostick.ecs;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.core.ComponentMapper;
-
 
 public class ActionSystem extends IteratingSystem{
-    private static ComponentMapper<MouseState> mMap = ComponentMapper.getFor(MouseState.class);
-    private static ComponentMapper<Position> pMap = ComponentMapper.getFor(Position.class);
 
     public ActionSystem() {
         super(Family.all(MouseState.class, Position.class).get());
@@ -21,11 +17,10 @@ public class ActionSystem extends IteratingSystem{
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        Position position = pMap.get(entity);
-        MouseState state = mMap.get(entity);
+        Position position = Mappers.positionCMap.get(entity);
+        MouseState state = Mappers.mouseStateCMap.get(entity);
         int q = position.q;
         int r = position.r;
-
     }
 }
 
