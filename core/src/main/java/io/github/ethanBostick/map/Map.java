@@ -42,9 +42,13 @@ public class Map implements Observer{
 		return (q + this.size) + ((r+this.size) * w);
 	}
 
+	public boolean outOfMapBounds(int q, int r){
+		return (Math.abs(q) > this.size || Math.abs(r) > this.size || Math.abs(q+r) > this.size);
+	}
+
 	public Entity getEntityAt(int q, int r, TilePosition t){
 
-		if(Math.abs(q) > this.size || Math.abs(r) > this.size || Math.abs(q+r) > this.size){
+		if(outOfMapBounds(q, r)){
 			return null;
 		}
 

@@ -4,6 +4,9 @@ import io.github.ethanBostick.ui.GameHUD;
 import io.github.ethanBostick.input.GameController;
 import com.badlogic.gdx.InputMultiplexer;
 import io.github.ethanBostick.ecs.RenderSystem;
+import io.github.ethanBostick.ecs.ActionSystem;
+import io.github.ethanBostick.ecs.SelectionSystem;
+import io.github.ethanBostick.ecs.Sprite;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
@@ -33,6 +36,10 @@ public class GameScreen implements Screen {
         OrthographicCamera camera = new OrthographicCamera();
 		this.engine = new Engine();
 		this.engine.addSystem(new RenderSystem(new SpriteBatch(),camera));
+		this.engine.addSystem(new ActionSystem());
+		Sprite highlightSprite = this.engine.createComponent(Sprite.class);
+		Position highlightPosition = this.engine.createComponent(Position.class);
+		this.engine.addSystem(new SelectionSystem(highlightSprite, highlightPosition));
 
 		EntityBuilder entityBuilder = EntityBuilder.instance(engine);
 		Map map = Map.instance();
@@ -52,6 +59,8 @@ public class GameScreen implements Screen {
 		MouseState mouseState = this.engine.createComponent(MouseState.class);
 		Position mousePosition = this.engine.createComponent(Position.class);
 		entityBuilder.initMouse(mousePosition, mouseState);
+		entityBuilder.initHighlighter(highlightPosition, highlightSprite);
+
 		this.gameController = new GameController(500, 500, camera, mouseState, mousePosition);
 		this.multiplexer.addProcessor(this.gameController);
 		Gdx.input.setInputProcessor(this.multiplexer);

@@ -99,7 +99,7 @@ public class GameController extends InputAdapter{
 
     @Override 
     public boolean touchUp(int screenX, int screenY, int pointer, int button){
-
+        this.mouseState.pressedDown = false;
         return true;
     }
 

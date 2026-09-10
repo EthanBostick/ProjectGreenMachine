@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 
 
 public class Sprite implements Component, Poolable{
-	public Texture texture;
+	public Texture texture = null;
 
 	public Sprite(){
 	}

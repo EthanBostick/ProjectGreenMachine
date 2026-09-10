@@ -7,30 +7,21 @@ import io.github.ethanBostick.ecs.BiomeType;
 import io.github.ethanBostick.ecs.Position;
 import io.github.ethanBostick.ecs.MouseState;
 import io.github.ethanBostick.ecs.Sprite;
+import io.github.ethanBostick.utils.TextureUtils;
 
 //libGDX stuff
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.utils.ObjectMap;
 
 public class EntityBuilder {
 	private static EntityBuilder theInstance = null;
     private Engine engine = null;
-	private ObjectMap<String, Texture> textureMap;
 
     public Entity createRenderable(int q, int r, int renderLayer, String texturePath){
 		Entity entity = this.engine.createEntity();
-		Texture texture = this.textureMap.get(texturePath); 
-
-		if (texture == null){
-			texture = new Texture(Gdx.files.internal(texturePath));
-			this.textureMap.put(texturePath,texture);
-		}
 
 		Sprite s = this.engine.createComponent(Sprite.class);
 		Position p = this.engine.createComponent(Position.class);
-        s.texture = texture;
+        s.texture = TextureUtils.pathToTexture(texturePath);
         p.q = q;
 		p.r = r;
 		p.layer = renderLayer;
@@ -39,6 +30,19 @@ public class EntityBuilder {
 		entity.add(s);
 
 		return entity;
+    }
+
+    public void initHighlighter(Position p, Sprite s){
+		Entity entity = this.engine.createEntity();
+
+		p.q = 0;
+		p.r = 0;
+		p.layer = 99;
+
+		entity.add(p);
+		entity.add(s);
+
+		this.addToEngine(entity);
     }
 
 	public void addBiome(BiomeType b, Entity e){
@@ -82,7 +86,6 @@ public class EntityBuilder {
 	}
 
 	private EntityBuilder(Engine e){
-		this.textureMap = new ObjectMap<>(2); //argue estimated size
         this.engine = e;
     }
 
