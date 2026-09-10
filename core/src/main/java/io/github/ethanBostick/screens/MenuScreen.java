@@ -4,7 +4,8 @@ package io.github.ethanBostick.screens;
 import io.github.ethanBostick.ui.MenuHUD;
 // Input
 import io.github.ethanBostick.input.MenuInputAdapter;
-import io.github.ethanBostick.input.InputManager;
+import com.badlogic.gdx.InputMultiplexer;
+
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
@@ -12,17 +13,18 @@ import com.badlogic.gdx.Gdx;
 public class MenuScreen implements Screen {
 
 	private MenuHUD menuHUD;
-	private InputManager inputManager;
+    private InputMultiplexer multiplexer;
 
 	public MenuScreen(){}
 
 	@Override
 	public void show() {
+        //init Input and UI
+		this.multiplexer = new InputMultiplexer();
 		this.menuHUD = new MenuHUD();
-		this.inputManager = new InputManager(this.menuHUD.stage); //ui stage index 0
-		this.inputManager.addProcessor(new MenuInputAdapter());
-
-		Gdx.input.setInputProcessor(this.inputManager.getMultiplexer());
+		this.multiplexer.addProcessor(0,this.menuHUD.stage); 
+		this.multiplexer.addProcessor(new MenuInputAdapter());
+		Gdx.input.setInputProcessor(this.multiplexer);
 	}
 
     @Override

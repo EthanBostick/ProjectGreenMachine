@@ -45,8 +45,5 @@ public class EventBus{
 		if (event instanceof ScreenChangeEvent){
 			EventFactory.instance().screenChangeEventPool.free((ScreenChangeEvent)event); //calls the events reset()
 		}
-		else if (event instanceof ZoomEvent){
-			EventFactory.instance().zoomEventPool.free((ZoomEvent)event);
-		}
 	}
 }

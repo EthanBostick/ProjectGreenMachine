@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import io.github.ethanBostick.ecs.Biome;
 import io.github.ethanBostick.ecs.BiomeType;
 import io.github.ethanBostick.ecs.Position;
+import io.github.ethanBostick.ecs.MouseState;
 import io.github.ethanBostick.ecs.Sprite;
 
 //libGDX stuff
@@ -67,6 +68,13 @@ public class EntityBuilder {
 				break;
 		}
 		e.add(biome);
+	}
+
+	public void initMouse(Position mousePosition, MouseState mouseState){
+		Entity entity = this.engine.createEntity();
+		entity.add(mousePosition);
+		entity.add(mouseState);
+		this.engine.addEntity(entity);
 	}
 
 	public void addToEngine(Entity e){

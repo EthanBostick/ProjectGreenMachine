@@ -61,11 +61,9 @@ public class RenderSystem extends SortedIteratingSystem{
         if (sprite.texture != null){
             float pixelX = HexUtils.getPixelX(position);
             float pixelY = HexUtils.getPixelY(position);
-            float width = 64;
-            float height = 52;
 
             // Only draw if the sprite's bounding box intersects the camera's view
-            if (camera.frustum.boundsInFrustum(pixelX + width/2f, pixelY + height/2f, 0, width/2f, height/2f, 0)) {
+            if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
                 batch.draw(sprite.texture, pixelX, pixelY);
             }
         }

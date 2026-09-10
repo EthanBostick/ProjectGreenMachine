@@ -1,21 +1,25 @@
-package io.github.ethanBostick.core;
+package io.github.ethanBostick.input;
 
-import io.github.ethanBostick.events.Event;
-import io.github.ethanBostick.events.EventType;
-import io.github.ethanBostick.events.ZoomEvent;
-import io.github.ethanBostick.events.EventBus;
+import io.github.ethanBostick.ecs.Position;
+import io.github.ethanBostick.ecs.MouseState;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import io.github.ethanBostick.utils.HexUtils;
 
-public class CameraController implements Observer{
+public class GameController extends InputAdapter{
     private final OrthographicCamera camera;
     private final Viewport viewport;
+    private final Position mousePosition;
+    private final MouseState mouseState;
+    private Vector3 touchVector = new Vector3(0,0,0);
 
     // Movement speeds & limits
     private float moveSpeed = 400f; // pixels per second
@@ -23,16 +27,17 @@ public class CameraController implements Observer{
     private float maxZoom = 4.0f;
     private final Vector2 targetPosition = new Vector2();
 
-    public CameraController(float virtualWidth, float virtualHeight, OrthographicCamera camera) {
+    public GameController(float virtualWidth, float virtualHeight, OrthographicCamera camera, MouseState mouseState, Position mousePosition) {
         this.camera = camera;
+        this.mousePosition = mousePosition;
+        this.mouseState = mouseState;
+
         viewport = new ExtendViewport(virtualWidth, virtualHeight, camera);
         viewport.apply();
         
         // Center the camera on startup
         camera.position.set(virtualWidth / 2f, virtualHeight / 2f, 0);
         targetPosition.set(camera.position.x, camera.position.y);
-
-		EventBus.instance().subscribe(EventType.ZOOM,this);
     }
 
     public void resize(int width, int height){
@@ -42,8 +47,6 @@ public class CameraController implements Observer{
     public void update(float delta) {
         // Clamp zoom bounds
         camera.zoom = MathUtils.clamp(camera.zoom, minZoom, maxZoom);
-
-        // Crucial: recalculate matrices
         camera.update();
     }
 
@@ -64,10 +67,6 @@ public class CameraController implements Observer{
         }
     }
 
-    public void zoom(float amount) {
-        // e.g. amount from scrolled() in InputProcessor
-        camera.zoom += amount * 0.1f;
-    }
 
     public void setTarget(float x, float y) {
         this.targetPosition.set(x, y);
@@ -77,21 +76,60 @@ public class CameraController implements Observer{
         float halfWidth = (camera.viewportWidth * camera.zoom) / 2f;
         float halfHeight = (camera.viewportHeight * camera.zoom) / 2f;
 
-        camera.position.x = MathUtils.clamp(camera.position.x, minX + halfWidth, maxX - halfWidth);
-        camera.position.y = MathUtils.clamp(camera.position.y, minY + halfHeight, maxY - halfHeight);
+        this.camera.position.x = MathUtils.clamp(camera.position.x, minX + halfWidth, maxX - halfWidth);
+        this.camera.position.y = MathUtils.clamp(camera.position.y, minY + halfHeight, maxY - halfHeight);
     }
 
-    @Override
-    public void onEvent(Event event){
-		switch (event.getType()){
-			case ZOOM:
-                ZoomEvent zm = (ZoomEvent) event;
-                this.zoom(zm.amount);
-				break;
-			default:
-				System.out.println("unknown event");
-		}
+	//reads mouse clicks
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        this.touchVector.x = screenX;
+        this.touchVector.y = screenY;
+        this.touchVector = this.camera.unproject(this.touchVector);
+
+        this.mousePosition.x = this.touchVector.x;
+        this.mousePosition.y = this.touchVector.y;
+        this.mouseState.button = button;
+        this.mouseState.pressedDown = true;
+        HexUtils.getAxialFromPixel(mousePosition);
+        System.out.println("(Pixel) x= "+ this.mousePosition.x+ ", y= "+ this.mousePosition.y);
+        System.out.println("(Axial) q= "+ this.mousePosition.q+ ", r= "+ this.mousePosition.r);
+		return true;
+	}
+
+    @Override 
+    public boolean touchUp(int screenX, int screenY, int pointer, int button){
+
+        return true;
     }
+
+	//key read method
+	@Override
+	public boolean keyDown(int keycode){
+
+		switch(keycode){
+			case Input.Keys.W:
+				break;
+			case Input.Keys.S:
+				break;
+			case Input.Keys.A:
+				break;
+			case Input.Keys.D:
+				break;
+		}
+		return false;
+	}
+
+	//scroll wheel reading
+	@Override
+	public boolean scrolled(float amountX, float amountY){
+
+		if (amountY != 0){
+            camera.zoom += amountY * 0.1f;
+			return true;
+		}
+		return false;
+	}
 
     public OrthographicCamera getCamera() { return camera; }
     public Viewport getViewport() { return viewport; }
