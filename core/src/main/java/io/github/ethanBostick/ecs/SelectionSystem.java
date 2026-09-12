@@ -34,13 +34,13 @@ public class SelectionSystem extends IteratingSystem{
             selected.texture = TextureUtils.pathToTexture("selected.png");
 
             Entity selectedTile = Map.instance().getEntityAt(selectedPosition.q, selectedPosition.r, TilePosition.TILE);
-            BiomeType biomeType = Mappers.biomeCMap.get(selectedTile).biomeType;
-            int biomeTemp = Mappers.biomeCMap.get(selectedTile).temp;
+            // BiomeType biomeType = Mappers.biomeCMap.get(selectedTile).biomeType;
+            // int biomeTemp = Mappers.biomeCMap.get(selectedTile).temp;
 
-            System.out.println("--- TILE INFO ---");
-            System.out.println("Biome type: "+ biomeType);
-            System.out.println("temp: "+ biomeTemp);
-            System.out.println("--- --------- ---");
+            // System.out.println("--- TILE INFO ---");
+            // System.out.println("Biome type: "+ biomeType);
+            // System.out.println("temp: "+ biomeTemp);
+            // System.out.println("--- --------- ---");
         }
         else if (Map.instance().outOfMapBounds(position.q, position.r)){
             selected.texture = null;

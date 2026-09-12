@@ -92,14 +92,24 @@ public class GameController extends InputAdapter{
         this.mouseState.button = button;
         this.mouseState.pressedDown = true;
         HexUtils.getAxialFromPixel(mousePosition);
-        System.out.println("(Pixel) x= "+ this.mousePosition.x+ ", y= "+ this.mousePosition.y);
-        System.out.println("(Axial) q= "+ this.mousePosition.q+ ", r= "+ this.mousePosition.r);
+        // System.out.println("(Pixel) x= "+ this.mousePosition.x+ ", y= "+ this.mousePosition.y);
+        // System.out.println("(Axial) q= "+ this.mousePosition.q+ ", r= "+ this.mousePosition.r);
+        System.out.println("Mouse Down");
 		return true;
 	}
 
     @Override 
+    public boolean touchDragged(int screenX, int screenY, int pointer){
+        this.mouseState.heldDown = true;
+        System.out.println("dragging");
+        return true;
+    }
+
+    @Override 
     public boolean touchUp(int screenX, int screenY, int pointer, int button){
         this.mouseState.pressedDown = false;
+        this.mouseState.heldDown = false;
+        System.out.println("Mouse up");
         return true;
     }
 
