@@ -18,8 +18,16 @@ public final class HexUtils {
         return Math.round(X_SCALE * p.q);
     }
 
+    public static int getPixelX(int q) {
+        return Math.round(X_SCALE * q);
+    }
+
     public static int getPixelY(Position p) {
         return Math.round(Y_SCALE * (p.r + 0.5f * p.q));
+    }
+
+    public static int getPixelY(int q, int r) {
+        return Math.round(Y_SCALE * (r + 0.5f * q));
     }
 
     // translate a pixelCoord to Axial, used for mouse clicks

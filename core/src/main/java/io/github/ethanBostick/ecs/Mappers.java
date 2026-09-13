@@ -7,5 +7,6 @@ public class Mappers {
     public static final ComponentMapper<Sprite> spriteCMap = ComponentMapper.getFor(Sprite.class);
     public static final ComponentMapper<MouseState> mouseStateCMap = ComponentMapper.getFor(MouseState.class);
     public static final ComponentMapper<Biome> biomeCMap = ComponentMapper.getFor(Biome.class);
+    public static final ComponentMapper<MultiTiledSprite> multiTiledSpriteCMap = ComponentMapper.getFor(MultiTiledSprite.class);
 
 }

@@ -10,7 +10,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
-public class RenderSystem extends SortedIteratingSystem{
+public class MultiRenderSystem extends SortedIteratingSystem{
     private final SpriteBatch batch;
     private OrthographicCamera camera = null;
 
@@ -26,8 +26,8 @@ public class RenderSystem extends SortedIteratingSystem{
         }
     }
 
-    public RenderSystem(SpriteBatch batch, OrthographicCamera camera) {
-        super(Family.all(Position.class, Sprite.class).get(), new LayerComparator());
+    public MultiRenderSystem(SpriteBatch batch, OrthographicCamera camera) {
+        super(Family.all(MultiTiledSprite.class).get(), new LayerComparator());
         this.batch = batch;
         this.camera = camera;
     }
@@ -51,16 +51,18 @@ public class RenderSystem extends SortedIteratingSystem{
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        Position position = Mappers.positionCMap.get(entity);
-        Sprite sprite = Mappers.spriteCMap.get(entity);
+        MultiTiledSprite mts = Mappers.multiTiledSpriteCMap.get(entity);
 
-        if (sprite.texture != null){
-            float pixelX = HexUtils.getPixelX(position);
-            float pixelY = HexUtils.getPixelY(position);
+        if (mts.texture != null){
+            for (int i = 0 ; i < mts.points.size; i += 2){
 
-            // Only draw if the sprite's bounding box intersects the camera's view
-            if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
-                batch.draw(sprite.texture, pixelX, pixelY);
+                float pixelX = HexUtils.getPixelX(mts.points.get(i));
+                float pixelY = HexUtils.getPixelY(mts.points.get(i),mts.points.get(i+1));
+
+                // Only draw if the sprite's bounding box intersects the camera's view
+                if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
+                    batch.draw(mts.texture, pixelX, pixelY);
+                }
             }
         }
     }

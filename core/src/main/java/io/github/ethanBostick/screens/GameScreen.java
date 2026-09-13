@@ -4,6 +4,7 @@ import io.github.ethanBostick.ui.GameHUD;
 import io.github.ethanBostick.input.GameController;
 import com.badlogic.gdx.InputMultiplexer;
 import io.github.ethanBostick.ecs.RenderSystem;
+import io.github.ethanBostick.ecs.MultiRenderSystem;
 import io.github.ethanBostick.ecs.ActionSystem;
 import io.github.ethanBostick.ecs.SelectionSystem;
 import io.github.ethanBostick.ecs.Sprite;
@@ -35,7 +36,9 @@ public class GameScreen implements Screen {
 	//init Ashley ECS
         OrthographicCamera camera = new OrthographicCamera();
 		this.engine = new Engine();
-		this.engine.addSystem(new RenderSystem(new SpriteBatch(),camera));
+		SpriteBatch spriteBatch = new SpriteBatch();
+		this.engine.addSystem(new RenderSystem(spriteBatch,camera));
+		this.engine.addSystem(new MultiRenderSystem(spriteBatch,camera));
 		this.engine.addSystem(new ActionSystem());
 		Sprite highlightSprite = this.engine.createComponent(Sprite.class);
 		Position highlightPosition = this.engine.createComponent(Position.class);
