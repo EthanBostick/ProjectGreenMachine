@@ -1,9 +1,9 @@
 package io.github.ethanBostick.map;
 
-import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.core.Observer;
 import io.github.ethanBostick.ecs.BiomeType;
+import io.github.ethanBostick.ecs.EntityBuilder;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventType;

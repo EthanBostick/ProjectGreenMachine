@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 
 public class RenderSystem extends SortedIteratingSystem{
     private final SpriteBatch batch;
-    private OrthographicCamera camera = null;
+    private final OrthographicCamera camera;
 
     //inline class to sort entities by layer
     private static class LayerComparator implements Comparator<Entity> {
@@ -26,10 +26,10 @@ public class RenderSystem extends SortedIteratingSystem{
         }
     }
 
-    public RenderSystem(SpriteBatch batch, OrthographicCamera camera) {
+    public RenderSystem() {
         super(Family.all(Position.class, Sprite.class).get(), new LayerComparator());
-        this.batch = batch;
-        this.camera = camera;
+        this.batch = Registry.spriteBatch;
+        this.camera = Registry.camera;
     }
 
     @Override

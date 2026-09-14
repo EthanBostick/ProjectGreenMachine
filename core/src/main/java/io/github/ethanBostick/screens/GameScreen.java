@@ -6,20 +6,16 @@ import com.badlogic.gdx.InputMultiplexer;
 import io.github.ethanBostick.ecs.RenderSystem;
 import io.github.ethanBostick.ecs.MultiRenderSystem;
 import io.github.ethanBostick.ecs.ActionSystem;
+import io.github.ethanBostick.ecs.EntityBuilder;
 import io.github.ethanBostick.ecs.SelectionSystem;
-import io.github.ethanBostick.ecs.Sprite;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 //testing
 import io.github.ethanBostick.map.Map;
-import io.github.ethanBostick.core.EntityBuilder;
-import io.github.ethanBostick.ecs.Position;
-import io.github.ethanBostick.ecs.MouseState;
+import io.github.ethanBostick.ecs.Registry;
 //end testing
 
 public class GameScreen implements Screen {
@@ -34,17 +30,14 @@ public class GameScreen implements Screen {
 	@Override
 	public void show() {
 	//init Ashley ECS
-        OrthographicCamera camera = new OrthographicCamera();
 		this.engine = new Engine();
-		SpriteBatch spriteBatch = new SpriteBatch();
-		this.engine.addSystem(new RenderSystem(spriteBatch,camera));
-		this.engine.addSystem(new MultiRenderSystem(spriteBatch,camera));
+		EntityBuilder.instance(engine);
+		Registry.init();
+		this.engine.addSystem(new RenderSystem());
+		this.engine.addSystem(new MultiRenderSystem());
 		this.engine.addSystem(new ActionSystem());
-		Sprite highlightSprite = this.engine.createComponent(Sprite.class);
-		Position highlightPosition = this.engine.createComponent(Position.class);
-		this.engine.addSystem(new SelectionSystem(highlightSprite, highlightPosition));
+		this.engine.addSystem(new SelectionSystem());
 
-		EntityBuilder entityBuilder = EntityBuilder.instance(engine);
 		Map map = Map.instance();
 		double[] concentrations = new double[6];
 		concentrations[0] = 0.4;
@@ -59,12 +52,7 @@ public class GameScreen implements Screen {
 		this.multiplexer = new InputMultiplexer();
 		this.gameHUD = new GameHUD();
 		this.multiplexer.addProcessor(0,this.gameHUD.stage); 
-		MouseState mouseState = this.engine.createComponent(MouseState.class);
-		Position mousePosition = this.engine.createComponent(Position.class);
-		entityBuilder.initMouse(mousePosition, mouseState);
-		entityBuilder.initHighlighter(highlightPosition, highlightSprite);
-
-		this.gameController = new GameController(500, 500, camera, mouseState, mousePosition);
+		this.gameController = new GameController(500, 500);
 		this.multiplexer.addProcessor(this.gameController);
 		Gdx.input.setInputProcessor(this.multiplexer);
 	}
@@ -100,5 +88,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
+		Registry.dispose();
     }
 }

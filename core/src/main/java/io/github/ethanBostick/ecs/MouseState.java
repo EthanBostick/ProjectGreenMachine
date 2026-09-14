@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Component;
 
 
 public class MouseState implements Component, Poolable{
+    public boolean clearSelect = false;
     public boolean pressedDown = false;
     public boolean pressedUp = false;
     public boolean heldDown = false;
@@ -15,6 +16,7 @@ public class MouseState implements Component, Poolable{
 	@Override
 	public void reset(){
         this.button = -1;
+        this.clearSelect = false;
         this.pressedDown = false;
         this.pressedUp = false;
         this.heldDown = false;

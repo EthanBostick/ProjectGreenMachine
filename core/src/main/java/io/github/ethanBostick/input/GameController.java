@@ -1,7 +1,8 @@
 package io.github.ethanBostick.input;
 
-import io.github.ethanBostick.ecs.Position;
-import io.github.ethanBostick.ecs.MouseState;
+import io.github.ethanBostick.ecs.Mappers;
+import io.github.ethanBostick.ecs.Registry;
+import io.github.ethanBostick.utils.HexUtils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -12,13 +13,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import io.github.ethanBostick.utils.HexUtils;
+import com.badlogic.ashley.core.Entity;
 
 public class GameController extends InputAdapter{
     private final OrthographicCamera camera;
     private final Viewport viewport;
-    private final Position mousePosition;
-    private final MouseState mouseState;
+    private final Entity mouse;
     private Vector3 touchVector = new Vector3(0,0,0);
 
     // Movement speeds & limits
@@ -27,10 +27,9 @@ public class GameController extends InputAdapter{
     private float maxZoom = 4.0f;
     private final Vector2 targetPosition = new Vector2();
 
-    public GameController(float virtualWidth, float virtualHeight, OrthographicCamera camera, MouseState mouseState, Position mousePosition) {
-        this.camera = camera;
-        this.mousePosition = mousePosition;
-        this.mouseState = mouseState;
+    public GameController(float virtualWidth, float virtualHeight) {
+        this.camera = Registry.camera;
+        this.mouse = Registry.mouse;
 
         viewport = new ExtendViewport(virtualWidth, virtualHeight, camera);
         viewport.apply();
@@ -87,29 +86,31 @@ public class GameController extends InputAdapter{
         this.touchVector.y = screenY;
         this.touchVector = this.camera.unproject(this.touchVector);
 
-        this.mousePosition.x = this.touchVector.x;
-        this.mousePosition.y = this.touchVector.y;
-        this.mouseState.button = button;
-        this.mouseState.pressedDown = true;
-        HexUtils.getAxialFromPixel(mousePosition);
-        // System.out.println("(Pixel) x= "+ this.mousePosition.x+ ", y= "+ this.mousePosition.y);
-        // System.out.println("(Axial) q= "+ this.mousePosition.q+ ", r= "+ this.mousePosition.r);
-        System.out.println("Mouse Down");
+        Mappers.positionCMap.get(this.mouse).x = this.touchVector.x;
+        Mappers.positionCMap.get(this.mouse).y = this.touchVector.y;
+        Mappers.mouseStateCMap.get(this.mouse).button = button;
+        Mappers.mouseStateCMap.get(this.mouse).pressedDown = true;
+        HexUtils.getAxialFromPixel(Mappers.positionCMap.get(this.mouse));
 		return true;
 	}
 
     @Override 
     public boolean touchDragged(int screenX, int screenY, int pointer){
-        this.mouseState.heldDown = true;
-        System.out.println("dragging");
+        this.touchVector.x = screenX;
+        this.touchVector.y = screenY;
+        this.touchVector = this.camera.unproject(this.touchVector);
+
+        Mappers.positionCMap.get(this.mouse).x = this.touchVector.x;
+        Mappers.positionCMap.get(this.mouse).y = this.touchVector.y;
+        HexUtils.getAxialFromPixel(Mappers.positionCMap.get(this.mouse));
+        Mappers.mouseStateCMap.get(this.mouse).heldDown = true;
         return true;
     }
 
     @Override 
     public boolean touchUp(int screenX, int screenY, int pointer, int button){
-        this.mouseState.pressedDown = false;
-        this.mouseState.heldDown = false;
-        System.out.println("Mouse up");
+        Mappers.mouseStateCMap.get(this.mouse).pressedUp = true;
+        Mappers.mouseStateCMap.get(this.mouse).heldDown = false;
         return true;
     }
 
@@ -118,14 +119,10 @@ public class GameController extends InputAdapter{
 	public boolean keyDown(int keycode){
 
 		switch(keycode){
-			case Input.Keys.W:
-				break;
-			case Input.Keys.S:
-				break;
-			case Input.Keys.A:
-				break;
-			case Input.Keys.D:
-				break;
+			case Input.Keys.ESCAPE:
+                System.out.println("clearing selected");
+                Mappers.mouseStateCMap.get(this.mouse).clearSelect = true;
+		        return true;
 		}
 		return false;
 	}

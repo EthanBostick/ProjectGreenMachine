@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 
 public class MultiRenderSystem extends SortedIteratingSystem{
     private final SpriteBatch batch;
-    private OrthographicCamera camera = null;
+    private final OrthographicCamera camera;
 
     //inline class to sort entities by layer
     private static class LayerComparator implements Comparator<Entity> {
@@ -26,10 +26,10 @@ public class MultiRenderSystem extends SortedIteratingSystem{
         }
     }
 
-    public MultiRenderSystem(SpriteBatch batch, OrthographicCamera camera) {
-        super(Family.all(MultiTiledSprite.class).get(), new LayerComparator());
-        this.batch = batch;
-        this.camera = camera;
+    public MultiRenderSystem() {
+        super(Family.all(MultiTileSprite.class).get(), new LayerComparator());
+        this.batch = Registry.spriteBatch;
+        this.camera = Registry.camera;
     }
 
     @Override
@@ -51,17 +51,23 @@ public class MultiRenderSystem extends SortedIteratingSystem{
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        MultiTiledSprite mts = Mappers.multiTiledSpriteCMap.get(entity);
+        MultiTileSprite mts = Mappers.multiTileSpriteCMap.get(entity);
+        MultiTilePosition mtp = Mappers.multiTilePositionCMap.get(entity);
 
         if (mts.texture != null){
-            for (int i = 0 ; i < mts.points.size; i += 2){
+            for (int i = 0 ; i < mtp.points.size; i += 2){
 
-                float pixelX = HexUtils.getPixelX(mts.points.get(i));
-                float pixelY = HexUtils.getPixelY(mts.points.get(i),mts.points.get(i+1));
+                float pixelX = HexUtils.getPixelX(mtp.points.get(i));
+                float pixelY = HexUtils.getPixelY(mtp.points.get(i),mtp.points.get(i+1));
 
                 // Only draw if the sprite's bounding box intersects the camera's view
                 if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
-                    batch.draw(mts.texture, pixelX, pixelY);
+                    if (i+2 == mtp.points.size){
+                        batch.draw(mts.textureHead, pixelX, pixelY);
+                    }
+                    else{
+                        batch.draw(mts.texture, pixelX, pixelY);
+                    }
                 }
             }
         }

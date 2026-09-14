@@ -35,6 +35,7 @@ public class GameHUD {
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Cookie +1");
                 // Trigger your ECS event here
+                //send an event over to the render system to change the current rendering depth component (this depth component will be owned by the selection system, render system, multiTiledRender system, etc)
             }
         });
 

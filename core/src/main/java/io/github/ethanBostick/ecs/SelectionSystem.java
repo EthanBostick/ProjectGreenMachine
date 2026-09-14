@@ -9,13 +9,13 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 
 public class SelectionSystem extends IteratingSystem{
-    private Sprite selected = null;
-    private Position selectedPosition = null;
+    private Entity selectTool = null;
+    private Entity dragTool = null;
 
-    public SelectionSystem(Sprite selected, Position selectedPosition) {
+    public SelectionSystem() {
         super(Family.all(MouseState.class, Position.class).get());
-        this.selected = selected;
-        this.selectedPosition = selectedPosition;
+        this.selectTool = Registry.selectTool;
+        this.dragTool = Registry.dragTool;
     }
 
     @Override
@@ -25,25 +25,66 @@ public class SelectionSystem extends IteratingSystem{
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        Position position = Mappers.positionCMap.get(entity);
-        MouseState state = Mappers.mouseStateCMap.get(entity);
+        Position mousePosition = Mappers.positionCMap.get(entity);
+        MouseState mouseState = Mappers.mouseStateCMap.get(entity);
 
-        if (state.pressedDown && !Map.instance().outOfMapBounds(position.q, position.r)){
-            selectedPosition.q = position.q;
-            selectedPosition.r = position.r;
-            selected.texture = TextureUtils.pathToTexture("selected.png");
+        Position selectedPosition = Mappers.positionCMap.get(this.selectTool);
+        Sprite selectedSprite = Mappers.spriteCMap.get(this.selectTool);
 
-            Entity selectedTile = Map.instance().getEntityAt(selectedPosition.q, selectedPosition.r, TilePosition.TILE);
-            // BiomeType biomeType = Mappers.biomeCMap.get(selectedTile).biomeType;
-            // int biomeTemp = Mappers.biomeCMap.get(selectedTile).temp;
+        MultiTilePosition dragPosition = Mappers.multiTilePositionCMap.get(this.dragTool);
 
-            // System.out.println("--- TILE INFO ---");
-            // System.out.println("Biome type: "+ biomeType);
-            // System.out.println("temp: "+ biomeTemp);
-            // System.out.println("--- --------- ---");
+        // esc key clears selection 
+        if(mouseState.clearSelect){
+            mouseState.clearSelect = false;
+            selectedSprite.texture = null;
+            return;
         }
-        else if (Map.instance().outOfMapBounds(position.q, position.r)){
-            selected.texture = null;
+
+        // regular select logic
+        if (mouseState.pressedDown && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
+            if(mousePosition.q == selectedPosition.q && mousePosition.r == selectedPosition.r && selectedSprite.texture != null){
+                selectedSprite.texture = null;
+            }
+            else{
+                selectedPosition.q = mousePosition.q;
+                selectedPosition.r = mousePosition.r;
+                selectedSprite.texture = TextureUtils.pathToTexture("selected.png");
+
+                Entity selectedTile = Map.instance().getEntityAt(selectedPosition.q, selectedPosition.r, TilePosition.TILE);
+                // BiomeType biomeType = Mappers.biomeCMap.get(selectedTile).biomeType;
+                // int biomeTemp = Mappers.biomeCMap.get(selectedTile).temp;
+
+                // System.out.println("--- TILE INFO ---");
+                // System.out.println("Biome type: "+ biomeType);
+                // System.out.println("temp: "+ biomeTemp);
+                // System.out.println("--- --------- ---");
+            }
+            mouseState.pressedDown = false;
+        }
+        else if (Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
+            selectedSprite.texture = null;
+            mouseState.pressedDown = false;
+        }
+
+        // drag tool logic
+        if(mouseState.pressedUp){
+            mouseState.pressedUp = false;
+            dragPosition.points.clear();
+        }
+        else if (mouseState.heldDown && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
+            if (dragPosition.points.size > 0){
+                int prevQ = dragPosition.points.items[dragPosition.points.size - 2];
+                int prevR = dragPosition.points.items[dragPosition.points.size -1];
+
+                if(mousePosition.q != prevQ || mousePosition.r != prevR){
+                    dragPosition.points.add(mousePosition.q);
+                    dragPosition.points.add(mousePosition.r);
+                }
+            }
+            else{
+                dragPosition.points.add(mousePosition.q);
+                dragPosition.points.add(mousePosition.r);
+            }
         }
     }
 }

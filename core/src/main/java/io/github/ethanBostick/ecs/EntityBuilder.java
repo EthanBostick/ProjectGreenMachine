@@ -1,12 +1,7 @@
-package io.github.ethanBostick.core;
+package io.github.ethanBostick.ecs;
 
 import com.badlogic.ashley.core.Entity;
 
-import io.github.ethanBostick.ecs.Biome;
-import io.github.ethanBostick.ecs.BiomeType;
-import io.github.ethanBostick.ecs.Position;
-import io.github.ethanBostick.ecs.MouseState;
-import io.github.ethanBostick.ecs.Sprite;
 import io.github.ethanBostick.utils.TextureUtils;
 
 //libGDX stuff
@@ -32,8 +27,10 @@ public class EntityBuilder {
 		return entity;
     }
 
-    public void initHighlighter(Position p, Sprite s){
+    public Entity initSelectTool(){
 		Entity entity = this.engine.createEntity();
+		Sprite s = this.engine.createComponent(Sprite.class);
+		Position p = this.engine.createComponent(Position.class);
 
 		p.q = 0;
 		p.r = 0;
@@ -43,7 +40,36 @@ public class EntityBuilder {
 		entity.add(s);
 
 		this.addToEngine(entity);
+		return entity;
     }
+
+    public Entity initDragTool(){
+		Entity entity = this.engine.createEntity();
+		MultiTileSprite mts = this.engine.createComponent(MultiTileSprite.class);
+		MultiTilePosition mtp = this.engine.createComponent(MultiTilePosition.class);
+
+		mtp.layer = 99;
+		mts.texture = TextureUtils.pathToTexture("pathSelect.png");
+		mts.textureHead = TextureUtils.pathToTexture("pathSelectHead.png");
+
+		entity.add(mtp);
+		entity.add(mts);
+
+		this.addToEngine(entity);
+		return entity;
+    }
+
+	public Entity initMouse(){
+		MouseState mouseState = this.engine.createComponent(MouseState.class);
+		Position mousePosition = this.engine.createComponent(Position.class);
+		Entity entity = this.engine.createEntity();
+
+		entity.add(mousePosition);
+		entity.add(mouseState);
+
+		this.engine.addEntity(entity);
+		return entity;
+	}
 
 	public void addBiome(BiomeType b, Entity e){
 		Biome biome = this.engine.createComponent(Biome.class);
@@ -74,12 +100,6 @@ public class EntityBuilder {
 		e.add(biome);
 	}
 
-	public void initMouse(Position mousePosition, MouseState mouseState){
-		Entity entity = this.engine.createEntity();
-		entity.add(mousePosition);
-		entity.add(mouseState);
-		this.engine.addEntity(entity);
-	}
 
 	public void addToEngine(Entity e){
 		this.engine.addEntity(e);
