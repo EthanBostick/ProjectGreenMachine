@@ -52,14 +52,14 @@ public class SelectionSystem extends IteratingSystem{
                 selectedPosition.r = mousePosition.r;
                 selectedSprite.texture = TextureUtils.pathToTexture("selected.png");
 
-                Entity selectedTile = Map.instance().getEntityAt(selectedPosition.q, selectedPosition.r, TilePosition.SURFACE);
-                // BiomeType biomeType = Mappers.biomeCMap.get(selectedTile).biomeType;
-                // int biomeTemp = Mappers.biomeCMap.get(selectedTile).temp;
+                Entity selectedTile = Map.instance().getEntityAt(selectedPosition.q, selectedPosition.r, TilePosition.MYCELIUM);
 
-                // System.out.println("--- SURFACE INFO ---");
-                // System.out.println("Biome type: "+ biomeType);
-                // System.out.println("temp: "+ biomeTemp);
-                // System.out.println("--- --------- ---");
+                if(selectedTile != null){
+                    System.out.println("--- Mycelium INFO ---");
+                    System.out.println("Density: "+ Mappers.densityCMap.get(selectedTile).density);
+                    System.out.println("Direction: "+ Mappers.directionCMap.get(selectedTile).directionVector[0] + ", "+Mappers.directionCMap.get(selectedTile).directionVector[1] );
+                    System.out.println("--- --------- ---");
+                }
             }
             mouseState.pressedDown = false;
         }

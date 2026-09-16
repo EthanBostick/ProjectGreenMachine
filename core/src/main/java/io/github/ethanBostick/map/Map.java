@@ -154,7 +154,7 @@ public class Map implements Observer{
 				entityBuilder.addBiome(bType, tileEntity);
 				if(extraPng != null){
 					Entity terrainEntity = entityBuilder.createRenderable(q,r,1, 0, extraPng);
-					this.map[index].put(TilePosition.INANIMATE,terrainEntity);
+					this.map[index].put(TilePosition.TERRAIN,terrainEntity);
 					this.entityBuilder.addToEngine(terrainEntity);
 				}
 				this.entityBuilder.addToEngine(tileEntity);
@@ -165,16 +165,25 @@ public class Map implements Observer{
 				entityBuilder.addBiome(bType, underEntity);
 				this.entityBuilder.addToEngine(underEntity);
 				this.map[index].put(TilePosition.UNDERGROUND,underEntity);
-				// if (rock == 1){
-				// 	rockEntity = entityBuilder.createRenderable(q,r, 2, "rock.png");
-				// 	this.map[index].put(TilePosition.INANIMATE, rockEntity);
-				// 	this.entityBuilder.addToEngine(rockEntity);
-				// }
+
+				double rockThreshold = (tilePng == "mountain.png") ? 0.75 : 0.25;
+				if (rInt <= rockThreshold){
+					Entity rockEntity = entityBuilder.createRenderable(q,r, 1,1, "rock.png");
+					this.map[index].put(TilePosition.TERRAIN, rockEntity);
+					this.entityBuilder.addToEngine(rockEntity);
+				}
+
 
 				if (q == 0 && r == 0){
+					Entity initMycelium = entityBuilder.createMycelium(q, r, 3);
+					this.entityBuilder.addToEngine(initMycelium);
+					this.map[index].put(TilePosition.MYCELIUM, initMycelium);
+
 					//do not track, for visual only
-					Entity e = entityBuilder.createRenderable(0,0, 3,0, "hexCenter.png");
-					this.entityBuilder.addToEngine(e);
+					Entity center = entityBuilder.createRenderable(0,0, 3,0, "hexCenter.png");
+					this.entityBuilder.addToEngine(center);
+					Entity centerUnder = entityBuilder.createRenderable(0,0, 3,1, "hexCenter.png");
+					this.entityBuilder.addToEngine(centerUnder);
 				}
 			}
 		}

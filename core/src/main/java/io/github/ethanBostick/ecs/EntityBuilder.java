@@ -33,6 +33,16 @@ public class EntityBuilder {
 		return entity;
     }
 
+	public Entity createMycelium(int q, int r, int density){
+		Entity e = createRenderable(q, r, 1, 1, "myceliumD1.png");
+		Direction direction = this.engine.createComponent(Direction.class);
+		e.add(direction);
+		addDensity(e, density);		
+		addNutrients(e);
+
+		return e;
+	}
+
     public Entity initSelectTool(){
 		Entity entity = this.engine.createEntity();
 		Sprite s = this.engine.createComponent(Sprite.class);
@@ -115,6 +125,17 @@ public class EntityBuilder {
 				break;
 		}
 		e.add(biome);
+	}
+
+	public void addDensity(Entity e, int density){
+		Density d = this.engine.createComponent(Density.class);
+		d.density = density;
+		e.add(d);
+	}
+
+	public void addNutrients(Entity e){
+		Nutrients n = this.engine.createComponent(Nutrients.class);
+		e.add(n);
 	}
 
 

@@ -8,6 +8,8 @@ import io.github.ethanBostick.ecs.MultiRenderSystem;
 import io.github.ethanBostick.ecs.ActionSystem;
 import io.github.ethanBostick.ecs.EntityBuilder;
 import io.github.ethanBostick.ecs.SelectionSystem;
+import io.github.ethanBostick.ecs.MyceliumSystem;
+
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
@@ -37,6 +39,7 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new MultiRenderSystem());
 		this.engine.addSystem(new ActionSystem());
 		this.engine.addSystem(new SelectionSystem());
+		this.engine.addSystem(new MyceliumSystem(10));
 
 		Map map = Map.instance();
 		double[] concentrations = new double[6];

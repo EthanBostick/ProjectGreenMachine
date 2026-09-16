@@ -2,8 +2,9 @@ package io.github.ethanBostick.map;
 
 public enum TilePosition {
     UNDERGROUND(0),
-    SURFACE(1),
-    INANIMATE(2);
+    MYCELIUM(1),
+    SURFACE(2),
+    TERRAIN(3);
 
     private int position;
 
