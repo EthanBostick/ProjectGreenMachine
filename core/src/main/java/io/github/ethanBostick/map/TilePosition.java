@@ -1,9 +1,9 @@
 package io.github.ethanBostick.map;
 
 public enum TilePosition {
-    TILE(0),
-    ENTITY(1),
-    SELECTED(2);
+    UNDERGROUND(0),
+    SURFACE(1),
+    INANIMATE(2);
 
     private int position;
 

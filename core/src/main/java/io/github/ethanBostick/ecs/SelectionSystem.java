@@ -27,10 +27,12 @@ public class SelectionSystem extends IteratingSystem{
     protected void processEntity(Entity entity, float deltaTime) {
         Position mousePosition = Mappers.positionCMap.get(entity);
         MouseState mouseState = Mappers.mouseStateCMap.get(entity);
+        MultiTilePosition mouseDragPosition = Mappers.multiTilePositionCMap.get(entity);
 
         Position selectedPosition = Mappers.positionCMap.get(this.selectTool);
         Sprite selectedSprite = Mappers.spriteCMap.get(this.selectTool);
 
+        MultiTileSprite dragSprites = Mappers.multiTileSpriteCMap.get(this.dragTool);
         MultiTilePosition dragPosition = Mappers.multiTilePositionCMap.get(this.dragTool);
 
         // esc key clears selection 
@@ -50,11 +52,11 @@ public class SelectionSystem extends IteratingSystem{
                 selectedPosition.r = mousePosition.r;
                 selectedSprite.texture = TextureUtils.pathToTexture("selected.png");
 
-                Entity selectedTile = Map.instance().getEntityAt(selectedPosition.q, selectedPosition.r, TilePosition.TILE);
+                Entity selectedTile = Map.instance().getEntityAt(selectedPosition.q, selectedPosition.r, TilePosition.SURFACE);
                 // BiomeType biomeType = Mappers.biomeCMap.get(selectedTile).biomeType;
                 // int biomeTemp = Mappers.biomeCMap.get(selectedTile).temp;
 
-                // System.out.println("--- TILE INFO ---");
+                // System.out.println("--- SURFACE INFO ---");
                 // System.out.println("Biome type: "+ biomeType);
                 // System.out.println("temp: "+ biomeTemp);
                 // System.out.println("--- --------- ---");
@@ -68,22 +70,29 @@ public class SelectionSystem extends IteratingSystem{
 
         // drag tool logic
         if(mouseState.pressedUp){
-            mouseState.pressedUp = false;
             dragPosition.points.clear();
+            dragSprites.texture.clear();
+            mouseDragPosition.points.clear();
+            mouseState.pressedUp = false;
         }
         else if (mouseState.heldDown && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
-            if (dragPosition.points.size > 0){
-                int prevQ = dragPosition.points.items[dragPosition.points.size - 2];
-                int prevR = dragPosition.points.items[dragPosition.points.size -1];
-
+            if (mouseDragPosition.points.size > 0){
+                int prevQ = mouseDragPosition.points.items[mouseDragPosition.points.size - 2];
+                int prevR = mouseDragPosition.points.items[mouseDragPosition.points.size -1];
                 if(mousePosition.q != prevQ || mousePosition.r != prevR){
-                    dragPosition.points.add(mousePosition.q);
-                    dragPosition.points.add(mousePosition.r);
+                    int[] dirVec = {mousePosition.q - prevQ, mousePosition.r - prevR};
+                    dragPosition.points.add(prevQ);
+                    dragPosition.points.add(prevR);
+                    dragSprites.texture.add(TextureUtils.dirToTexture(0, dirVec));
+                    dragSprites.textureHead = TextureUtils.dirToTexture(0, dirVec);
+
+                    mouseDragPosition.points.add(mousePosition.q);
+                    mouseDragPosition.points.add(mousePosition.r);
                 }
             }
             else{
-                dragPosition.points.add(mousePosition.q);
-                dragPosition.points.add(mousePosition.r);
+                mouseDragPosition.points.add(mousePosition.q);
+                mouseDragPosition.points.add(mousePosition.r);
             }
         }
     }

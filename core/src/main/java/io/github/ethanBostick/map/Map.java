@@ -104,69 +104,76 @@ public class Map implements Observer{
 				this.map[index] = new ObjectMap<TilePosition,Entity>(2); 
 
 				Entity tileEntity = null;
+				String tilePng = "hex_template.png";
+				String extraPng = null;
+				BiomeType bType = BiomeType.BLANK;
+
 				switch(initGrid[index]){
 					case 65:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "forestFloor.png");
-						entityBuilder.addBiome(BiomeType.FOREST, tileEntity);
-
+						tilePng = "forestFloor.png";
+						bType = BiomeType.FOREST;						
 						if (rInt <= 0.45){
-							Entity treeEntity = entityBuilder.createRenderable(q,r,1, "trees2.png");
-							this.map[index].put(TilePosition.ENTITY,treeEntity);
-							this.entityBuilder.addToEngine(treeEntity);
+							extraPng = "trees2.png";							
 						}
 						break;
 					case 100:
-						tileEntity = entityBuilder.createRenderable(q,r, 0, "sand.png");
-						entityBuilder.addBiome(BiomeType.DESERT, tileEntity);
+						tilePng = "sand.png";
+						bType = BiomeType.DESERT;						
 						break;
 					case 75:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "grassFloor.png");
-						entityBuilder.addBiome(BiomeType.GRASS_LAND, tileEntity);
+						tilePng = "grassFloor.png";
+						bType = BiomeType.GRASS_LAND;						
 						if (rInt <= 0.6){
-							Entity grassEntity = entityBuilder.createRenderable(q,r,1, "grass.png");
-							this.map[index].put(TilePosition.ENTITY,grassEntity);
-							this.entityBuilder.addToEngine(grassEntity);
+							extraPng = "grass.png";							
 						}
 						break;
 					case 50:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "mountain.png");
-						entityBuilder.addBiome(BiomeType.MOUNTAIN, tileEntity);
+						tilePng = "mountain.png";
+						bType = BiomeType.MOUNTAIN;						
 						break;
 					case 15:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "taiga.png");
-						entityBuilder.addBiome(BiomeType.TAIGA, tileEntity);
+						tilePng = "taiga.png";
+						bType = BiomeType.TAIGA;						
 						if (rInt <= 0.25){
-							Entity treeEntity = entityBuilder.createRenderable(q,r,1, "pineTrees1.png");
-							this.map[index].put(TilePosition.ENTITY,treeEntity);
-							this.entityBuilder.addToEngine(treeEntity);
+							extraPng = "pineTrees1.png";							
 						}
 						break;
 					case 35:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "boreal.png");
-						entityBuilder.addBiome(BiomeType.BOREAL, tileEntity);
+						tilePng = "boreal.png";
+						bType = BiomeType.BOREAL;						
 						if (rInt <= 0.7){
-							Entity treeEntity = entityBuilder.createRenderable(q,r,1, "pineTrees1.png");
-							this.map[index].put(TilePosition.ENTITY,treeEntity);
-							this.entityBuilder.addToEngine(treeEntity);
+							extraPng = "pineTrees1.png";							
 						}
 						break;
 					case -1:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "mountain.png");
-						entityBuilder.addBiome(BiomeType.MOUNTAIN, tileEntity);
+						tilePng = "mountain.png";
+						bType = BiomeType.MOUNTAIN;						
 						break;
 				}
+				tileEntity = entityBuilder.createRenderable(q,r,0,0, tilePng);
+				entityBuilder.addBiome(bType, tileEntity);
+				if(extraPng != null){
+					Entity terrainEntity = entityBuilder.createRenderable(q,r,1, 0, extraPng);
+					this.map[index].put(TilePosition.INANIMATE,terrainEntity);
+					this.entityBuilder.addToEngine(terrainEntity);
+				}
 				this.entityBuilder.addToEngine(tileEntity);
-				this.map[index].put(TilePosition.TILE,tileEntity);
+				this.map[index].put(TilePosition.SURFACE,tileEntity);
 
+				//underground gen
+				Entity underEntity = entityBuilder.createRenderable(q,r,0,1, "dirt.png");
+				entityBuilder.addBiome(bType, underEntity);
+				this.entityBuilder.addToEngine(underEntity);
+				this.map[index].put(TilePosition.UNDERGROUND,underEntity);
 				// if (rock == 1){
 				// 	rockEntity = entityBuilder.createRenderable(q,r, 2, "rock.png");
-				// 	this.map[index].put(TilePosition.ENTITY, rockEntity);
+				// 	this.map[index].put(TilePosition.INANIMATE, rockEntity);
 				// 	this.entityBuilder.addToEngine(rockEntity);
 				// }
 
 				if (q == 0 && r == 0){
 					//do not track, for visual only
-					Entity e = entityBuilder.createRenderable(0,0, 3, "hexCenter.png");
+					Entity e = entityBuilder.createRenderable(0,0, 3,0, "hexCenter.png");
 					this.entityBuilder.addToEngine(e);
 				}
 			}

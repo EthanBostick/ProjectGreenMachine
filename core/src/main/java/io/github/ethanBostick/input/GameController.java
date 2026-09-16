@@ -111,6 +111,7 @@ public class GameController extends InputAdapter{
     public boolean touchUp(int screenX, int screenY, int pointer, int button){
         Mappers.mouseStateCMap.get(this.mouse).pressedUp = true;
         Mappers.mouseStateCMap.get(this.mouse).heldDown = false;
+        Mappers.mouseStateCMap.get(this.mouse).pressedDown = false;
         return true;
     }
 

@@ -11,6 +11,7 @@ public class Registry {
     public static Entity mouse = null;
     public static Entity selectTool = null;
     public static Entity dragTool = null;
+    public static Entity player = null;
 
     public static void init(){
         camera = new OrthographicCamera();
@@ -18,12 +19,15 @@ public class Registry {
         selectTool = EntityBuilder.instance().initSelectTool();
         mouse = EntityBuilder.instance().initMouse();
         dragTool = EntityBuilder.instance().initDragTool();
+        player = EntityBuilder.instance().initPlayer();
     }
 
     public static void dispose(){
         camera = null;
 		spriteBatch = null;
         selectTool = null;
+        dragTool = null;
         mouse = null;
+        player = null;
     }
 }

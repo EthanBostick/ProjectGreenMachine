@@ -1,6 +1,8 @@
 package io.github.ethanBostick.ecs;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.graphics.Texture;
 
 import io.github.ethanBostick.utils.TextureUtils;
 
@@ -11,17 +13,21 @@ public class EntityBuilder {
 	private static EntityBuilder theInstance = null;
     private Engine engine = null;
 
-    public Entity createRenderable(int q, int r, int renderLayer, String texturePath){
+    public Entity createRenderable(int q, int r, int renderLayer, int depth, String texturePath){
 		Entity entity = this.engine.createEntity();
 
+		Depth d = this.engine.createComponent(Depth.class);
 		Sprite s = this.engine.createComponent(Sprite.class);
 		Position p = this.engine.createComponent(Position.class);
+
+		d.depth = depth;
         s.texture = TextureUtils.pathToTexture(texturePath);
         p.q = q;
 		p.r = r;
 		p.layer = renderLayer;
 
 		entity.add(p);
+		entity.add(d);
 		entity.add(s);
 
 		return entity;
@@ -49,8 +55,7 @@ public class EntityBuilder {
 		MultiTilePosition mtp = this.engine.createComponent(MultiTilePosition.class);
 
 		mtp.layer = 99;
-		mts.texture = TextureUtils.pathToTexture("pathSelect.png");
-		mts.textureHead = TextureUtils.pathToTexture("pathSelectHead.png");
+		mts.texture = new Array<Texture>(6);
 
 		entity.add(mtp);
 		entity.add(mts);
@@ -62,10 +67,22 @@ public class EntityBuilder {
 	public Entity initMouse(){
 		MouseState mouseState = this.engine.createComponent(MouseState.class);
 		Position mousePosition = this.engine.createComponent(Position.class);
+		MultiTilePosition mtp = this.engine.createComponent(MultiTilePosition.class);
 		Entity entity = this.engine.createEntity();
 
 		entity.add(mousePosition);
 		entity.add(mouseState);
+		entity.add(mtp);
+
+		this.engine.addEntity(entity);
+		return entity;
+	}
+
+	public Entity initPlayer(){
+		Depth depth = this.engine.createComponent(Depth.class);
+		Entity entity = this.engine.createEntity();
+
+		entity.add(depth);
 
 		this.engine.addEntity(entity);
 		return entity;

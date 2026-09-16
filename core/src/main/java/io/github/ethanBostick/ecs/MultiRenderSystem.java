@@ -27,7 +27,7 @@ public class MultiRenderSystem extends SortedIteratingSystem{
     }
 
     public MultiRenderSystem() {
-        super(Family.all(MultiTileSprite.class).get(), new LayerComparator());
+        super(Family.all(MultiTileSprite.class,MultiTilePosition.class).get(), new LayerComparator());
         this.batch = Registry.spriteBatch;
         this.camera = Registry.camera;
     }
@@ -62,11 +62,11 @@ public class MultiRenderSystem extends SortedIteratingSystem{
 
                 // Only draw if the sprite's bounding box intersects the camera's view
                 if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
-                    if (i+2 == mtp.points.size){
+                    if (i+2 >= mtp.points.size){
                         batch.draw(mts.textureHead, pixelX, pixelY);
                     }
                     else{
-                        batch.draw(mts.texture, pixelX, pixelY);
+                        batch.draw(mts.texture.get(Math.floorDiv(i, 2)), pixelX, pixelY);
                     }
                 }
             }

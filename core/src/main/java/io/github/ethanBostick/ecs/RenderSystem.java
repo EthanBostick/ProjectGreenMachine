@@ -51,6 +51,12 @@ public class RenderSystem extends SortedIteratingSystem{
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+
+        Depth depth = Mappers.depthCMap.get(entity);
+        if(depth != null && depth.depth != Mappers.depthCMap.get(Registry.player).depth){
+            return;
+        }
+
         Position position = Mappers.positionCMap.get(entity);
         Sprite sprite = Mappers.spriteCMap.get(entity);
 
