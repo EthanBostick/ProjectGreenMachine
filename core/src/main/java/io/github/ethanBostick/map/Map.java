@@ -1,9 +1,9 @@
 package io.github.ethanBostick.map;
 
-import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.core.Observer;
 import io.github.ethanBostick.ecs.BiomeType;
+import io.github.ethanBostick.ecs.EntityBuilder;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventType;
@@ -42,9 +42,13 @@ public class Map implements Observer{
 		return (q + this.size) + ((r+this.size) * w);
 	}
 
+	public boolean outOfMapBounds(int q, int r){
+		return (Math.abs(q) > this.size || Math.abs(r) > this.size || Math.abs(q+r) > this.size);
+	}
+
 	public Entity getEntityAt(int q, int r, TilePosition t){
 
-		if(Math.abs(q) > this.size || Math.abs(r) > this.size || Math.abs(q+r) > this.size){
+		if(outOfMapBounds(q, r)){
 			return null;
 		}
 
@@ -100,66 +104,76 @@ public class Map implements Observer{
 				this.map[index] = new ObjectMap<TilePosition,Entity>(2); 
 
 				Entity tileEntity = null;
+				String tilePng = "hex_template.png";
+				String extraPng = null;
+				BiomeType bType = BiomeType.BLANK;
+
 				switch(initGrid[index]){
 					case 65:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "grass.png");
-						entityBuilder.addBiome(BiomeType.FOREST, tileEntity);
-
+						tilePng = "forestFloor.png";
+						bType = BiomeType.FOREST;						
 						if (rInt <= 0.45){
-							Entity treeEntity = entityBuilder.createRenderable(q,r,1, "trees2.png");
-							this.map[index].put(TilePosition.ENTITY,tileEntity);
-							this.map[index].put(TilePosition.ENTITY,tileEntity);
-							this.entityBuilder.addToEngine(treeEntity);
+							extraPng = "trees2.png";							
 						}
 						break;
 					case 100:
-						tileEntity = entityBuilder.createRenderable(q,r, 0, "sand.png");
-						entityBuilder.addBiome(BiomeType.DESERT, tileEntity);
+						tilePng = "sand.png";
+						bType = BiomeType.DESERT;						
 						break;
 					case 75:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "grassLand.png");
-						entityBuilder.addBiome(BiomeType.GRASS_LAND, tileEntity);
+						tilePng = "grassFloor.png";
+						bType = BiomeType.GRASS_LAND;						
+						if (rInt <= 0.6){
+							extraPng = "grass.png";							
+						}
 						break;
 					case 50:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "mountain.png");
-						entityBuilder.addBiome(BiomeType.MOUNTAIN, tileEntity);
+						tilePng = "mountain.png";
+						bType = BiomeType.MOUNTAIN;						
 						break;
 					case 15:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "taiga.png");
-						entityBuilder.addBiome(BiomeType.TAIGA, tileEntity);
+						tilePng = "taiga.png";
+						bType = BiomeType.TAIGA;						
 						if (rInt <= 0.25){
-							Entity treeEntity = entityBuilder.createRenderable(q,r,1, "pineTrees1.png");
-							this.map[index].put(TilePosition.ENTITY,tileEntity);
-							this.map[index].put(TilePosition.ENTITY,tileEntity);
-							this.entityBuilder.addToEngine(treeEntity);
+							extraPng = "pineTrees1.png";							
 						}
 						break;
 					case 35:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "boreal.png");
-						entityBuilder.addBiome(BiomeType.BOREAL, tileEntity);
+						tilePng = "boreal.png";
+						bType = BiomeType.BOREAL;						
 						if (rInt <= 0.7){
-							Entity treeEntity = entityBuilder.createRenderable(q,r,1, "pineTrees1.png");
-							this.map[index].put(TilePosition.ENTITY,tileEntity);
-							this.entityBuilder.addToEngine(treeEntity);
+							extraPng = "pineTrees1.png";							
 						}
 						break;
 					case -1:
-						tileEntity = entityBuilder.createRenderable(q,r,0, "mountain.png");
-						entityBuilder.addBiome(BiomeType.MOUNTAIN, tileEntity);
+						tilePng = "mountain.png";
+						bType = BiomeType.MOUNTAIN;						
 						break;
 				}
+				tileEntity = entityBuilder.createRenderable(q,r,0,0, tilePng);
+				entityBuilder.addBiome(bType, tileEntity);
+				if(extraPng != null){
+					Entity terrainEntity = entityBuilder.createRenderable(q,r,1, 0, extraPng);
+					this.map[index].put(TilePosition.INANIMATE,terrainEntity);
+					this.entityBuilder.addToEngine(terrainEntity);
+				}
 				this.entityBuilder.addToEngine(tileEntity);
-				this.map[index].put(TilePosition.TILE,tileEntity);
+				this.map[index].put(TilePosition.SURFACE,tileEntity);
 
+				//underground gen
+				Entity underEntity = entityBuilder.createRenderable(q,r,0,1, "dirt.png");
+				entityBuilder.addBiome(bType, underEntity);
+				this.entityBuilder.addToEngine(underEntity);
+				this.map[index].put(TilePosition.UNDERGROUND,underEntity);
 				// if (rock == 1){
 				// 	rockEntity = entityBuilder.createRenderable(q,r, 2, "rock.png");
-				// 	this.map[index].put(TilePosition.ENTITY, rockEntity);
+				// 	this.map[index].put(TilePosition.INANIMATE, rockEntity);
 				// 	this.entityBuilder.addToEngine(rockEntity);
 				// }
 
 				if (q == 0 && r == 0){
 					//do not track, for visual only
-					Entity e = entityBuilder.createRenderable(0,0, 3, "hexCenter.png");
+					Entity e = entityBuilder.createRenderable(0,0, 3,0, "hexCenter.png");
 					this.entityBuilder.addToEngine(e);
 				}
 			}

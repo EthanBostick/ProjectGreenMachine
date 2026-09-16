@@ -10,7 +10,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
-public class RenderSystem extends SortedIteratingSystem{
+public class MultiRenderSystem extends SortedIteratingSystem{
     private final SpriteBatch batch;
     private final OrthographicCamera camera;
 
@@ -26,8 +26,8 @@ public class RenderSystem extends SortedIteratingSystem{
         }
     }
 
-    public RenderSystem() {
-        super(Family.all(Position.class, Sprite.class).get(), new LayerComparator());
+    public MultiRenderSystem() {
+        super(Family.all(MultiTileSprite.class,MultiTilePosition.class).get(), new LayerComparator());
         this.batch = Registry.spriteBatch;
         this.camera = Registry.camera;
     }
@@ -51,22 +51,24 @@ public class RenderSystem extends SortedIteratingSystem{
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+        MultiTileSprite mts = Mappers.multiTileSpriteCMap.get(entity);
+        MultiTilePosition mtp = Mappers.multiTilePositionCMap.get(entity);
 
-        Depth depth = Mappers.depthCMap.get(entity);
-        if(depth != null && depth.depth != Mappers.depthCMap.get(Registry.player).depth){
-            return;
-        }
+        if (mts.texture != null){
+            for (int i = 0 ; i < mtp.points.size; i += 2){
 
-        Position position = Mappers.positionCMap.get(entity);
-        Sprite sprite = Mappers.spriteCMap.get(entity);
+                float pixelX = HexUtils.getPixelX(mtp.points.get(i));
+                float pixelY = HexUtils.getPixelY(mtp.points.get(i),mtp.points.get(i+1));
 
-        if (sprite.texture != null){
-            float pixelX = HexUtils.getPixelX(position);
-            float pixelY = HexUtils.getPixelY(position);
-
-            // Only draw if the sprite's bounding box intersects the camera's view
-            if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
-                batch.draw(sprite.texture, pixelX, pixelY);
+                // Only draw if the sprite's bounding box intersects the camera's view
+                if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
+                    if (i+2 >= mtp.points.size){
+                        batch.draw(mts.textureHead, pixelX, pixelY);
+                    }
+                    else{
+                        batch.draw(mts.texture.get(Math.floorDiv(i, 2)), pixelX, pixelY);
+                    }
+                }
             }
         }
     }

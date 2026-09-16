@@ -1,5 +1,6 @@
 package io.github.ethanBostick.ui;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -8,6 +9,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
+import io.github.ethanBostick.ecs.Mappers;
+import io.github.ethanBostick.ecs.Registry;
+
 
 public class GameHUD {
     // Expose the stage so your Main class can render it and pass it to the Multiplexer
@@ -33,8 +38,10 @@ public class GameHUD {
         buildButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("Cookie +1");
+                Mappers.depthCMap.get(Registry.player).depth = (Mappers.depthCMap.get(Registry.player).depth + 1) % 2;
+                System.out.println(Mappers.depthCMap.get(Registry.player).depth);
                 // Trigger your ECS event here
+                //send an event over to the render system to change the current rendering depth component (this depth component will be owned by the selection system, render system, multiTiledRender system, etc)
             }
         });
 
