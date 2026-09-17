@@ -25,6 +25,18 @@ public class MyceliumSystem extends IntervalIteratingSystem {
         Direction direction = Mappers.directionCMap.get(entity);
         Sprite sprite = Mappers.spriteCMap.get(entity);
 
+        switch (density.density){
+            case 1:
+                sprite.texture = TextureUtils.pathToTexture("myceliumD1.png");
+                break;
+            case 2:
+                sprite.texture = TextureUtils.pathToTexture("myceliumD2.png");
+                break;
+            case 3:
+                sprite.texture = TextureUtils.pathToTexture("myceliumD3.png");
+                break;
+        }
+
         if (Map.instance().getEntityAt(position.q + direction.directionVector[0], position.r + direction.directionVector[1], TilePosition.MYCELIUM) == null){
             int newQ = position.q + direction.directionVector[0];
             int newR = position.r + direction.directionVector[1];
@@ -38,19 +50,19 @@ public class MyceliumSystem extends IntervalIteratingSystem {
             Entity oldMycelium = Map.instance().getEntityAt(newQ, newR, TilePosition.MYCELIUM);
             Density oldDensity = Mappers.densityCMap.get(oldMycelium);
             oldDensity.density = (oldDensity.density >= 3)? 3 : oldDensity.density + 1;
-        }
+            Sprite oldSprite = Mappers.spriteCMap.get(oldMycelium);
 
-        switch (density.density){
-            case 1:
-                sprite.texture = TextureUtils.pathToTexture("myceliumD1.png");
-                break;
-            case 2:
-                sprite.texture = TextureUtils.pathToTexture("myceliumD2.png");
-                break;
-            case 3:
-                sprite.texture = TextureUtils.pathToTexture("myceliumD3.png");
-                break;
+            switch (oldDensity.density){
+                case 1:
+                    oldSprite.texture = TextureUtils.pathToTexture("myceliumD1.png");
+                    break;
+                case 2:
+                    oldSprite.texture = TextureUtils.pathToTexture("myceliumD2.png");
+                    break;
+                case 3:
+                    oldSprite.texture = TextureUtils.pathToTexture("myceliumD3.png");
+                    break;
+            }
         }
-
     }
 }

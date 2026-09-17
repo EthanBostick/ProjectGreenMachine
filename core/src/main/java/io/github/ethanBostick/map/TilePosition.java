@@ -1,6 +1,7 @@
 package io.github.ethanBostick.map;
 
 public enum TilePosition {
+    MAX_POSITIONS(4),
     UNDERGROUND(0),
     MYCELIUM(1),
     SURFACE(2),

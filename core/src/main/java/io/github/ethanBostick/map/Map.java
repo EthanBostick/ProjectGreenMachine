@@ -21,7 +21,7 @@ public class Map implements Observer{
 	private int size = 0;
 	private int w = 0;
 	public Random random = null;
-	private ObjectMap<TilePosition,Entity>[] map;
+	private Entity[][] map;
 	private EntityBuilder entityBuilder = null;
 
 	private Map(){
@@ -31,7 +31,7 @@ public class Map implements Observer{
 
 	public void setEntityAt(int q, int r, Entity e, TilePosition t){
 		int i = getIndex(q, r);
-		this.map[i].put(t, e);
+		this.map[i][t.value()] = e;
 	}
 
 	public int getMapSize(){
@@ -53,7 +53,7 @@ public class Map implements Observer{
 		}
 
 		int i = getIndex(q, r);
-		return this.map[i].get(t);
+		return this.map[i][t.value()];
 	}
 
 	@SuppressWarnings("unchecked")
@@ -95,13 +95,12 @@ public class Map implements Observer{
 		MapGenerator mapGenerator = new MapGenerator(this.size, thresh, initGrid);
 		initGrid = mapGenerator.generate(999999,20);
 
-		this.map = new ObjectMap[w*w];
+		this.map = new Entity[w*w][TilePosition.MAX_POSITIONS.value()];
 		for (int q = -this.size ; q <= this.size ; q ++){
 			for (int r = Math.max(-this.size, -q - this.size); r <= Math.min(this.size, -q + this.size); r ++){
 				
 				int index = this.getIndex(q, r);
 				double rInt = this.random.nextDouble();
-				this.map[index] = new ObjectMap<TilePosition,Entity>(2); 
 
 				Entity tileEntity = null;
 				String tilePng = "hex_template.png";
@@ -154,22 +153,22 @@ public class Map implements Observer{
 				entityBuilder.addBiome(bType, tileEntity);
 				if(extraPng != null){
 					Entity terrainEntity = entityBuilder.createRenderable(q,r,1, 0, extraPng);
-					this.map[index].put(TilePosition.TERRAIN,terrainEntity);
+					this.map[index][TilePosition.TERRAIN.value()] = terrainEntity;
 					this.entityBuilder.addToEngine(terrainEntity);
 				}
 				this.entityBuilder.addToEngine(tileEntity);
-				this.map[index].put(TilePosition.SURFACE,tileEntity);
+				this.map[index][TilePosition.SURFACE.value()] = tileEntity;
 
 				//underground gen
 				Entity underEntity = entityBuilder.createRenderable(q,r,0,1, "dirt.png");
 				entityBuilder.addBiome(bType, underEntity);
 				this.entityBuilder.addToEngine(underEntity);
-				this.map[index].put(TilePosition.UNDERGROUND,underEntity);
+				this.map[index][TilePosition.UNDERGROUND.value()] = underEntity;
 
 				double rockThreshold = (tilePng == "mountain.png") ? 0.75 : 0.25;
 				if (rInt <= rockThreshold){
-					Entity rockEntity = entityBuilder.createRenderable(q,r, 1,1, "rock.png");
-					this.map[index].put(TilePosition.TERRAIN, rockEntity);
+					Entity rockEntity = entityBuilder.createRenderable(q,r, 2,1, "rock.png");
+					this.map[index][TilePosition.TERRAIN.value()] = rockEntity;
 					this.entityBuilder.addToEngine(rockEntity);
 				}
 
@@ -177,7 +176,7 @@ public class Map implements Observer{
 				if (q == 0 && r == 0){
 					Entity initMycelium = entityBuilder.createMycelium(q, r, 3);
 					this.entityBuilder.addToEngine(initMycelium);
-					this.map[index].put(TilePosition.MYCELIUM, initMycelium);
+					this.map[index][TilePosition.MYCELIUM.value()] = initMycelium;
 
 					//do not track, for visual only
 					Entity center = entityBuilder.createRenderable(0,0, 3,0, "hexCenter.png");
