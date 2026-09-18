@@ -44,23 +44,26 @@ public class SelectionSystem extends IteratingSystem{
 
         // regular select logic
         if (mouseState.pressedDown && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
+            //pressed the same hex again
             if(mousePosition.q == selectedPosition.q && mousePosition.r == selectedPosition.r && selectedSprite.texture != null){
-                selectedSprite.texture = null;
+                //increment the selection
+                selectedPosition.tilePosition = TilePosition.values()[(selectedPosition.tilePosition.value()+1) % TilePosition.MAX_POSITIONS.value()];
             }
-            else{
-                selectedPosition.q = mousePosition.q;
-                selectedPosition.r = mousePosition.r;
-                selectedSprite.texture = TextureUtils.pathToTexture("selected.png");
+            selectedPosition.q = mousePosition.q;
+            selectedPosition.r = mousePosition.r;
+            selectedSprite.texture = TextureUtils.pathToTexture("selected.png");
 
-                Entity selectedTile = Map.instance().getEntityAt(selectedPosition.q, selectedPosition.r, TilePosition.MYCELIUM);
-
-                if(selectedTile != null){
-                    System.out.println("--- Mycelium INFO ---");
-                    System.out.println("Density: "+ Mappers.densityCMap.get(selectedTile).density);
-                    System.out.println("Direction: "+ Mappers.directionCMap.get(selectedTile).directionVector[0] + ", "+Mappers.directionCMap.get(selectedTile).directionVector[1] );
-                    System.out.println("--- --------- ---");
-                }
+            Entity selectedTile = Map.instance().getEntityAt(selectedPosition.q, selectedPosition.r, selectedPosition.tilePosition);
+            if(selectedTile != null){
+                Nutrients selectedNutrients = Mappers.nutrientsCMap.get(selectedTile);
+                int carbonAmount = (selectedNutrients != null)? selectedNutrients.carbons : 0;
+                int mineralAmount = (selectedNutrients != null)? selectedNutrients.minerals : 0;
+                System.out.println("--- info "+ selectedPosition.tilePosition +  " ---");
+                System.out.println("carbons: "+ carbonAmount);
+                System.out.println("minerals: "+ mineralAmount);
+                System.out.println("--- END INFO ---");
             }
+
             mouseState.pressedDown = false;
         }
         else if (Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){

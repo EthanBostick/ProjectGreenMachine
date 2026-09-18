@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.Texture;
 
+import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.TextureUtils;
 
 //libGDX stuff
@@ -13,7 +14,7 @@ public class EntityBuilder {
 	private static EntityBuilder theInstance = null;
     private Engine engine = null;
 
-    public Entity createRenderable(int q, int r, int renderLayer, int depth, String texturePath){
+    public Entity createRenderable(int q, int r, int renderLayer, int depth, TilePosition tilePosition, String texturePath){
 		Entity entity = this.engine.createEntity();
 
 		Depth d = this.engine.createComponent(Depth.class);
@@ -25,6 +26,7 @@ public class EntityBuilder {
         p.q = q;
 		p.r = r;
 		p.layer = renderLayer;
+		p.tilePosition = tilePosition;
 
 		entity.add(p);
 		entity.add(d);
@@ -34,7 +36,7 @@ public class EntityBuilder {
     }
 
 	public Entity createMycelium(int q, int r, int density){
-		Entity e = createRenderable(q, r, 1, 1, "myceliumD1.png");
+		Entity e = createRenderable(q, r, 1, 1,TilePosition.MYCELIUM, "myceliumD1.png");
 		Direction direction = this.engine.createComponent(Direction.class);
 		e.add(direction);
 		addDensity(e, density);		
@@ -51,6 +53,7 @@ public class EntityBuilder {
 		p.q = 0;
 		p.r = 0;
 		p.layer = 99;
+		p.tilePosition = TilePosition.SURFACE;
 
 		entity.add(p);
 		entity.add(s);
@@ -133,11 +136,17 @@ public class EntityBuilder {
 		e.add(d);
 	}
 
+	public void addNutrients(Entity e, int carbonAmount, int mineralAmount){
+		Nutrients n = this.engine.createComponent(Nutrients.class);
+		n.carbons = carbonAmount;
+		n.minerals = mineralAmount;
+		e.add(n);
+	}
+
 	public void addNutrients(Entity e){
 		Nutrients n = this.engine.createComponent(Nutrients.class);
 		e.add(n);
 	}
-
 
 	public void addToEngine(Entity e){
 		this.engine.addEntity(e);

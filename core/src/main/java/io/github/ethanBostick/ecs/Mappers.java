@@ -11,5 +11,6 @@ public class Mappers {
     public static final ComponentMapper<MultiTileSprite> multiTileSpriteCMap = ComponentMapper.getFor(MultiTileSprite.class);
     public static final ComponentMapper<MultiTilePosition> multiTilePositionCMap = ComponentMapper.getFor(MultiTilePosition.class);
     public static final ComponentMapper<Density> densityCMap = ComponentMapper.getFor(Density.class);
+    public static final ComponentMapper<Nutrients> nutrientsCMap = ComponentMapper.getFor(Nutrients.class);
     public static final ComponentMapper<Direction> directionCMap = ComponentMapper.getFor(Direction.class);
 }

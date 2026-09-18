@@ -12,6 +12,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import io.github.ethanBostick.ecs.Mappers;
 import io.github.ethanBostick.ecs.Registry;
+import io.github.ethanBostick.events.Event;
+import io.github.ethanBostick.events.EventFactory;
+import io.github.ethanBostick.events.DepthChangeEvent;
+import io.github.ethanBostick.events.EventBus;
+import io.github.ethanBostick.events.EventType;
 
 
 public class GameHUD {
@@ -38,8 +43,9 @@ public class GameHUD {
         buildButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //directly reference the player and their depth component
-                Mappers.depthCMap.get(Registry.player).depth = (Mappers.depthCMap.get(Registry.player).depth + 1) % 2;
+				DepthChangeEvent depthChangeEvent = EventFactory.instance().depthChangeEventPool.obtain();
+				depthChangeEvent.newDepthDir = 1;
+				EventBus.instance().publish(depthChangeEvent);			
             }
         });
 

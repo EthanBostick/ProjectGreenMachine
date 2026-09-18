@@ -47,21 +47,23 @@ public class MyceliumSystem extends IntervalIteratingSystem {
         else{
             int newQ = position.q + direction.directionVector[0];
             int newR = position.r + direction.directionVector[1];
-            Entity oldMycelium = Map.instance().getEntityAt(newQ, newR, TilePosition.MYCELIUM);
-            Density oldDensity = Mappers.densityCMap.get(oldMycelium);
-            oldDensity.density = (oldDensity.density >= 3)? 3 : oldDensity.density + 1;
-            Sprite oldSprite = Mappers.spriteCMap.get(oldMycelium);
+            if (Math.abs(newQ) + Math.abs(newR) !=0){
+                Entity oldMycelium = Map.instance().getEntityAt(newQ, newR, TilePosition.MYCELIUM);
+                Density oldDensity = Mappers.densityCMap.get(oldMycelium);
+                oldDensity.density = (oldDensity.density >= 3)? 3 : oldDensity.density + 1;
+                Sprite oldSprite = Mappers.spriteCMap.get(oldMycelium);
 
-            switch (oldDensity.density){
-                case 1:
-                    oldSprite.texture = TextureUtils.pathToTexture("myceliumD1.png");
-                    break;
-                case 2:
-                    oldSprite.texture = TextureUtils.pathToTexture("myceliumD2.png");
-                    break;
-                case 3:
-                    oldSprite.texture = TextureUtils.pathToTexture("myceliumD3.png");
-                    break;
+                switch (oldDensity.density){
+                    case 1:
+                        oldSprite.texture = TextureUtils.pathToTexture("myceliumD1.png");
+                        break;
+                    case 2:
+                        oldSprite.texture = TextureUtils.pathToTexture("myceliumD2.png");
+                        break;
+                    case 3:
+                        oldSprite.texture = TextureUtils.pathToTexture("myceliumD3.png");
+                        break;
+                }
             }
         }
     }

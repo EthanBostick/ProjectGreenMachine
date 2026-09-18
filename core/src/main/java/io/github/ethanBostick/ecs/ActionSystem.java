@@ -31,8 +31,8 @@ public class ActionSystem extends IteratingSystem{
                 if(mousePosition.q != prevQ || mousePosition.r != prevR){
                     Entity mycelium = Map.instance().getEntityAt(prevQ, prevR, TilePosition.MYCELIUM);
                     if (mycelium != null){
-                    Mappers.directionCMap.get(mycelium).directionVector[0] = mousePosition.q - prevQ;
-                    Mappers.directionCMap.get(mycelium).directionVector[1] = mousePosition.r - prevR;
+                        Mappers.directionCMap.get(mycelium).directionVector[0] = mousePosition.q - prevQ;
+                        Mappers.directionCMap.get(mycelium).directionVector[1] = mousePosition.r - prevR;
                     }
                 }
             }

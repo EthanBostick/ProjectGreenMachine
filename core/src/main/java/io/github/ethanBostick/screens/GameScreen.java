@@ -9,6 +9,7 @@ import io.github.ethanBostick.ecs.ActionSystem;
 import io.github.ethanBostick.ecs.EntityBuilder;
 import io.github.ethanBostick.ecs.SelectionSystem;
 import io.github.ethanBostick.ecs.MyceliumSystem;
+import io.github.ethanBostick.ecs.PlayerStateSystem;
 
 
 import com.badlogic.gdx.Screen;
@@ -40,6 +41,7 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new ActionSystem());
 		this.engine.addSystem(new SelectionSystem());
 		this.engine.addSystem(new MyceliumSystem(10));
+		this.engine.addSystem(new PlayerStateSystem());
 
 		Map map = Map.instance();
 		double[] concentrations = new double[6];
@@ -49,7 +51,7 @@ public class GameScreen implements Screen {
 		concentrations[3] = 0.67;
 		concentrations[4] = 0.76;
 		concentrations[5] = 0.85;
-		map.initMap(100,concentrations,0.75,8);
+		map.initMap(100,concentrations,0.75,8,67);
 
 	//init Input and UI
 		this.multiplexer = new InputMultiplexer();

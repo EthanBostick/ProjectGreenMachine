@@ -1,8 +1,10 @@
 package io.github.ethanBostick.map;
 
 import com.badlogic.gdx.math.MathUtils;
+import java.util.Random;
 
 public class MapGenerator {
+    private Random random = null;
     private final int radius;
     private final int width;
     private int[] grid; //holds temperatures -1 = Blank Tile.
@@ -12,11 +14,12 @@ public class MapGenerator {
         {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}
     };
 
-    public MapGenerator(int radius, double thresh, int[] initialNoiseGrid) {
+    public MapGenerator(int radius, double thresh, int[] initialNoiseGrid, Random rand) {
         this.radius = radius;
         this.width = (radius * 2) + 1;
         this.thresh = thresh;
         this.grid = initialNoiseGrid; 
+        this.random = rand;
     }
 
     public int[] generate(int maxSchellingIterations, int maxSmoothingIterations) {
@@ -85,7 +88,7 @@ public class MapGenerator {
         for (int i = 0; i < this.grid.length; i++) {
             if (this.grid[i] == -1) {
                 validCount++;
-                if (MathUtils.random(validCount - 1) == 0) {
+                if (random.nextInt(validCount) == 0) {
                     selected = i;
                 }
             }
