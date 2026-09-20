@@ -2,11 +2,12 @@ package io.github.ethanBostick.map;
 
 public enum TilePosition {
     UNDERGROUND(0),
-    UNDERGROUND_TERRAIN(1),
-    MYCELIUM(2),
-    SURFACE(3),
-    TERRAIN(4),
-    MAX_POSITIONS(5);
+    RESOURCE_NODE(1),
+    UNDERGROUND_TERRAIN(2),
+    MYCELIUM(3),
+    SURFACE(4),
+    TERRAIN(5),
+    MAX_POSITIONS(6);
 
     private int position;
 

@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.Texture;
 
+import io.github.ethanBostick.map.BiomeType;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.TextureUtils;
 

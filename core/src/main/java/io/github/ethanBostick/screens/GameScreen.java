@@ -16,6 +16,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.ashley.core.Engine;
 
+import io.github.ethanBostick.map.BiomeType;
 //testing
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.ecs.Registry;
@@ -44,14 +45,26 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new PlayerStateSystem());
 
 		Map map = Map.instance();
-		double[] concentrations = new double[6];
-		concentrations[0] = 0.4;
-		concentrations[1] = 0.49;
-		concentrations[2] = 0.58;
-		concentrations[3] = 0.67;
-		concentrations[4] = 0.76;
-		concentrations[5] = 0.85;
-		map.initMap(100,concentrations,0.75,8,67);
+		double[] concentrations = new double[] {
+			0.4,//blank tile
+			0.09,
+			0.09,
+			0.09,
+			0.15,
+			0.09,
+			0.09};
+		BiomeType[] biomes = new BiomeType[]{
+			BiomeType.BLANK,
+			BiomeType.DESERT,
+			BiomeType.GRASS_LAND,
+			BiomeType.FOREST,
+			BiomeType.MOUNTAIN,
+			BiomeType.BOREAL,
+			BiomeType.TAIGA
+		};
+
+		map.initConfig(100, concentrations,biomes,0.75 , 10, 67);
+		map.initMap();
 
 	//init Input and UI
 		this.multiplexer = new InputMultiplexer();
