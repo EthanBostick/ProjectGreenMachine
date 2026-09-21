@@ -102,8 +102,8 @@ public class GameController extends InputAdapter{
         HexUtils.getAxialFromPixel(Mappers.positionCMap.get(this.mouse));
 
         //update touchdown hex
-        Mappers.multiTilePositionCMap.get(this.mouse).points.set(0, Mappers.positionCMap.get(this.mouse).q);
-        Mappers.multiTilePositionCMap.get(this.mouse).points.set(1, Mappers.positionCMap.get(this.mouse).r);
+        Mappers.multiTilePositionCMap.get(this.mouse).points.add(Mappers.positionCMap.get(this.mouse).q);
+        Mappers.multiTilePositionCMap.get(this.mouse).points.add(Mappers.positionCMap.get(this.mouse).r);
 
 		return true;
 	}
@@ -125,8 +125,8 @@ public class GameController extends InputAdapter{
         Mappers.mouseStateCMap.get(this.mouse).heldDown = true;
 
         //update end hex
-        Mappers.multiTilePositionCMap.get(this.mouse).points.set(2, Mappers.positionCMap.get(this.mouse).q);
-        Mappers.multiTilePositionCMap.get(this.mouse).points.set(3, Mappers.positionCMap.get(this.mouse).r);
+        Mappers.multiTilePositionCMap.get(this.mouse).points.add(Mappers.positionCMap.get(this.mouse).q);
+        Mappers.multiTilePositionCMap.get(this.mouse).points.add(Mappers.positionCMap.get(this.mouse).r);
         return true;
     }
 
@@ -142,6 +142,8 @@ public class GameController extends InputAdapter{
         Mappers.VectorArrowCMap.get(this.dragTool).endX = 0;
         Mappers.VectorArrowCMap.get(this.dragTool).endY = 0;
 
+        //clear mouse touch points
+        Mappers.multiTilePositionCMap.get(this.mouse).points.clear();
         return true;
     }
 
