@@ -2,23 +2,27 @@ package io.github.ethanBostick.screens;
 
 import io.github.ethanBostick.ui.GameHUD;
 import io.github.ethanBostick.input.GameController;
-import com.badlogic.gdx.InputMultiplexer;
+
 import io.github.ethanBostick.ecs.RenderSystem;
 import io.github.ethanBostick.ecs.MultiRenderSystem;
+import io.github.ethanBostick.ecs.VectorRenderSystem;
+
 import io.github.ethanBostick.ecs.ActionSystem;
-import io.github.ethanBostick.ecs.EntityBuilder;
 import io.github.ethanBostick.ecs.SelectionSystem;
 import io.github.ethanBostick.ecs.MyceliumSystem;
 import io.github.ethanBostick.ecs.NetworkFlowSystem;
+
 import io.github.ethanBostick.ecs.PlayerStateSystem;
+import io.github.ethanBostick.ecs.EntityBuilder;
 
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.InputMultiplexer;
 
-import io.github.ethanBostick.map.BiomeType;
 //testing
+import io.github.ethanBostick.map.BiomeType;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.ecs.Registry;
 //end testing
@@ -41,6 +45,8 @@ public class GameScreen implements Screen {
 		Registry.init();
 		this.engine.addSystem(new RenderSystem());
 		this.engine.addSystem(new MultiRenderSystem());
+		this.engine.addSystem(new VectorRenderSystem());
+
 		this.engine.addSystem(new ActionSystem());
 		this.engine.addSystem(new SelectionSystem());
 		this.engine.addSystem(new MyceliumSystem(tickRate));

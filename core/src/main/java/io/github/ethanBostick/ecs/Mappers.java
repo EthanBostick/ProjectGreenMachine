@@ -15,4 +15,5 @@ public class Mappers {
     public static final ComponentMapper<NutrientCapacity> nutrientCapacityCMap = ComponentMapper.getFor(NutrientCapacity.class);
     public static final ComponentMapper<NutrientDraw> nutrientDrawCMap = ComponentMapper.getFor(NutrientDraw.class);
     public static final ComponentMapper<Direction> directionCMap = ComponentMapper.getFor(Direction.class);
+    public static final ComponentMapper<VectorArrow> VectorArrowCMap = ComponentMapper.getFor(VectorArrow.class);
 }

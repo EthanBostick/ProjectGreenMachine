@@ -72,24 +72,33 @@ public class EntityBuilder {
 
     public Entity initDragTool(){
 		Entity entity = this.engine.createEntity();
-		MultiTileSprite mts = this.engine.createComponent(MultiTileSprite.class);
-		MultiTilePosition mtp = this.engine.createComponent(MultiTilePosition.class);
 
-		mtp.layer = 99;
-		mts.texture = new Array<Texture>(6);
+		//Free form drag arrow
+		VectorArrow vectorArrow = this.engine.createComponent(VectorArrow.class);
+		Sprite sprite = this.engine.createComponent(Sprite.class);
+		sprite.texture = TextureUtils.pathToTexture("dragArrow.png");
+		entity.add(sprite);
+		entity.add(vectorArrow);
 
-		entity.add(mtp);
-		entity.add(mts);
+		//MultiTile Stuff for LERP drag
+		// MultiTileSprite mts = this.engine.createComponent(MultiTileSprite.class);
+		// MultiTilePosition mtp = this.engine.createComponent(MultiTilePosition.class);
+
+		// mtp.layer = 99;
+		// mts.texture = new Array<Texture>(6);
+
+		// entity.add(mtp);
+		// entity.add(mts);
 
 		this.addToEngine(entity);
 		return entity;
     }
 
 	public Entity initMouse(){
+		Entity entity = this.engine.createEntity();
 		MouseState mouseState = this.engine.createComponent(MouseState.class);
 		Position mousePosition = this.engine.createComponent(Position.class);
 		MultiTilePosition mtp = this.engine.createComponent(MultiTilePosition.class);
-		Entity entity = this.engine.createEntity();
 
 		entity.add(mousePosition);
 		entity.add(mouseState);

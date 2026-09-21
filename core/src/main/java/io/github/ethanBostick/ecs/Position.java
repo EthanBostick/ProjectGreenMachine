@@ -1,9 +1,7 @@
 package io.github.ethanBostick.ecs;
 
 import com.badlogic.gdx.utils.Pool.Poolable;
-
 import io.github.ethanBostick.map.TilePosition;
-
 import com.badlogic.ashley.core.Component;
 
 public class Position implements Component, Poolable{

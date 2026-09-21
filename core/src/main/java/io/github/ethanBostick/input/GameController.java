@@ -19,6 +19,7 @@ public class GameController extends InputAdapter{
     private final OrthographicCamera camera;
     private final Viewport viewport;
     private final Entity mouse;
+    private final Entity dragTool;
     private Vector3 touchVector = new Vector3(0,0,0);
 
     // Movement speeds & limits
@@ -30,6 +31,7 @@ public class GameController extends InputAdapter{
     public GameController(float virtualWidth, float virtualHeight) {
         this.camera = Registry.camera;
         this.mouse = Registry.mouse;
+        this.dragTool = Registry.dragTool;
 
         viewport = new ExtendViewport(virtualWidth, virtualHeight, camera);
         viewport.apply();
@@ -88,9 +90,21 @@ public class GameController extends InputAdapter{
 
         Mappers.positionCMap.get(this.mouse).x = this.touchVector.x;
         Mappers.positionCMap.get(this.mouse).y = this.touchVector.y;
+
+        //update drag vector
+        Mappers.VectorArrowCMap.get(this.dragTool).startX = this.touchVector.x;
+        Mappers.VectorArrowCMap.get(this.dragTool).startY = this.touchVector.y;
+        Mappers.VectorArrowCMap.get(this.dragTool).endX = this.touchVector.x;
+        Mappers.VectorArrowCMap.get(this.dragTool).endY = this.touchVector.y;
+
         Mappers.mouseStateCMap.get(this.mouse).button = button;
         Mappers.mouseStateCMap.get(this.mouse).pressedDown = true;
         HexUtils.getAxialFromPixel(Mappers.positionCMap.get(this.mouse));
+
+        //update touchdown hex
+        Mappers.multiTilePositionCMap.get(this.mouse).points.set(0, Mappers.positionCMap.get(this.mouse).q);
+        Mappers.multiTilePositionCMap.get(this.mouse).points.set(1, Mappers.positionCMap.get(this.mouse).r);
+
 		return true;
 	}
 
@@ -102,8 +116,17 @@ public class GameController extends InputAdapter{
 
         Mappers.positionCMap.get(this.mouse).x = this.touchVector.x;
         Mappers.positionCMap.get(this.mouse).y = this.touchVector.y;
+
+        //update drag vector
+        Mappers.VectorArrowCMap.get(this.dragTool).endX = this.touchVector.x;
+        Mappers.VectorArrowCMap.get(this.dragTool).endY = this.touchVector.y;
+
         HexUtils.getAxialFromPixel(Mappers.positionCMap.get(this.mouse));
         Mappers.mouseStateCMap.get(this.mouse).heldDown = true;
+
+        //update end hex
+        Mappers.multiTilePositionCMap.get(this.mouse).points.set(2, Mappers.positionCMap.get(this.mouse).q);
+        Mappers.multiTilePositionCMap.get(this.mouse).points.set(3, Mappers.positionCMap.get(this.mouse).r);
         return true;
     }
 
@@ -112,6 +135,13 @@ public class GameController extends InputAdapter{
         Mappers.mouseStateCMap.get(this.mouse).pressedUp = true;
         Mappers.mouseStateCMap.get(this.mouse).heldDown = false;
         Mappers.mouseStateCMap.get(this.mouse).pressedDown = false;
+
+        //clear drag tool:
+        Mappers.VectorArrowCMap.get(this.dragTool).startX = 0;
+        Mappers.VectorArrowCMap.get(this.dragTool).startY = 0;
+        Mappers.VectorArrowCMap.get(this.dragTool).endX = 0;
+        Mappers.VectorArrowCMap.get(this.dragTool).endY = 0;
+
         return true;
     }
 
