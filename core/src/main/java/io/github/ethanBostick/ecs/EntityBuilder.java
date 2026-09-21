@@ -36,12 +36,19 @@ public class EntityBuilder {
 		return entity;
     }
 
-	public Entity createMycelium(int q, int r, int density){
+	public Entity createMycelium(int q, int r, int density, int initCarbon, int initMineral){
 		Entity e = createRenderable(q, r, 1, 1,TilePosition.MYCELIUM, "myceliumD1.png");
 		Direction direction = this.engine.createComponent(Direction.class);
+		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
+		NutrientDraw nutrientDraw = this.engine.createComponent(NutrientDraw.class);
+		nutrientCapacity.carbonCapacity = 10*density;
+		nutrientCapacity.mineralCapacity = 5*density;
+
+		e.add(nutrientCapacity);
+		e.add(nutrientDraw);
 		e.add(direction);
 		addDensity(e, density);		
-		addNutrients(e);
+		addNutrients(e, initCarbon, initMineral);
 
 		return e;
 	}

@@ -12,5 +12,7 @@ public class Mappers {
     public static final ComponentMapper<MultiTilePosition> multiTilePositionCMap = ComponentMapper.getFor(MultiTilePosition.class);
     public static final ComponentMapper<Density> densityCMap = ComponentMapper.getFor(Density.class);
     public static final ComponentMapper<Nutrients> nutrientsCMap = ComponentMapper.getFor(Nutrients.class);
+    public static final ComponentMapper<NutrientCapacity> nutrientCapacityCMap = ComponentMapper.getFor(NutrientCapacity.class);
+    public static final ComponentMapper<NutrientDraw> nutrientDrawCMap = ComponentMapper.getFor(NutrientDraw.class);
     public static final ComponentMapper<Direction> directionCMap = ComponentMapper.getFor(Direction.class);
 }

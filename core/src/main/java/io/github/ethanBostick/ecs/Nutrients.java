@@ -4,8 +4,8 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.ashley.core.Component;
 
 public class Nutrients implements Component, Poolable{
-    int carbons = 0;
-    int minerals = 0;
+    public int carbons = 0;
+    public int minerals = 0;
 
     public Nutrients(){}
     

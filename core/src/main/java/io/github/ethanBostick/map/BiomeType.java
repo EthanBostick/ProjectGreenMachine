@@ -2,8 +2,8 @@ package io.github.ethanBostick.map;
 
 public enum BiomeType {
     GRASS_LAND(ResourceType.MINERAL,1.5f,75),
-    DESERT(ResourceType.MINERAL, 0.25f,100),
-    FOREST(ResourceType.CARBON, 1.5f,65),
+    DESERT(ResourceType.MINERAL, 0.5f,100),
+    FOREST(ResourceType.CARBON, 1.75f,65),
     TAIGA(ResourceType.CARBON,1.15f,15),
     BOREAL(ResourceType.CARBON,0.90f,35),
     MOUNTAIN(ResourceType.MINERAL,0.9f,50),

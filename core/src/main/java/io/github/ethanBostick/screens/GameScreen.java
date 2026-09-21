@@ -9,6 +9,7 @@ import io.github.ethanBostick.ecs.ActionSystem;
 import io.github.ethanBostick.ecs.EntityBuilder;
 import io.github.ethanBostick.ecs.SelectionSystem;
 import io.github.ethanBostick.ecs.MyceliumSystem;
+import io.github.ethanBostick.ecs.NetworkFlowSystem;
 import io.github.ethanBostick.ecs.PlayerStateSystem;
 
 
@@ -27,6 +28,7 @@ public class GameScreen implements Screen {
 	private GameHUD gameHUD = null;
 	private InputMultiplexer multiplexer = null;
 	private GameController gameController = null;
+	public float tickRate = 0.5f;
 	public Engine engine;
 
 	public GameScreen(){}
@@ -41,7 +43,8 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new MultiRenderSystem());
 		this.engine.addSystem(new ActionSystem());
 		this.engine.addSystem(new SelectionSystem());
-		this.engine.addSystem(new MyceliumSystem(10));
+		this.engine.addSystem(new MyceliumSystem(tickRate));
+		this.engine.addSystem(new NetworkFlowSystem(tickRate));
 		this.engine.addSystem(new PlayerStateSystem());
 
 		Map map = Map.instance();

@@ -1,6 +1,5 @@
 package io.github.ethanBostick.map;
 
-import io.github.ethanBostick.ecs.Biome;
 import io.github.ethanBostick.ecs.EntityBuilder;
 
 import java.lang.Math;
@@ -169,7 +168,7 @@ public class Map{
 				int resourceConcentration = duelGrid[1][index];
 				if (resourceConcentration > 0 && bType.resourceType() != ResourceType.NONE){
 					Entity resourceNode;
-					int nodeLevel  = (resourceConcentration > 50)? 3: (resourceConcentration > 25) ? 2:1;
+					int nodeLevel  = (resourceConcentration > 40)? 3: (resourceConcentration > 30) ? 2:1;
 
 					//create the entity with sprite
 					if(bType.resourceType() == ResourceType.CARBON){
@@ -187,8 +186,9 @@ public class Map{
 
 				double rockThreshold = (tilePng == "mountain.png") ? 0.75 : 0.13; // rock obstacle
 
+				//init mycelium network node
 				if (q == 0 && r == 0){
-					Entity initMycelium = entityBuilder.createMycelium(q, r, 3);
+					Entity initMycelium = entityBuilder.createMycelium(q, r, 3,30,15);
 					this.entityBuilder.addToEngine(initMycelium);
 					this.map[index][TilePosition.MYCELIUM.value()] = initMycelium;
 
