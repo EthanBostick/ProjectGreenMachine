@@ -8,9 +8,9 @@ import io.github.ethanBostick.ecs.MultiRenderSystem;
 import io.github.ethanBostick.ecs.VectorRenderSystem;
 
 import io.github.ethanBostick.ecs.ActionSystem;
-import io.github.ethanBostick.ecs.SelectionSystem;
-import io.github.ethanBostick.ecs.MyceliumSystem;
+import io.github.ethanBostick.ecs.NetworkGrowthSystem;
 import io.github.ethanBostick.ecs.NetworkFlowSystem;
+import io.github.ethanBostick.ecs.RunnerSystem;
 
 import io.github.ethanBostick.ecs.PlayerStateSystem;
 import io.github.ethanBostick.ecs.EntityBuilder;
@@ -48,9 +48,9 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new VectorRenderSystem());
 
 		this.engine.addSystem(new ActionSystem());
-		this.engine.addSystem(new SelectionSystem());
-		this.engine.addSystem(new MyceliumSystem(tickRate));
+		this.engine.addSystem(new NetworkGrowthSystem(tickRate));
 		this.engine.addSystem(new NetworkFlowSystem(tickRate));
+		this.engine.addSystem(new RunnerSystem(tickRate));
 		this.engine.addSystem(new PlayerStateSystem());
 
 		Map map = Map.instance();

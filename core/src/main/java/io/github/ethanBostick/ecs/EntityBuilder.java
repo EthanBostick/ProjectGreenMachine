@@ -53,7 +53,36 @@ public class EntityBuilder {
 		return e;
 	}
 
-    public Entity initSelectTool(){
+	public Entity createMyceliumRunner(int startQ, int startR, int endQ, int endR ){
+		Entity runner = this.engine.createEntity();
+		Sprite targetHighlight = this.engine.createComponent(Sprite.class);
+		Position targetPosition = this.engine.createComponent(Position.class);
+		MultiTilePosition startAndEnd = this.engine.createComponent(MultiTilePosition.class);
+		Direction initDirection = this.engine.createComponent(Direction.class);
+		Complete status = this.engine.createComponent(Complete.class);
+		Depth depth = this.engine.createComponent(Depth.class);
+
+		targetHighlight.texture = TextureUtils.pathToTexture("runnerTarget.png");
+		targetPosition.q = endQ;
+		targetPosition.r = endR;
+		depth.depth = 1;
+
+		startAndEnd.points.add(startQ);
+		startAndEnd.points.add(startR);
+		startAndEnd.points.add(endQ);
+		startAndEnd.points.add(endR);
+
+		runner.add(depth);
+		runner.add(targetHighlight);
+		runner.add(targetPosition);
+		runner.add(startAndEnd);
+		runner.add(initDirection);
+		runner.add(status);
+
+		return runner;
+	}
+
+    public Entity initHighlighter(){
 		Entity entity = this.engine.createEntity();
 		Sprite s = this.engine.createComponent(Sprite.class);
 		Position p = this.engine.createComponent(Position.class);
@@ -70,39 +99,21 @@ public class EntityBuilder {
 		return entity;
     }
 
-    public Entity initDragTool(){
-		Entity entity = this.engine.createEntity();
-
-		//Free form drag arrow
-		VectorArrow vectorArrow = this.engine.createComponent(VectorArrow.class);
-		Sprite sprite = this.engine.createComponent(Sprite.class);
-		sprite.texture = TextureUtils.pathToTexture("dragArrow.png");
-		entity.add(sprite);
-		entity.add(vectorArrow);
-
-		//MultiTile Stuff for LERP drag
-		// MultiTileSprite mts = this.engine.createComponent(MultiTileSprite.class);
-		// MultiTilePosition mtp = this.engine.createComponent(MultiTilePosition.class);
-
-		// mtp.layer = 99;
-		// mts.texture = new Array<Texture>(6);
-
-		// entity.add(mtp);
-		// entity.add(mts);
-
-		this.addToEngine(entity);
-		return entity;
-    }
-
 	public Entity initMouse(){
 		Entity entity = this.engine.createEntity();
 		MouseState mouseState = this.engine.createComponent(MouseState.class);
 		Position mousePosition = this.engine.createComponent(Position.class);
 		MultiTilePosition mtp = this.engine.createComponent(MultiTilePosition.class);
+		VectorArrow vectorArrow = this.engine.createComponent(VectorArrow.class);
+		ActiveTool tool = this.engine.createComponent(ActiveTool.class);
 
+		vectorArrow.arrowTexture = TextureUtils.pathToTexture("dragArrow.png");
+
+		entity.add(vectorArrow);
 		entity.add(mousePosition);
 		entity.add(mouseState);
 		entity.add(mtp);
+		entity.add(tool);
 
 		this.engine.addEntity(entity);
 		return entity;

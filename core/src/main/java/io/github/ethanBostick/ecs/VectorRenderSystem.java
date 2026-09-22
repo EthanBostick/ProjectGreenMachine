@@ -14,7 +14,7 @@ public class VectorRenderSystem extends IteratingSystem{
 
     public VectorRenderSystem() {
         //prio 10 so it renders at top
-        super(Family.all(VectorArrow.class,Sprite.class).get(), 10);
+        super(Family.all(VectorArrow.class).get(), 10);
         this.batch = Registry.spriteBatch;
         this.camera = Registry.camera;
     }
@@ -33,7 +33,6 @@ public class VectorRenderSystem extends IteratingSystem{
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         VectorArrow arrow = Mappers.VectorArrowCMap.get(entity);
-        Sprite arrowSprite = Mappers.spriteCMap.get(entity);
 
         //deltas
         float dx = arrow.endX - arrow.startX;
@@ -45,7 +44,7 @@ public class VectorRenderSystem extends IteratingSystem{
         //converted from radians to degrees for SpriteBatch
         float angle = MathUtils.atan2(dy, dx) * MathUtils.radiansToDegrees;
 
-        TextureRegion arrowRegion = new TextureRegion(arrowSprite.texture);
+        TextureRegion arrowRegion = new TextureRegion(arrow.arrowTexture);
         //draw(TextureRegion, x, y, originX, originY, width, height, scaleX, scaleY, rotation)
         batch.draw(
             arrowRegion, 
