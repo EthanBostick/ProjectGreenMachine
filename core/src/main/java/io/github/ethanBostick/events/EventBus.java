@@ -45,5 +45,11 @@ public class EventBus{
 		if (event instanceof ScreenChangeEvent){
 			EventFactory.instance().screenChangeEventPool.free((ScreenChangeEvent)event); //calls the events reset()
 		}
+		else if (event instanceof DepthChangeEvent){
+			EventFactory.instance().depthChangeEventPool.free((DepthChangeEvent)event);
+		}
+		else if (event instanceof ToolChangeEvent){
+			EventFactory.instance().toolChangeEventPool.free((ToolChangeEvent)event);
+		}
 	}
 }

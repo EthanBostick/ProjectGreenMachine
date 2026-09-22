@@ -105,7 +105,6 @@ public class EntityBuilder {
 		Position mousePosition = this.engine.createComponent(Position.class);
 		MultiTilePosition mtp = this.engine.createComponent(MultiTilePosition.class);
 		VectorArrow vectorArrow = this.engine.createComponent(VectorArrow.class);
-		ActiveTool tool = this.engine.createComponent(ActiveTool.class);
 
 		vectorArrow.arrowTexture = TextureUtils.pathToTexture("dragArrow.png");
 
@@ -113,7 +112,6 @@ public class EntityBuilder {
 		entity.add(mousePosition);
 		entity.add(mouseState);
 		entity.add(mtp);
-		entity.add(tool);
 
 		this.engine.addEntity(entity);
 		return entity;
@@ -121,8 +119,10 @@ public class EntityBuilder {
 
 	public Entity initPlayer(){
 		Depth depth = this.engine.createComponent(Depth.class);
+		ActiveTool tool = this.engine.createComponent(ActiveTool.class);
 		Entity entity = this.engine.createEntity();
 
+		entity.add(tool);
 		entity.add(depth);
 
 		this.engine.addEntity(entity);

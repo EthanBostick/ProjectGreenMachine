@@ -13,7 +13,7 @@ public class ActionSystem extends IteratingSystem{
     private final Entity highlighter;
 
     public ActionSystem() {
-        super(Family.all(MouseState.class, ActiveTool.class).get(),1);
+        super(Family.all(MouseState.class).get(),1);
         this.highlighter = Registry.highlighter;
     }
 
@@ -62,6 +62,7 @@ public class ActionSystem extends IteratingSystem{
         }
 
         // deploy Runners
+
         if (mouseDragPosition.points.size < 4) return;
         int startQ = mouseDragPosition.points.get(0);
         int startR = mouseDragPosition.points.get(1);
@@ -86,7 +87,7 @@ public class ActionSystem extends IteratingSystem{
 
     @Override
     protected void processEntity(Entity mouse, float deltaTime) {
-        ToolType activeTool = Mappers.activeToolCMap.get(mouse).tool;
+        ToolType activeTool = Mappers.activeToolCMap.get(Registry.player).tool;
         MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
 
         // esc key clears selection 
@@ -98,7 +99,13 @@ public class ActionSystem extends IteratingSystem{
 
         switch (activeTool){
             case DEFAULT:
+                //display the drag line
+                Mappers.VectorArrowCMap.get(mouse).arrowTexture = TextureUtils.pathToTexture("dragArrow.png");
                 this.defaultAction(mouse);
+                break;
+            case BUILD:
+                //hide drag line if its not being used by the active tool
+                Mappers.VectorArrowCMap.get(mouse).arrowTexture = null;
                 break;
         }
 

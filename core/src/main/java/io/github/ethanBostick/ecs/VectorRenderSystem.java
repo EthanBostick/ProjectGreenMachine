@@ -34,6 +34,8 @@ public class VectorRenderSystem extends IteratingSystem{
     protected void processEntity(Entity entity, float deltaTime) {
         VectorArrow arrow = Mappers.VectorArrowCMap.get(entity);
 
+        if(arrow.arrowTexture == null) return;
+
         //deltas
         float dx = arrow.endX - arrow.startX;
         float dy = arrow.endY - arrow.startY;

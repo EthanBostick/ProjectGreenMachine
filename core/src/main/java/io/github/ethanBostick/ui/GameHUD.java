@@ -1,6 +1,8 @@
 package io.github.ethanBostick.ui;
 
 
+import javax.tools.Tool;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -12,9 +14,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import io.github.ethanBostick.ecs.Mappers;
 import io.github.ethanBostick.ecs.Registry;
+import io.github.ethanBostick.ecs.ToolType;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventFactory;
 import io.github.ethanBostick.events.DepthChangeEvent;
+import io.github.ethanBostick.events.ToolChangeEvent;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventType;
 
@@ -37,10 +41,11 @@ public class GameHUD {
         rootTable.bottom().right(); // Align contents to the bottom right of the screen
 
         // 4. Create your Actors (Widgets)
-        TextButton buildButton = new TextButton("Click Me", uiSkin);
+        TextButton depthButton = new TextButton("Change Depth", uiSkin);
+        TextButton buildToolButton = new TextButton("Build Tool", uiSkin);
 
         // 5. Add Input Listeners to the Actors
-        buildButton.addListener(new ClickListener() {
+        depthButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
 				DepthChangeEvent depthChangeEvent = EventFactory.instance().depthChangeEventPool.obtain();
@@ -49,9 +54,19 @@ public class GameHUD {
             }
         });
 
+        buildToolButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
+                toolChangeEvent.tool = ToolType.BUILD;
+				EventBus.instance().publish(toolChangeEvent);			
+            }
+        });
+
         // 6. Assemble the Hierarchy: Add Button -> Table -> Stage
         // The pad(10) adds 10 pixels of margin around the button
-        rootTable.add(buildButton).pad(10); 
+        rootTable.add(depthButton).pad(5); 
+        rootTable.add(buildToolButton).pad(5); 
         stage.addActor(rootTable);
     }
     
