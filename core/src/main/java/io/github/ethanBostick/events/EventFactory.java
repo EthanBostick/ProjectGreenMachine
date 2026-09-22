@@ -13,6 +13,13 @@ public class EventFactory {
         }
     };
 
+    public final Pool<DepthChangeEvent> depthChangeEventPool = new Pool<DepthChangeEvent>() {
+        @Override
+        protected DepthChangeEvent newObject() {
+            return new DepthChangeEvent();
+        }
+    };
+
 	private EventFactory(){}
 
 	public static EventFactory instance(){

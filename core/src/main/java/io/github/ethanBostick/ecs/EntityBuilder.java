@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.Texture;
 
+import io.github.ethanBostick.map.BiomeType;
+import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.TextureUtils;
 
 //libGDX stuff
@@ -13,7 +15,7 @@ public class EntityBuilder {
 	private static EntityBuilder theInstance = null;
     private Engine engine = null;
 
-    public Entity createRenderable(int q, int r, int renderLayer, int depth, String texturePath){
+    public Entity createRenderable(int q, int r, int renderLayer, int depth, TilePosition tilePosition, String texturePath){
 		Entity entity = this.engine.createEntity();
 
 		Depth d = this.engine.createComponent(Depth.class);
@@ -25,6 +27,7 @@ public class EntityBuilder {
         p.q = q;
 		p.r = r;
 		p.layer = renderLayer;
+		p.tilePosition = tilePosition;
 
 		entity.add(p);
 		entity.add(d);
@@ -33,7 +36,53 @@ public class EntityBuilder {
 		return entity;
     }
 
-    public Entity initSelectTool(){
+	public Entity createMycelium(int q, int r, int density, int initCarbon, int initMineral){
+		Entity e = createRenderable(q, r, 1, 1,TilePosition.MYCELIUM, "myceliumD1.png");
+		Direction direction = this.engine.createComponent(Direction.class);
+		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
+		NutrientDraw nutrientDraw = this.engine.createComponent(NutrientDraw.class);
+		nutrientCapacity.carbonCapacity = 10*density;
+		nutrientCapacity.mineralCapacity = 5*density;
+
+		e.add(nutrientCapacity);
+		e.add(nutrientDraw);
+		e.add(direction);
+		addDensity(e, density);		
+		addNutrients(e, initCarbon, initMineral);
+
+		return e;
+	}
+
+	public Entity createMyceliumRunner(int startQ, int startR, int endQ, int endR ){
+		Entity runner = this.engine.createEntity();
+		Sprite targetHighlight = this.engine.createComponent(Sprite.class);
+		Position targetPosition = this.engine.createComponent(Position.class);
+		MultiTilePosition startAndEnd = this.engine.createComponent(MultiTilePosition.class);
+		Direction initDirection = this.engine.createComponent(Direction.class);
+		Complete status = this.engine.createComponent(Complete.class);
+		Depth depth = this.engine.createComponent(Depth.class);
+
+		targetHighlight.texture = TextureUtils.pathToTexture("runnerTarget.png");
+		targetPosition.q = endQ;
+		targetPosition.r = endR;
+		depth.depth = 1;
+
+		startAndEnd.points.add(startQ);
+		startAndEnd.points.add(startR);
+		startAndEnd.points.add(endQ);
+		startAndEnd.points.add(endR);
+
+		runner.add(depth);
+		runner.add(targetHighlight);
+		runner.add(targetPosition);
+		runner.add(startAndEnd);
+		runner.add(initDirection);
+		runner.add(status);
+
+		return runner;
+	}
+
+    public Entity initHighlighter(){
 		Entity entity = this.engine.createEntity();
 		Sprite s = this.engine.createComponent(Sprite.class);
 		Position p = this.engine.createComponent(Position.class);
@@ -41,6 +90,7 @@ public class EntityBuilder {
 		p.q = 0;
 		p.r = 0;
 		p.layer = 99;
+		p.tilePosition = TilePosition.SURFACE;
 
 		entity.add(p);
 		entity.add(s);
@@ -49,30 +99,21 @@ public class EntityBuilder {
 		return entity;
     }
 
-    public Entity initDragTool(){
-		Entity entity = this.engine.createEntity();
-		MultiTileSprite mts = this.engine.createComponent(MultiTileSprite.class);
-		MultiTilePosition mtp = this.engine.createComponent(MultiTilePosition.class);
-
-		mtp.layer = 99;
-		mts.texture = new Array<Texture>(6);
-
-		entity.add(mtp);
-		entity.add(mts);
-
-		this.addToEngine(entity);
-		return entity;
-    }
-
 	public Entity initMouse(){
+		Entity entity = this.engine.createEntity();
 		MouseState mouseState = this.engine.createComponent(MouseState.class);
 		Position mousePosition = this.engine.createComponent(Position.class);
 		MultiTilePosition mtp = this.engine.createComponent(MultiTilePosition.class);
-		Entity entity = this.engine.createEntity();
+		VectorArrow vectorArrow = this.engine.createComponent(VectorArrow.class);
+		ActiveTool tool = this.engine.createComponent(ActiveTool.class);
 
+		vectorArrow.arrowTexture = TextureUtils.pathToTexture("dragArrow.png");
+
+		entity.add(vectorArrow);
 		entity.add(mousePosition);
 		entity.add(mouseState);
 		entity.add(mtp);
+		entity.add(tool);
 
 		this.engine.addEntity(entity);
 		return entity;
@@ -117,6 +158,23 @@ public class EntityBuilder {
 		e.add(biome);
 	}
 
+	public void addDensity(Entity e, int density){
+		Density d = this.engine.createComponent(Density.class);
+		d.density = density;
+		e.add(d);
+	}
+
+	public void addNutrients(Entity e, int carbonAmount, int mineralAmount){
+		Nutrients n = this.engine.createComponent(Nutrients.class);
+		n.carbons = carbonAmount;
+		n.minerals = mineralAmount;
+		e.add(n);
+	}
+
+	public void addNutrients(Entity e){
+		Nutrients n = this.engine.createComponent(Nutrients.class);
+		e.add(n);
+	}
 
 	public void addToEngine(Entity e){
 		this.engine.addEntity(e);

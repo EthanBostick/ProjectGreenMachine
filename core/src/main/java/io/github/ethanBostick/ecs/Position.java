@@ -1,6 +1,7 @@
 package io.github.ethanBostick.ecs;
 
 import com.badlogic.gdx.utils.Pool.Poolable;
+import io.github.ethanBostick.map.TilePosition;
 import com.badlogic.ashley.core.Component;
 
 public class Position implements Component, Poolable{
@@ -9,6 +10,7 @@ public class Position implements Component, Poolable{
     public float x = 0;
     public float y = 0;
     public int layer = 0;
+    public TilePosition tilePosition = null;
 
     public Position(){}
     
@@ -19,6 +21,7 @@ public class Position implements Component, Poolable{
         this.x = 0;
         this.y = 0;
         this.layer = 0;
+        this.tilePosition = null;
 	}
 
 }

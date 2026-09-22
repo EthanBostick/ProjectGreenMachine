@@ -1,5 +1,7 @@
 package io.github.ethanBostick.ecs;
 
+import io.github.ethanBostick.map.BiomeType;
+
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.ashley.core.Component;
 

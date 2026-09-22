@@ -9,24 +9,21 @@ public class Registry {
     public static OrthographicCamera camera = null;
     public static SpriteBatch spriteBatch = null;
     public static Entity mouse = null;
-    public static Entity selectTool = null;
-    public static Entity dragTool = null;
+    public static Entity highlighter = null;
     public static Entity player = null;
 
     public static void init(){
         camera = new OrthographicCamera();
 		spriteBatch = new SpriteBatch();
-        selectTool = EntityBuilder.instance().initSelectTool();
+        highlighter = EntityBuilder.instance().initHighlighter();
         mouse = EntityBuilder.instance().initMouse();
-        dragTool = EntityBuilder.instance().initDragTool();
         player = EntityBuilder.instance().initPlayer();
     }
 
     public static void dispose(){
         camera = null;
 		spriteBatch = null;
-        selectTool = null;
-        dragTool = null;
+        highlighter = null;
         mouse = null;
         player = null;
     }

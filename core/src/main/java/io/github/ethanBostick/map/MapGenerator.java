@@ -1,8 +1,9 @@
 package io.github.ethanBostick.map;
 
-import com.badlogic.gdx.math.MathUtils;
+import java.util.Random;
 
 public class MapGenerator {
+    private Random random = null;
     private final int radius;
     private final int width;
     private int[] grid; //holds temperatures -1 = Blank Tile.
@@ -12,14 +13,34 @@ public class MapGenerator {
         {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}
     };
 
-    public MapGenerator(int radius, double thresh, int[] initialNoiseGrid) {
+    // FastNoiseLite instances for procedural resources
+    private FastNoiseLite simplex;
+    private FastNoiseLite cellular;
+
+    public MapGenerator(int radius, double thresh, int[] initialNoiseGrid, Random rand, int seed) {
         this.radius = radius;
         this.width = (radius * 2) + 1;
         this.thresh = thresh;
         this.grid = initialNoiseGrid; 
+        this.random = rand;
+        
+        // Initialize noise specifically for resources
+        this.simplex = new FastNoiseLite();
+        this.simplex.SetSeed(seed);
+        this.simplex.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+        this.simplex.SetFrequency(0.08f);
+
+        this.cellular = new FastNoiseLite();
+        this.cellular.SetSeed(seed + 1); // Offset seed for variation
+        this.cellular.SetNoiseType(FastNoiseLite.NoiseType.Cellular);
+        this.cellular.SetCellularDistanceFunction(FastNoiseLite.CellularDistanceFunction.Euclidean);
+        this.cellular.SetCellularReturnType(FastNoiseLite.CellularReturnType.Distance);
+        this.cellular.SetFrequency(0.08f);
     }
 
-    public int[] generate(int maxSchellingIterations, int maxSmoothingIterations) {
+    // returns a 2d int map of the two map layers (i = 0 -> temp biome map, i = 1 -> resource map)
+    // ex: rtn[which map][index]
+    public int[][] generate(int maxSchellingIterations, int maxSmoothingIterations) {
         for (int i = 0; i < maxSchellingIterations; i++) {
             boolean converged = runSchellingPass();
             if (converged) break;
@@ -28,7 +49,72 @@ public class MapGenerator {
             this.grid = runSmoothingPass();
         }
 
-        return this.grid;
+        int[] resourceGrid = runResourcePass();
+        return new int[][] { this.grid, resourceGrid };
+    }
+
+    private int[] runResourcePass() {
+        int[] resourceGrid = new int[this.grid.length];
+
+        for (int q = -this.radius; q <= this.radius; q++) {
+            int r1 = Math.max(-this.radius, -q - this.radius);
+            int r2 = Math.min(this.radius, -q + this.radius);
+            for (int r = r1; r <= r2; r++) {
+                
+                int index = getIndex(q, r);
+                int biomeTemp = this.grid[index];
+
+                // Ignore empty structural tiles completely
+                if (biomeTemp == -1) {
+                    resourceGrid[index] = 0;
+                    continue; 
+                }
+
+                // 1. Simplex (Macro Regions): Maps output from roughly -1 to 1 into 0 to 1
+                float macroNoise = (simplex.GetNoise(q, r) + 1f) / 2f; 
+                
+                // 2. Voronoi (Vein Epicenters): Distance to nearest cell center
+                float veinDistance = cellular.GetNoise(q, r); 
+                
+                // Invert distance so the cell center is a spike (1.0) and edges are 0.0
+                float veinIntensity = 1f - Math.min(1f, Math.abs(veinDistance) * 2f); 
+
+                // 3. Combine raw shapes
+                float rawConcentration = macroNoise + (veinIntensity * 1.5f);
+
+                // 4. Apply Biome Logics (The Scalar)
+                float biomeScalar = getBiomeResourceScalar(biomeTemp); 
+
+                // 5. Calculate Final Integer Concentration (0 to 100 max)
+                int finalConcentration = Math.round(rawConcentration * 20f * biomeScalar);
+                
+                // 6. Prune weak tiles to keep resources strictly as "hotspots"
+                if (finalConcentration >= 15) {
+                    resourceGrid[index] = Math.min(100, finalConcentration);
+                } else {
+                    resourceGrid[index] = 0;
+                }
+            }
+        }
+        return resourceGrid;
+    }
+
+    private float getBiomeResourceScalar(int biomeTemp) {
+        if (biomeTemp == BiomeType.FOREST.tempValue()){
+            return BiomeType.FOREST.resourceScalar();
+        } else if (biomeTemp == BiomeType.DESERT.tempValue()){
+            return BiomeType.DESERT.resourceScalar();
+        } else if (biomeTemp == BiomeType.GRASS_LAND.tempValue()){
+            return BiomeType.GRASS_LAND.resourceScalar();
+        } else if (biomeTemp == BiomeType.MOUNTAIN.tempValue()){
+            return BiomeType.MOUNTAIN.resourceScalar();
+        } else if (biomeTemp == BiomeType.TAIGA.tempValue()){
+            return BiomeType.TAIGA.resourceScalar();
+        } else if (biomeTemp == BiomeType.BOREAL.tempValue()){
+            return BiomeType.BOREAL.resourceScalar();
+        } else{
+            return 1.0f;
+        }
     }
 
     private boolean runSchellingPass() {
@@ -85,7 +171,7 @@ public class MapGenerator {
         for (int i = 0; i < this.grid.length; i++) {
             if (this.grid[i] == -1) {
                 validCount++;
-                if (MathUtils.random(validCount - 1) == 0) {
+                if (random.nextInt(validCount) == 0) {
                     selected = i;
                 }
             }

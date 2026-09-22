@@ -27,7 +27,7 @@ public class RenderSystem extends SortedIteratingSystem{
     }
 
     public RenderSystem() {
-        super(Family.all(Position.class, Sprite.class).get(), new LayerComparator());
+        super(Family.all(Position.class, Sprite.class).get(), new LayerComparator(),0);//priority 0, this system will always run first
         this.batch = Registry.spriteBatch;
         this.camera = Registry.camera;
     }

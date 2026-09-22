@@ -2,18 +2,27 @@ package io.github.ethanBostick.screens;
 
 import io.github.ethanBostick.ui.GameHUD;
 import io.github.ethanBostick.input.GameController;
-import com.badlogic.gdx.InputMultiplexer;
+
 import io.github.ethanBostick.ecs.RenderSystem;
 import io.github.ethanBostick.ecs.MultiRenderSystem;
+import io.github.ethanBostick.ecs.VectorRenderSystem;
+
 import io.github.ethanBostick.ecs.ActionSystem;
+import io.github.ethanBostick.ecs.NetworkGrowthSystem;
+import io.github.ethanBostick.ecs.NetworkFlowSystem;
+import io.github.ethanBostick.ecs.RunnerSystem;
+
+import io.github.ethanBostick.ecs.PlayerStateSystem;
 import io.github.ethanBostick.ecs.EntityBuilder;
-import io.github.ethanBostick.ecs.SelectionSystem;
+
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.InputMultiplexer;
 
 //testing
+import io.github.ethanBostick.map.BiomeType;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.ecs.Registry;
 //end testing
@@ -23,6 +32,7 @@ public class GameScreen implements Screen {
 	private GameHUD gameHUD = null;
 	private InputMultiplexer multiplexer = null;
 	private GameController gameController = null;
+	public float tickRate = 0.5f;
 	public Engine engine;
 
 	public GameScreen(){}
@@ -35,18 +45,35 @@ public class GameScreen implements Screen {
 		Registry.init();
 		this.engine.addSystem(new RenderSystem());
 		this.engine.addSystem(new MultiRenderSystem());
+		this.engine.addSystem(new VectorRenderSystem());
+
 		this.engine.addSystem(new ActionSystem());
-		this.engine.addSystem(new SelectionSystem());
+		this.engine.addSystem(new NetworkGrowthSystem(tickRate));
+		this.engine.addSystem(new NetworkFlowSystem(tickRate));
+		this.engine.addSystem(new RunnerSystem(tickRate));
+		this.engine.addSystem(new PlayerStateSystem());
 
 		Map map = Map.instance();
-		double[] concentrations = new double[6];
-		concentrations[0] = 0.4;
-		concentrations[1] = 0.49;
-		concentrations[2] = 0.58;
-		concentrations[3] = 0.67;
-		concentrations[4] = 0.76;
-		concentrations[5] = 0.85;
-		map.initMap(100,concentrations,0.75,8);
+		double[] concentrations = new double[] {
+			0.4,//blank tile
+			0.09,
+			0.09,
+			0.09,
+			0.15,
+			0.09,
+			0.09};
+		BiomeType[] biomes = new BiomeType[]{
+			BiomeType.BLANK,
+			BiomeType.DESERT,
+			BiomeType.GRASS_LAND,
+			BiomeType.FOREST,
+			BiomeType.MOUNTAIN,
+			BiomeType.BOREAL,
+			BiomeType.TAIGA
+		};
+
+		map.initConfig(100, concentrations,biomes,0.75 , 10, 67);
+		map.initMap();
 
 	//init Input and UI
 		this.multiplexer = new InputMultiplexer();
