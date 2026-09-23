@@ -1,8 +1,6 @@
 package io.github.ethanBostick.ecs;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.graphics.Texture;
 
 import io.github.ethanBostick.map.BiomeType;
 import io.github.ethanBostick.map.TilePosition;
@@ -48,6 +46,28 @@ public class EntityBuilder {
 		e.add(nutrientDraw);
 		e.add(direction);
 		addDensity(e, density);		
+		addNutrients(e, initCarbon, initMineral);
+
+		return e;
+	}
+
+	public Entity createMyceliumExtractor(int q, int r, int initCarbon, int initMineral){
+		Entity e = createRenderable(q, r, 1, 1,TilePosition.MYCELIUM, "extractorMycelium.png");
+		Direction direction = this.engine.createComponent(Direction.class);
+		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
+		NutrientDraw nutrientDraw = this.engine.createComponent(NutrientDraw.class);
+		Extraction extraction = this.engine.createComponent(Extraction.class);
+		nutrientCapacity.carbonCapacity = 30;
+		nutrientCapacity.mineralCapacity = 15;
+		extraction.carbonRate = 5;
+		extraction.carbonRate = 1;
+		extraction.radius = 0;
+
+		e.add(nutrientCapacity);
+		e.add(nutrientDraw);
+		e.add(direction);
+		e.add(extraction);
+		addDensity(e, 4);
 		addNutrients(e, initCarbon, initMineral);
 
 		return e;

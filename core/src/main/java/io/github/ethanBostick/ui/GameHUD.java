@@ -12,15 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import io.github.ethanBostick.ecs.Mappers;
-import io.github.ethanBostick.ecs.Registry;
 import io.github.ethanBostick.ecs.ToolType;
-import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventFactory;
 import io.github.ethanBostick.events.DepthChangeEvent;
 import io.github.ethanBostick.events.ToolChangeEvent;
 import io.github.ethanBostick.events.EventBus;
-import io.github.ethanBostick.events.EventType;
 
 
 public class GameHUD {

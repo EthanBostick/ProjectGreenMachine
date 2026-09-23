@@ -3,14 +3,13 @@ package io.github.ethanBostick.ecs;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
-import com.badlogic.gdx.graphics.Texture;
 
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.TextureUtils;
 
 public class NetworkGrowthSystem extends IntervalIteratingSystem {
-    public final float interval; //half seconds
+    public final float interval; //seconds
     
     /**
      * @param interval The time in seconds between each system execution (e.g., 0.5f)

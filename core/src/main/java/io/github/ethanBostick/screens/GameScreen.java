@@ -11,10 +11,10 @@ import io.github.ethanBostick.ecs.ActionSystem;
 import io.github.ethanBostick.ecs.NetworkGrowthSystem;
 import io.github.ethanBostick.ecs.NetworkFlowSystem;
 import io.github.ethanBostick.ecs.RunnerSystem;
+import io.github.ethanBostick.ecs.ExtractionSystem;
 
 import io.github.ethanBostick.ecs.PlayerStateSystem;
 import io.github.ethanBostick.ecs.EntityBuilder;
-
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
@@ -48,6 +48,7 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new VectorRenderSystem());
 
 		this.engine.addSystem(new ActionSystem());
+		this.engine.addSystem(new ExtractionSystem(tickRate));
 		this.engine.addSystem(new NetworkGrowthSystem(tickRate));
 		this.engine.addSystem(new NetworkFlowSystem(tickRate));
 		this.engine.addSystem(new RunnerSystem(tickRate));

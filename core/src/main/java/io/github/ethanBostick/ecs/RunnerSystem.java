@@ -7,10 +7,9 @@ import java.lang.Math;
 
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
-import io.github.ethanBostick.utils.TextureUtils;
 
 public class RunnerSystem extends IntervalIteratingSystem {
-    public final float interval; //half seconds
+    public final float interval; //seconds
     
     /**
      * @param interval The time in seconds between each system execution (e.g., 0.5f)

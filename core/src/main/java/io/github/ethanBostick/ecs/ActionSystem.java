@@ -85,6 +85,22 @@ public class ActionSystem extends IteratingSystem{
 
     }
 
+    private void buildAction(Entity mouse){
+        Position mousePosition = Mappers.positionCMap.get(mouse);
+        MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
+        MultiTilePosition mouseDragPosition = Mappers.multiTilePositionCMap.get(mouse);
+
+        if (mouseState.pressedDown && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r) && !mouseState.heldDown){
+
+            Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
+            if(selectedTile != null) return;
+
+            Entity extractorNode = EntityBuilder.instance().createMyceliumExtractor(mousePosition.q, mousePosition.r, 0, 0);
+            EntityBuilder.instance().addToEngine(extractorNode);
+            Map.instance().setEntityAt(mousePosition.q, mousePosition.r, extractorNode, TilePosition.MYCELIUM);       
+        }
+    }
+
     @Override
     protected void processEntity(Entity mouse, float deltaTime) {
         ToolType activeTool = Mappers.activeToolCMap.get(Registry.player).tool;
@@ -106,6 +122,7 @@ public class ActionSystem extends IteratingSystem{
             case BUILD:
                 //hide drag line if its not being used by the active tool
                 Mappers.VectorArrowCMap.get(mouse).arrowTexture = null;
+                this.buildAction(mouse);
                 break;
         }
 
