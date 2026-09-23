@@ -7,6 +7,9 @@ import io.github.ethanBostick.ecs.Position;
 public final class HexUtils {
     private HexUtils() {}
 
+    public static final int[][] hexDirections = {
+        {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}
+    };
     public static final float HEIGHT = 52f;
     public static final float WIDTH = 64f;
     public static final float SIZE = 30f;

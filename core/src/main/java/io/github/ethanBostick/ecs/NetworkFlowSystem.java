@@ -6,12 +6,11 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
+import io.github.ethanBostick.utils.HexUtils;
 
 public class NetworkFlowSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
-    private final int[][] hexDirections = {
-        {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}
-    };
+    private final int[][] hexDirections;
     
     /**
      * @param interval The time in seconds between each system execution (e.g., 0.5f)
@@ -19,6 +18,7 @@ public class NetworkFlowSystem extends IntervalIteratingSystem {
     public NetworkFlowSystem(float interval) {
         super(Family.all(Nutrients.class, NutrientDraw.class, NutrientCapacity.class, Position.class).get(), interval);
         this.interval = interval;
+        this.hexDirections = HexUtils.hexDirections;
     }
 
     @Override

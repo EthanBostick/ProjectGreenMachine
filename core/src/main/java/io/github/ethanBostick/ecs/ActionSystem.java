@@ -2,6 +2,7 @@ package io.github.ethanBostick.ecs;
 
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
+import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
 
 import com.badlogic.ashley.systems.IteratingSystem;
@@ -11,10 +12,12 @@ import com.badlogic.ashley.core.Family;
 public class ActionSystem extends IteratingSystem{
 
     private final Entity highlighter;
+    private final int[][] hexDirections;
 
     public ActionSystem() {
         super(Family.all(MouseState.class).get(),1);
         this.highlighter = Registry.highlighter;
+        this.hexDirections = HexUtils.hexDirections;
     }
 
     @Override
@@ -85,6 +88,17 @@ public class ActionSystem extends IteratingSystem{
 
     }
 
+    private boolean neighboringMycelium(Position p){
+        boolean friendNear = false;
+        for (int i = 0; i < 6; i++){
+            Entity neighbor = Map.instance().getEntityAt(p.q + this.hexDirections[i][0], p.r + this.hexDirections[i][1], TilePosition.MYCELIUM);
+            friendNear = neighbor != null;
+            if (friendNear) break;
+        }
+
+        return friendNear;
+    }
+
     private void buildAction(Entity mouse){
         Position mousePosition = Mappers.positionCMap.get(mouse);
         MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
@@ -93,11 +107,15 @@ public class ActionSystem extends IteratingSystem{
         if (mouseState.pressedDown && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r) && !mouseState.heldDown){
 
             Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
+            //TODO: allow creation ontop of existing mycelium (ensure entities are returned to the pool properly)
             if(selectedTile != null) return;
 
-            Entity extractorNode = EntityBuilder.instance().createMyceliumExtractor(mousePosition.q, mousePosition.r, 0, 0);
-            EntityBuilder.instance().addToEngine(extractorNode);
-            Map.instance().setEntityAt(mousePosition.q, mousePosition.r, extractorNode, TilePosition.MYCELIUM);       
+            //check for atleast one mycelium neighbor
+            if (neighboringMycelium(mousePosition)){
+                Entity extractorNode = EntityBuilder.instance().createMyceliumExtractor(mousePosition.q, mousePosition.r, 0, 0);
+                EntityBuilder.instance().addToEngine(extractorNode);
+                Map.instance().setEntityAt(mousePosition.q, mousePosition.r, extractorNode, TilePosition.MYCELIUM);       
+            }
         }
     }
 
