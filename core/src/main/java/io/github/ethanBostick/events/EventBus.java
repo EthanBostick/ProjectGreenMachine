@@ -51,5 +51,8 @@ public class EventBus{
 		else if (event instanceof ToolChangeEvent){
 			EventFactory.instance().toolChangeEventPool.free((ToolChangeEvent)event);
 		}
+		else if (event instanceof TileSelectEvent){
+			EventFactory.instance().tileSelectEventPool.free((TileSelectEvent)event);
+		}
 	}
 }

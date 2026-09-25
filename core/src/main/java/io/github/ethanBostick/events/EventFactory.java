@@ -27,6 +27,13 @@ public class EventFactory {
         }
     };
 
+    public final Pool<TileSelectEvent> tileSelectEventPool = new Pool<TileSelectEvent>() {
+        @Override
+        protected TileSelectEvent newObject() {
+            return new TileSelectEvent();
+        }
+    };
+
 	private EventFactory(){}
 
 	public static EventFactory instance(){

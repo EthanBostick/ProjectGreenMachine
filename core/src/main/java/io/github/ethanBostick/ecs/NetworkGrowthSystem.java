@@ -15,8 +15,8 @@ public class NetworkGrowthSystem extends IntervalIteratingSystem {
      * @param interval The time in seconds between each system execution (e.g., 0.5f)
      */
     public NetworkGrowthSystem(float interval) {
-        super(Family.all(Nutrients.class,NutrientCapacity.class,NutrientDraw.class, Direction.class,Position.class).get(), interval*10);
-        this.interval = interval * 10;
+        super(Family.all(Nutrients.class,NutrientCapacity.class,NutrientDraw.class, Direction.class,Position.class).get(), interval*5);
+        this.interval = interval*5;
     }
 
     private void updateDensityData(Sprite targetSprite, NutrientCapacity nutrientCapacity, int newDensity){
@@ -24,17 +24,20 @@ public class NetworkGrowthSystem extends IntervalIteratingSystem {
         switch (newDensity){
             case 1:
                 targetSprite.texture = TextureUtils.pathToTexture("myceliumD1.png");
+                nutrientCapacity.carbonCapacity = 10*newDensity;
+                nutrientCapacity.mineralCapacity = 5*newDensity;
                 break;
             case 2:
                 targetSprite.texture = TextureUtils.pathToTexture("myceliumD2.png");
+                nutrientCapacity.carbonCapacity = 10*newDensity;
+                nutrientCapacity.mineralCapacity = 5*newDensity;
                 break;
             case 3:
                 targetSprite.texture = TextureUtils.pathToTexture("myceliumD3.png");
+                nutrientCapacity.carbonCapacity = 10*newDensity;
+                nutrientCapacity.mineralCapacity = 5*newDensity;
                 break;
         }
-        //more hold
-		nutrientCapacity.carbonCapacity = 10*newDensity;
-		nutrientCapacity.mineralCapacity = 5*newDensity;
     }
 
     @Override

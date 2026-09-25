@@ -79,8 +79,8 @@ public class GameScreen implements Screen {
 	//init Input and UI
 		this.multiplexer = new InputMultiplexer();
 		this.gameHUD = new GameHUD();
-		this.multiplexer.addProcessor(0,this.gameHUD.stage); 
 		this.gameController = new GameController(500, 500);
+		this.multiplexer.addProcessor(this.gameHUD.stage); 
 		this.multiplexer.addProcessor(this.gameController);
 		Gdx.input.setInputProcessor(this.multiplexer);
 	}
@@ -93,6 +93,7 @@ public class GameScreen implements Screen {
 
         //engine systems update
 		this.engine.update(delta);
+		this.gameHUD.update();
 		this.gameHUD.stage.act(delta);
 		this.gameHUD.stage.draw();
     }

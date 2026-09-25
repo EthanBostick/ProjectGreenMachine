@@ -4,6 +4,9 @@ import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
+import io.github.ethanBostick.events.EventBus;
+import io.github.ethanBostick.events.TileSelectEvent;
+import io.github.ethanBostick.events.EventFactory;
 
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.core.Entity;
@@ -34,7 +37,7 @@ public class ActionSystem extends IteratingSystem{
         Sprite selectedSprite = Mappers.spriteCMap.get(this.highlighter);
 
         // regular select logic
-        if (mouseState.pressedDown && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r) && !mouseState.heldDown){
+        if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
             //pressed the same hex again
             if(mousePosition.q == selectedPosition.q && mousePosition.r == selectedPosition.r && selectedSprite.texture != null){
                 //increment the selection
@@ -44,21 +47,9 @@ public class ActionSystem extends IteratingSystem{
             selectedPosition.r = mousePosition.r;
             selectedSprite.texture = TextureUtils.pathToTexture("selected.png");
 
-            Entity selectedTile = Map.instance().getEntityAt(selectedPosition.q, selectedPosition.r, TilePosition.MYCELIUM);
-            if(selectedTile != null){
-                Direction growthDirection = Mappers.directionCMap.get(selectedTile);
-                Nutrients selectedNutrients = Mappers.nutrientsCMap.get(selectedTile);
-
-                int dirQ = (growthDirection != null)? growthDirection.directionVector[0] : 0;
-                int dirR = (growthDirection != null)? growthDirection.directionVector[1] : 1;
-                int carbonAmount = (selectedNutrients != null)? selectedNutrients.carbons : 0;
-                int mineralAmount = (selectedNutrients != null)? selectedNutrients.minerals : 0;
-                System.out.println("--- info "+ selectedPosition.tilePosition +  " ---");
-                System.out.println("carbons: "+ carbonAmount);
-                System.out.println("minerals: "+ mineralAmount);
-                System.out.println("direction: "+ dirQ +"," + dirR);
-                System.out.println("--- END INFO ---");
-            }
+            TileSelectEvent selectEvent = EventFactory.instance().tileSelectEventPool.obtain();
+            selectEvent.position = selectedPosition;
+            EventBus.instance().publish(selectEvent);			
         }
         else if (Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
             selectedSprite.texture = null;

@@ -60,7 +60,7 @@ public class EntityBuilder {
 		nutrientCapacity.carbonCapacity = 30;
 		nutrientCapacity.mineralCapacity = 15;
 		extraction.carbonRate = 5;
-		extraction.carbonRate = 1;
+		extraction.mineralRate = 1;
 		extraction.radius = 0;
 
 		e.add(nutrientCapacity);

@@ -15,8 +15,8 @@ public class RunnerSystem extends IntervalIteratingSystem {
      * @param interval The time in seconds between each system execution (e.g., 0.5f)
      */
     public RunnerSystem(float interval) {
-        super(Family.all(MultiTilePosition.class, Position.class, Sprite.class,Direction.class,Complete.class).get(), interval*5);
-        this.interval = interval * 5;
+        super(Family.all(MultiTilePosition.class, Position.class, Sprite.class,Direction.class,Complete.class).get(), interval);
+        this.interval = interval;
     }
 
     @Override
