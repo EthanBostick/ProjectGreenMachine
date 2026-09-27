@@ -1,8 +1,8 @@
 package io.github.ethanBostick.events;
 
-import io.github.ethanBostick.ecs.ToolType;
-
 import com.badlogic.gdx.utils.Pool.Poolable;
+
+import io.github.ethanBostick.ecs.components.ToolType;
 
 public class ToolChangeEvent implements Event, Poolable{
 

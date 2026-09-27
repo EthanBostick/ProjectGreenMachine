@@ -1,7 +1,7 @@
 package io.github.ethanBostick.input;
 
-import io.github.ethanBostick.ecs.Mappers;
-import io.github.ethanBostick.ecs.Registry;
+import io.github.ethanBostick.ecs.components.Mappers;
+import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.utils.HexUtils;
 
 import com.badlogic.gdx.Gdx;

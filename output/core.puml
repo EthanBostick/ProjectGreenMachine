@@ -43,7 +43,7 @@ class GameScreen {
   -multiplexer: InputMultiplexer = null
   -gameController: GameController = null
   +tickRate: float = 0.5f
-  +engine: Engine
+  +engine: PooledEngine
   --
   +GameScreen()
   +show(): void
@@ -110,11 +110,11 @@ class LayerComparator {
   +compare(e1: Entity, e2: Entity): int
 }
 
-class Biome {
+class Region {
   +temp: int = 0
-  +biomeType: BiomeType = null
+  +regionType: RegionType = null
   --
-  +Biome()
+  +Region()
   +reset(): void
 }
 
@@ -200,9 +200,9 @@ class PlayerStateSystem {
   -player: Entity
   --
   +PlayerStateSystem()
-  +addedToEngine(engine: Engine): void
+  +addedToEngine(engine: PooledEngine): void
   +update(deltaTime: float): void
-  +removedFromEngine(engine: Engine): void
+  +removedFromEngine(engine: PooledEngine): void
   +onEvent(event: Event): void
 }
 
@@ -233,7 +233,7 @@ class Mappers {
   +{static} spriteCMap: ComponentMapper<Sprite> = ComponentMapper.getFor(Sprite.class)
   +{static} mouseStateCMap: ComponentMapper<MouseState> = ComponentMapper.getFor(MouseState.class)
   +{static} activeToolCMap: ComponentMapper<ActiveTool> = ComponentMapper.getFor(ActiveTool.class)
-  +{static} biomeCMap: ComponentMapper<Biome> = ComponentMapper.getFor(Biome.class)
+  +{static} regionCMap: ComponentMapper<Region> = ComponentMapper.getFor(Region.class)
   +{static} depthCMap: ComponentMapper<Depth> = ComponentMapper.getFor(Depth.class)
   +{static} multiTileSpriteCMap: ComponentMapper<MultiTileSprite> = ComponentMapper.getFor(MultiTileSprite.class)
   +{static} multiTilePositionCMap: ComponentMapper<MultiTilePosition> = ComponentMapper.getFor(MultiTilePosition.class)
@@ -314,9 +314,9 @@ class NutrientCapacity {
 
 class EntityBuilder {
   -{static} theInstance: EntityBuilder = null
-  -engine: Engine = null
+  -engine: PooledEngine = null
   --
-  -EntityBuilder(e: Engine)
+  -EntityBuilder(e: PooledEngine)
   +createRenderable(q: int, r: int, renderLayer: int, depth: int, tilePosition: TilePosition, texturePath: String): Entity
   +createMycelium(q: int, r: int, density: int, initCarbon: int, initMineral: int): Entity
   +createMyceliumExtractor(q: int, r: int, initCarbon: int, initMineral: int): Entity
@@ -324,12 +324,12 @@ class EntityBuilder {
   +initHighlighter(): Entity
   +initMouse(): Entity
   +initPlayer(): Entity
-  +addBiome(b: BiomeType, e: Entity): void
+  +addRegion(b: RegionType, e: Entity): void
   +addDensity(e: Entity, density: int): void
   +addNutrients(e: Entity, carbonAmount: int, mineralAmount: int): void
   +addNutrients(e: Entity): void
   +addToEngine(e: Entity): void
-  +{static} instance(e: Engine): EntityBuilder
+  +{static} instance(e: PooledEngine): EntityBuilder
   +{static} instance(): EntityBuilder
 }
 
@@ -378,7 +378,7 @@ class MapGenerator {
   +MapGenerator(radius: int, thresh: double, initialNoiseGrid: int[], rand: Random, seed: int)
   +generate(maxSchellingIterations: int, maxSmoothingIterations: int): int[][]
   -runResourcePass(): int[]
-  -getBiomeResourceScalar(biomeTemp: int): float
+  -getRegionResourceScalar(regionTemp: int): float
   -runSchellingPass(): boolean
   -getHappiness(q: int, r: int, selfTemp: int): double
   -getRandomBlankIndex(): int
@@ -394,8 +394,8 @@ class Map {
   -size: int = 0
   -w: int = 0
   +random: Random = null
-  -activeBiomes: BiomeType = null
-  -biomeConcentrations: double = null
+  -activeRegions: RegionType = null
+  -regionConcentrations: double = null
   -startingArea: int
   -likenessThresh: double = 0
   -seed: int
@@ -406,8 +406,8 @@ class Map {
   +getIndex(q: int, r: int): int
   +outOfMapBounds(q: int, r: int): boolean
   +getEntityAt(q: int, r: int, t: TilePosition): Entity
-  -weightedBiomeChoice(): int
-  +initConfig(size: int, concentrations: double[], activeBiomes: BiomeType[], thresh: double, startingArea: int, seed: int): void
+  -weightedRegionChoice(): int
+  +initConfig(size: int, concentrations: double[], activeRegions: RegionType[], thresh: double, startingArea: int, seed: int): void
   +initMap(): void
   +{static} instance(): Map
 }
@@ -533,7 +533,7 @@ Mappers o-- Position
 Mappers o-- Sprite
 Mappers o-- MouseState
 Mappers o-- ActiveTool
-Mappers o-- Biome
+Mappers o-- Region
 Mappers o-- Depth
 Mappers o-- MultiTileSprite
 Mappers o-- MultiTilePosition

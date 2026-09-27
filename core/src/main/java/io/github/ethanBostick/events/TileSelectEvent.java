@@ -1,8 +1,8 @@
 package io.github.ethanBostick.events;
 
-import io.github.ethanBostick.ecs.Position;
-
 import com.badlogic.gdx.utils.Pool.Poolable;
+
+import io.github.ethanBostick.ecs.components.Position;
 
 public class TileSelectEvent implements Event, Poolable{
 

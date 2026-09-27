@@ -1,9 +1,10 @@
 package io.github.ethanBostick.utils;
 
-import io.github.ethanBostick.ecs.Direction;
-
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.ObjectMap;
+
+import io.github.ethanBostick.ecs.components.Direction;
+
 import com.badlogic.gdx.Gdx;
 
 public class TextureUtils {

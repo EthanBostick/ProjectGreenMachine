@@ -2,7 +2,7 @@ package io.github.ethanBostick.utils;
 
 import com.badlogic.gdx.utils.IntArray;
 
-import io.github.ethanBostick.ecs.Position;
+import io.github.ethanBostick.ecs.components.Position;
 
 public final class HexUtils {
     private HexUtils() {}

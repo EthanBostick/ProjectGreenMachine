@@ -1,12 +1,12 @@
 package io.github.ethanBostick.map;
 
-import io.github.ethanBostick.ecs.EntityBuilder;
-
 import java.lang.Math;
 import java.util.Random;
 
 //GDX stuff
 import com.badlogic.ashley.core.Entity;
+
+import io.github.ethanBostick.core.EntityBuilder;
 
 public class Map{
 	private static Map theInstance = null;
@@ -17,8 +17,8 @@ public class Map{
 	private int size = 0;
 	private int w = 0;
 	public Random random = null;
-	private BiomeType[] activeBiomes = null;
-	private double[] biomeConcentrations = null;
+	private RegionType[] activeRegions = null;
+	private double[] regionConcentrations = null;
 	private int startingArea;
 	private double likenessThresh = 0; 
 	private int seed;
@@ -54,51 +54,51 @@ public class Map{
 		return this.map[i][t.value()];
 	}
 
-	private int weightedBiomeChoice(){
+	private int weightedRegionChoice(){
 		double randomValue = this.random.nextDouble();
 		double total = 0.0;
 
-		for(int i=0; i < this.biomeConcentrations.length; i++){
-			if(this.biomeConcentrations[i] < 0){
+		for(int i=0; i < this.regionConcentrations.length; i++){
+			if(this.regionConcentrations[i] < 0){
 				throw new IllegalArgumentException();
 			}
 
-			total += this.biomeConcentrations[i];
+			total += this.regionConcentrations[i];
 
 			if (randomValue < total){
 				return i;
 			}
 		}
 
-		return this.biomeConcentrations.length - 1;
+		return this.regionConcentrations.length - 1;
 	}
 
-	public void initConfig(int size, double[] concentrations, BiomeType[] activeBiomes, double thresh, int startingArea, int seed){
+	public void initConfig(int size, double[] concentrations, RegionType[] activeRegions, double thresh, int startingArea, int seed){
 		this.size = size;
 		this.random = new Random(seed);
 		this.seed = seed;
 		this.w = (size*2) + 1;
-		this.biomeConcentrations = concentrations;
+		this.regionConcentrations = concentrations;
 		this.startingArea = startingArea;
 		this.likenessThresh = thresh;
-		this.activeBiomes = activeBiomes;
+		this.activeRegions = activeRegions;
 	}
 
 	public void initMap(){
-		int[] biomeGrid = new int[w*w];
+		int[] regionGrid = new int[w*w];
 		for (int q = -this.size ; q <= this.size ; q ++){
 			for (int r = Math.max(-this.size, -q - this.size); r <= Math.min(this.size, -q + this.size); r ++){
 				int index = this.getIndex(q, r);
 				if(Math.abs(q) <= startingArea && Math.abs(r) <= startingArea && Math.abs(q+r) <= startingArea){
-					biomeGrid[index] = BiomeType.FOREST.tempValue();
+					regionGrid[index] = RegionType.RESTORED.tempValue();
 				}
 				else{
-					biomeGrid[index] = activeBiomes[this.weightedBiomeChoice()].tempValue();
+					regionGrid[index] = activeRegions[this.weightedRegionChoice()].tempValue();
 				}
 			}
 		}
-		MapGenerator mapGenerator = new MapGenerator(this.size, likenessThresh, biomeGrid, this.random, this.seed);
-		int[][] duelGrid = mapGenerator.generate(999999,20);
+		MapGenerator mapGenerator = new MapGenerator(this.size, likenessThresh, regionGrid, this.random, this.seed);
+		int[][] duelGrid = mapGenerator.generate(999999,6);
 
 		this.map = new Entity[w*w][TilePosition.MAX_POSITIONS.value()];
 		for (int q = -this.size ; q <= this.size ; q ++){
@@ -110,47 +110,35 @@ public class Map{
 				Entity tileEntity = null;
 				String tilePng = "hex_template.png";
 				String extraPng = null;
-				BiomeType bType = BiomeType.BLANK;
+				RegionType bType = RegionType.BLANK;
 
-				if (duelGrid[0][index] == BiomeType.FOREST.tempValue()){
-					tilePng = "forestFloor.png";
-					bType = BiomeType.FOREST;						
+				if (duelGrid[0][index] == RegionType.BARREN.tempValue()){
+					tilePng = "barrenTile.png";
+					bType = RegionType.BARREN;						
+
+				} else if (duelGrid[0][index] == RegionType.RADIOACTIVE.tempValue()){
+					tilePng = "radioactiveTile.png";
+					bType = RegionType.RADIOACTIVE;						
+				} else if (duelGrid[0][index] == RegionType.POLLUTED.tempValue()){
+					tilePng = "pollutedTile.png";
+					bType = RegionType.POLLUTED;						
 					if (rDouble <= 0.45){
-						extraPng = "trees2.png";							
+						extraPng = "deadTree.png";							
 					}
-
-				} else if (duelGrid[0][index] == BiomeType.DESERT.tempValue()){
-					tilePng = "sand.png";
-					bType = BiomeType.DESERT;						
-				} else if (duelGrid[0][index] == BiomeType.GRASS_LAND.tempValue()){
-					tilePng = "grassFloor.png";
-					bType = BiomeType.GRASS_LAND;						
-					if (rDouble <= 0.6){
-						extraPng = "grass.png";							
-					}
-				} else if (duelGrid[0][index] == BiomeType.MOUNTAIN.tempValue()){
+				} else if (duelGrid[0][index] == RegionType.MOUNTAIN.tempValue()){
 					tilePng = "mountain.png";
-					bType = BiomeType.MOUNTAIN;						
-				} else if (duelGrid[0][index] == BiomeType.TAIGA.tempValue()){
-					tilePng = "taiga.png";
-					bType = BiomeType.TAIGA;						
-					if (rDouble <= 0.25){
-						extraPng = "pineTrees1.png";							
-					}
-				} else if (duelGrid[0][index] == BiomeType.BOREAL.tempValue()){
-					tilePng = "boreal.png";
-					bType = BiomeType.BOREAL;						
-					if (rDouble <= 0.7){
-						extraPng = "pineTrees1.png";							
-					}
+					bType = RegionType.MOUNTAIN;						
+				} else if (duelGrid[0][index] == RegionType.RESTORED.tempValue()){
+					tilePng = "dirt.png";
+					bType = RegionType.RESTORED;						
 				} else{
 					tilePng = "mountain.png";
-					bType = BiomeType.MOUNTAIN;						
+					bType = RegionType.MOUNTAIN;						
 				}
 
 				//Put the Entities together and update map
 				tileEntity = entityBuilder.createRenderable(q,r,0,0,TilePosition.SURFACE, tilePng);
-				entityBuilder.addBiome(bType, tileEntity);
+				entityBuilder.addRegion(bType, tileEntity);
 				if(extraPng != null){
 					Entity terrainEntity = entityBuilder.createRenderable(q,r,1, 0,TilePosition.TERRAIN, extraPng);
 					this.map[index][TilePosition.TERRAIN.value()] = terrainEntity;
@@ -161,7 +149,7 @@ public class Map{
 
 				//underground gen
 				Entity underGroundTileEntity = entityBuilder.createRenderable(q,r,0,1,TilePosition.UNDERGROUND, "dirt.png");
-				entityBuilder.addBiome(bType, underGroundTileEntity);
+				entityBuilder.addRegion(bType, underGroundTileEntity);
 				this.entityBuilder.addToEngine(underGroundTileEntity);
 				this.map[index][TilePosition.UNDERGROUND.value()] = underGroundTileEntity;
 

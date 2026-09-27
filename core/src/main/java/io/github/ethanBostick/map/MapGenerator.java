@@ -38,7 +38,7 @@ public class MapGenerator {
         this.cellular.SetFrequency(0.08f);
     }
 
-    // returns a 2d int map of the two map layers (i = 0 -> temp biome map, i = 1 -> resource map)
+    // returns a 2d int map of the two map layers (i = 0 -> temp region map, i = 1 -> resource map)
     // ex: rtn[which map][index]
     public int[][] generate(int maxSchellingIterations, int maxSmoothingIterations) {
         for (int i = 0; i < maxSchellingIterations; i++) {
@@ -62,10 +62,10 @@ public class MapGenerator {
             for (int r = r1; r <= r2; r++) {
                 
                 int index = getIndex(q, r);
-                int biomeTemp = this.grid[index];
+                int regionTemp = this.grid[index];
 
                 // Ignore empty structural tiles completely
-                if (biomeTemp == -1) {
+                if (regionTemp == -1) {
                     resourceGrid[index] = 0;
                     continue; 
                 }
@@ -82,11 +82,11 @@ public class MapGenerator {
                 // 3. Combine raw shapes
                 float rawConcentration = macroNoise + (veinIntensity * 1.5f);
 
-                // 4. Apply Biome Logics (The Scalar)
-                float biomeScalar = getBiomeResourceScalar(biomeTemp); 
+                // 4. Apply Region Logics (The Scalar)
+                float regionScalar = getRegionResourceScalar(regionTemp); 
 
                 // 5. Calculate Final Integer Concentration (0 to 100 max)
-                int finalConcentration = Math.round(rawConcentration * 20f * biomeScalar);
+                int finalConcentration = Math.round(rawConcentration * 20f * regionScalar);
                 
                 // 6. Prune weak tiles to keep resources strictly as "hotspots"
                 if (finalConcentration >= 15) {
@@ -99,19 +99,17 @@ public class MapGenerator {
         return resourceGrid;
     }
 
-    private float getBiomeResourceScalar(int biomeTemp) {
-        if (biomeTemp == BiomeType.FOREST.tempValue()){
-            return BiomeType.FOREST.resourceScalar();
-        } else if (biomeTemp == BiomeType.DESERT.tempValue()){
-            return BiomeType.DESERT.resourceScalar();
-        } else if (biomeTemp == BiomeType.GRASS_LAND.tempValue()){
-            return BiomeType.GRASS_LAND.resourceScalar();
-        } else if (biomeTemp == BiomeType.MOUNTAIN.tempValue()){
-            return BiomeType.MOUNTAIN.resourceScalar();
-        } else if (biomeTemp == BiomeType.TAIGA.tempValue()){
-            return BiomeType.TAIGA.resourceScalar();
-        } else if (biomeTemp == BiomeType.BOREAL.tempValue()){
-            return BiomeType.BOREAL.resourceScalar();
+    private float getRegionResourceScalar(int regionTemp) {
+        if (regionTemp == RegionType.BARREN.tempValue()){
+            return RegionType.BARREN.resourceScalar();
+        } else if (regionTemp == RegionType.POLLUTED.tempValue()){
+            return RegionType.POLLUTED.resourceScalar();
+        } else if (regionTemp == RegionType.RADIOACTIVE.tempValue()){
+            return RegionType.RADIOACTIVE.resourceScalar();
+        } else if (regionTemp == RegionType.MOUNTAIN.tempValue()){
+            return RegionType.MOUNTAIN.resourceScalar();
+        } else if (regionTemp == RegionType.RESTORED.tempValue()){
+            return RegionType.RESTORED.resourceScalar();
         } else{
             return 1.0f;
         }
@@ -181,7 +179,13 @@ public class MapGenerator {
 
     private int[] runSmoothingPass() {
         int[] writeGrid = new int[this.grid.length];
-        int[] validTemps = {15, 35, 50, 65, 75, 100};
+        int[] validTemps = {
+            RegionType.BARREN.tempValue(), 
+            RegionType.MOUNTAIN.tempValue(),
+            RegionType.POLLUTED.tempValue(), 
+            RegionType.RADIOACTIVE.tempValue(), 
+            RegionType.RESTORED.tempValue()
+        };
 
         for (int q = -this.radius; q <= this.radius; q++) {
             int r1 = Math.max(-this.radius, -q - this.radius);
@@ -192,8 +196,9 @@ public class MapGenerator {
                 int selfTemp = this.grid[index];
                 
                 int activeNeighbors = 0;
-                int tempSum = 0;
-                int maxNeighbor = 0; //highest neighbor
+                
+                // Tally array matching the indices of validTemps
+                int[] typeCounts = new int[validTemps.length];
 
                 for (int[] dir : hexDirections) {
                     int nq = q + dir[0];
@@ -204,55 +209,53 @@ public class MapGenerator {
                     int neighborTemp = this.grid[getIndex(nq, nr)];
                     if (neighborTemp != -1) {
                         activeNeighbors++;
-                        tempSum += neighborTemp;
-                        if (neighborTemp > maxNeighbor) {
-                            maxNeighbor = neighborTemp; 
+                        // Tally the specific neighbor type
+                        for (int i = 0; i < validTemps.length; i++) {
+                            if (neighborTemp == validTemps[i]) {
+                                typeCounts[i]++;
+                                break;
+                            }
                         }
                     }
                 }
 
-                if (selfTemp == -1 && activeNeighbors >= 3) {
-                    if (maxNeighbor >= 75) {
-                        writeGrid[index] = maxNeighbor;
+                // Find the most frequent neighbor type
+                int highestFrequency = 0;
+                int mostCommonTemp = selfTemp;
+                for (int i = 0; i < validTemps.length; i++) {
+                    if (typeCounts[i] > highestFrequency) {
+                        highestFrequency = typeCounts[i];
+                        mostCommonTemp = validTemps[i];
+                    }
+                }
+
+                // Apply categorical smoothing rules
+                if (selfTemp == -1) {
+                    // Fill in empty structural gaps if heavily surrounded
+                    if (activeNeighbors >= 3) {
+                        writeGrid[index] = mostCommonTemp;
                     } else {
-                        writeGrid[index] = snapToClosestTemp(tempSum / activeNeighbors, validTemps);
+                        writeGrid[index] = -1;
                     }
-                    
-                } 
-                else if (selfTemp != -1 && activeNeighbors <= 1) {
-                    writeGrid[index] = -1;
-                    
-                } 
-                else if (selfTemp != -1 && activeNeighbors >= 4) {
-                    if (selfTemp >= 75 && maxNeighbor >= 75) {
-                        writeGrid[index] = selfTemp;
-                    } 
-                    else {
-                        int avgTemp = (selfTemp + tempSum) / (activeNeighbors + 1);
-                        writeGrid[index] = snapToClosestTemp(avgTemp, validTemps);
-                    }
-                    
                 } 
                 else {
-                    writeGrid[index] = selfTemp;
+                    // Smooth existing tiles
+                    if (activeNeighbors <= 1) {
+                        // Prune orphaned/isolated tiles
+                        writeGrid[index] = -1;
+                    } 
+                    else if (activeNeighbors >= 4 && highestFrequency >= 3) {
+                        // If surrounded by a strong majority of a specific condition, assimilate to it
+                        writeGrid[index] = mostCommonTemp;
+                    } 
+                    else {
+                        // Otherwise, hold your ground
+                        writeGrid[index] = selfTemp;
+                    }
                 }
             }
         }
         return writeGrid;
-    }
-
-    private int snapToClosestTemp(int target, int[] validTemps) {
-        int closest = validTemps[0];
-        int minDiff = Math.abs(target - closest);
-        
-        for (int temp : validTemps) {
-            int diff = Math.abs(target - temp);
-            if (diff < minDiff) {
-                minDiff = diff;
-                closest = temp;
-            }
-        }
-        return closest;
     }
 
     private int getIndex(int q, int r) {
