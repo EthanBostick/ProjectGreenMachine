@@ -6,6 +6,7 @@ import io.github.ethanBostick.ecs.components.ActiveTool;
 import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.Build;
 import io.github.ethanBostick.ecs.components.BuildType;
+import io.github.ethanBostick.ecs.components.Cleansing;
 import io.github.ethanBostick.ecs.components.Complete;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Density;
@@ -88,6 +89,34 @@ public class EntityBuilder {
 		e.add(nutrientFlow);
 		e.add(direction);
 		e.add(extraction);
+		addDensity(e, 4);
+		addNutrients(e, initCarbon, initMineral);
+
+		return e;
+	}
+
+	public Entity createMyceliumCleanser(int q, int r, int initCarbon, int initMineral){
+		Entity e = createRenderable(q, r, 3, 1,TilePosition.MYCELIUM, "cleanserMycelium.png");
+		Direction direction = this.engine.createComponent(Direction.class);
+		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
+		NutrientFlow nutrientFlow = this.engine.createComponent(NutrientFlow.class);
+		Cleansing cleansing = this.engine.createComponent(Cleansing.class);
+		nutrientCapacity.carbonCapacity = 20;
+		nutrientCapacity.mineralCapacity = 20;
+		cleansing.carbonCost = 1;
+		cleansing.mineralCost = 1;
+		cleansing.rate = 5f;
+		cleansing.radius = 1;
+
+		nutrientFlow.maxThroughput = 3;
+		//actively requests nutrients
+		nutrientFlow.needsCarbons = true;
+		nutrientFlow.needsMinerals = true;
+
+		e.add(nutrientCapacity);
+		e.add(nutrientFlow);
+		e.add(direction);
+		e.add(cleansing);
 		addDensity(e, 4);
 		addNutrients(e, initCarbon, initMineral);
 

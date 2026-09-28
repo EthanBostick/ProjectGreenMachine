@@ -8,6 +8,7 @@ import io.github.ethanBostick.ecs.systems.ActionSystem;
 import io.github.ethanBostick.ecs.systems.BuildSystem;
 import io.github.ethanBostick.ecs.systems.EntityManagementSystem;
 import io.github.ethanBostick.ecs.systems.ExtractionSystem;
+import io.github.ethanBostick.ecs.systems.CleansingSystem;
 import io.github.ethanBostick.ecs.systems.FlowGradientSystem;
 import io.github.ethanBostick.ecs.systems.MultiRenderSystem;
 import io.github.ethanBostick.ecs.systems.NetworkFlowSystem;
@@ -52,6 +53,7 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new NetworkGrowthSystem(tickRate*2, 4));
 
 		this.engine.addSystem(new ExtractionSystem(tickRate*2,4));
+		this.engine.addSystem(new CleansingSystem(tickRate*2,4));
 		this.engine.addSystem(new FlowGradientSystem(tickRate,5));
 		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 6));
 

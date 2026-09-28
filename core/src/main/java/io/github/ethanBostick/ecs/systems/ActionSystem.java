@@ -5,6 +5,7 @@ import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
 import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.ActiveTool;
 import io.github.ethanBostick.ecs.components.BuildType;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.MouseState;
@@ -99,20 +100,32 @@ public class ActionSystem extends IteratingSystem{
         return friendNear;
     }
 
-    private void buildAction(Entity mouse){
+    private void buildAction(Entity mouse, ActiveTool activeTool){
         Position mousePosition = Mappers.positionCMap.get(mouse);
         MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
         MultiTilePosition mouseDragPosition = Mappers.multiTilePositionCMap.get(mouse);
+        BuildType targetBuild = activeTool.buildTarget;
+
+        if (targetBuild == null) return;
+
+        int carbonCost = targetBuild.carbonCost();
+        int mineralCost = targetBuild.mineralCost();
 
         if (mouseState.pressedDown && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r) && !mouseState.heldDown){
 
             Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
-            //TODO: allow creation ontop of existing mycelium (ensure entities are returned to the pool properly)
-            if(selectedTile != null) return;
 
+            if(selectedTile != null && neighboringMycelium(mousePosition)){
+                Entity newBuild = EntityBuilder.instance().createBuild(targetBuild,mousePosition.q,mousePosition.r,carbonCost,mineralCost);
+                EntityBuilder.instance().addToEngine(newBuild);
+                Map.instance().setEntityAt(mousePosition.q, mousePosition.r, newBuild, TilePosition.MYCELIUM);       
+
+                //clear old mycelium
+                EntityBuilder.instance().addDead(selectedTile);
+            }
             //check for atleast one mycelium neighbor
-            if (neighboringMycelium(mousePosition)){
-                Entity newBuild = EntityBuilder.instance().createBuild(BuildType.EXTRACTOR,mousePosition.q,mousePosition.r,9,3);
+            else if (neighboringMycelium(mousePosition)){
+                Entity newBuild = EntityBuilder.instance().createBuild(targetBuild,mousePosition.q,mousePosition.r,carbonCost,mineralCost);
                 EntityBuilder.instance().addToEngine(newBuild);
                 //add to map so none may build there
                 Map.instance().setEntityAt(mousePosition.q, mousePosition.r, newBuild, TilePosition.MYCELIUM);       
@@ -122,17 +135,19 @@ public class ActionSystem extends IteratingSystem{
 
     @Override
     protected void processEntity(Entity mouse, float deltaTime) {
-        ToolType activeTool = Mappers.activeToolCMap.get(Registry.player).tool;
+        ActiveTool activeTool = Mappers.activeToolCMap.get(Registry.player);
         MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
 
         // esc key clears selection 
         if(mouseState.clearSelect){
+            activeTool.tool = ToolType.DEFAULT;    
+            activeTool.buildTarget = null;    
             mouseState.clearSelect = false;
             Mappers.spriteCMap.get(this.highlighter).texture = null;
             return;
         }
 
-        switch (activeTool){
+        switch (activeTool.tool){
             case DEFAULT:
                 //display the drag line
                 Mappers.VectorArrowCMap.get(mouse).arrowTexture = TextureUtils.pathToTexture("dragArrow.png");
@@ -141,7 +156,7 @@ public class ActionSystem extends IteratingSystem{
             case BUILD:
                 //hide drag line if its not being used by the active tool
                 Mappers.VectorArrowCMap.get(mouse).arrowTexture = null;
-                this.buildAction(mouse);
+                this.buildAction(mouse, activeTool);
                 break;
         }
 

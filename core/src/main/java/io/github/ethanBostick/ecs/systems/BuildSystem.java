@@ -36,6 +36,8 @@ public class BuildSystem extends IteratingSystem{
                 return EntityBuilder.instance().createMycelium(p.q, p.r, 3, 0, 0);
             case EXTRACTOR:
                 return EntityBuilder.instance().createMyceliumExtractor(p.q, p.r,0,0);
+            case CLEANSER:
+                return EntityBuilder.instance().createMyceliumCleanser(p.q, p.r,0,0);
         }
         return null;
     }

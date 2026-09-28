@@ -51,8 +51,8 @@ public class PlayerStateSystem extends EntitySystem implements Observer{
 				break;
 			case TOOL_CHANGE:
 				ToolChangeEvent toolEvent = (ToolChangeEvent) event;
-                //if that is the current active tool swap it to default (toggle on/off)
-                Mappers.activeToolCMap.get(this.player).tool = (Mappers.activeToolCMap.get(this.player).tool == toolEvent.tool)? ToolType.DEFAULT : toolEvent.tool;
+                Mappers.activeToolCMap.get(this.player).tool =  toolEvent.tool;
+                Mappers.activeToolCMap.get(this.player).buildTarget = toolEvent.buildTarget;
 				break;
 			case OVERLAY_CHANGE:
                 break;

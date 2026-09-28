@@ -68,7 +68,7 @@ public final class HexUtils {
         int centerR = p.r;
         output.clear();
 
-		for (int q = -size ; q < size ; q ++){
+		for (int q = -size ; q <= size ; q ++){
 			for (int r = Math.max(-size, -q - size); r < Math.min(size, -q + size); r ++){
                 output.add(q+centerQ);
                 output.add(r+centerR);

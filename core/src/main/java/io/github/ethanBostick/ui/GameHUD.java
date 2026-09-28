@@ -15,6 +15,7 @@ import com.badlogic.ashley.core.Entity;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.core.Observer;
+import io.github.ethanBostick.ecs.components.BuildType;
 import io.github.ethanBostick.ecs.components.Direction;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Nutrients;
@@ -71,19 +72,42 @@ public class GameHUD implements Observer {
         Table rootTable = new Table();
         rootTable.setFillParent(true);
         //goes to the top right, expand claims all available vertical and horizontal space for this cell
-        rootTable.add(infoPanel).expand().top().right().pad(10);
         //rootTable.setDebug(true); //shows grid lines
 
-        // move to a new row
-        rootTable.row();
 
         //group buttons in table
-        Table buttonContainer = new Table();
+        Table buildOptions = new Table();
 
+        TextButton buildExtractorButton = new TextButton("Extractor", uiSkin);
+        buildExtractorButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
+                toolChangeEvent.tool = ToolType.BUILD;
+                toolChangeEvent.buildTarget = BuildType.EXTRACTOR;
+				EventBus.instance().publish(toolChangeEvent);			
+            }
+        });
+
+        TextButton buildCleanserButton = new TextButton("Cleanser", uiSkin);
+        buildCleanserButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
+                toolChangeEvent.tool = ToolType.BUILD;
+                toolChangeEvent.buildTarget = BuildType.CLEANSER;
+				EventBus.instance().publish(toolChangeEvent);			
+            }
+        });
+        // 6. Assemble the Hierarchy: Add Button -> Table -> Stage
+        // The pad(10) adds 10 pixels of margin around the button
+        buildOptions.add(buildExtractorButton); 
+        buildOptions.add(buildCleanserButton); 
+        //put back together
+
+        Table bottomButtons = new Table();
         // 4. Create your Actors (Widgets)
         TextButton depthButton = new TextButton("Change Depth", uiSkin);
-        TextButton buildToolButton = new TextButton("Build Tool", uiSkin);
-
         // 5. Add Input Listeners to the Actors
         depthButton.addListener(new ClickListener() {
             @Override
@@ -94,22 +118,13 @@ public class GameHUD implements Observer {
             }
         });
 
-        buildToolButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
-                toolChangeEvent.tool = ToolType.BUILD;
-				EventBus.instance().publish(toolChangeEvent);			
-            }
-        });
 
-        // 6. Assemble the Hierarchy: Add Button -> Table -> Stage
-        // The pad(10) adds 10 pixels of margin around the button
-        buttonContainer.add(depthButton).padRight(5); 
-        buttonContainer.add(buildToolButton); 
-
+        bottomButtons.add(depthButton).padRight(5); 
         //put back together
-        rootTable.add(buttonContainer).bottom().right().pad(10);
+        rootTable.add(buildOptions).expand().top().left().pad(10);
+        rootTable.add(infoPanel).top().right().pad(10);
+        rootTable.row();
+        rootTable.add(bottomButtons).bottom().right().pad(10);
 
         //only add master root table
         stage.addActor(rootTable);

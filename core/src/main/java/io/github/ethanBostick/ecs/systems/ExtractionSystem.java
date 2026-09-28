@@ -17,7 +17,7 @@ import io.github.ethanBostick.utils.HexUtils;
 
 public class ExtractionSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
-    private IntArray processingArray = new IntArray(6);
+    private IntArray processingArray = new IntArray(12);
     
     public ExtractionSystem(float interval, int priority) {
         super(Family.all(Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Extraction.class).get(), interval, priority);
