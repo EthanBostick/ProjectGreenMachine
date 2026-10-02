@@ -10,7 +10,7 @@ import com.badlogic.ashley.core.PooledEngine;
 
 public class EntityManagementSystem extends IteratingSystem{
 
-    private PooledEngine theEngine;
+    private final PooledEngine theEngine;
 
     public EntityManagementSystem(PooledEngine engine, int priority) {
         //prio 99 so it goes last
@@ -26,5 +26,7 @@ public class EntityManagementSystem extends IteratingSystem{
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         this.theEngine.removeEntity(entity); //calls reset on all components and returns them to pool + removes entity
+
+        System.out.println("deleted");
     }
 }

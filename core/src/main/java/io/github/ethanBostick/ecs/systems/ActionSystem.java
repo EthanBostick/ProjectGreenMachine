@@ -111,7 +111,7 @@ public class ActionSystem extends IteratingSystem{
         int carbonCost = targetBuild.carbonCost();
         int mineralCost = targetBuild.mineralCost();
 
-        if (mouseState.pressedDown && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r) && !mouseState.heldDown){
+        if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r) && !mouseState.heldDown){
 
             Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
 
@@ -121,7 +121,7 @@ public class ActionSystem extends IteratingSystem{
                 Map.instance().setEntityAt(mousePosition.q, mousePosition.r, newBuild, TilePosition.MYCELIUM);       
 
                 //clear old mycelium
-                EntityBuilder.instance().addDead(selectedTile);
+                EntityBuilder.instance().reclaim(selectedTile);
             }
             //check for atleast one mycelium neighbor
             else if (neighboringMycelium(mousePosition)){
@@ -129,6 +129,22 @@ public class ActionSystem extends IteratingSystem{
                 EntityBuilder.instance().addToEngine(newBuild);
                 //add to map so none may build there
                 Map.instance().setEntityAt(mousePosition.q, mousePosition.r, newBuild, TilePosition.MYCELIUM);       
+            }
+        }
+    }
+
+    private void deleteAction(Entity mouse){
+        Position mousePosition = Mappers.positionCMap.get(mouse);
+        MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
+
+        if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r) && !mouseState.heldDown){
+
+            Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
+            if(selectedTile != null){
+                Map.instance().setEntityAt(mousePosition.q, mousePosition.r, null, TilePosition.MYCELIUM);       
+                //queue for reclaim nutrients
+                System.out.println("queued for reclaim");
+                EntityBuilder.instance().reclaim(selectedTile);
             }
         }
     }
@@ -157,6 +173,14 @@ public class ActionSystem extends IteratingSystem{
                 //hide drag line if its not being used by the active tool
                 Mappers.VectorArrowCMap.get(mouse).arrowTexture = null;
                 this.buildAction(mouse, activeTool);
+                break;
+            case DELETE:
+                Mappers.VectorArrowCMap.get(mouse).arrowTexture = null;
+                this.deleteAction(mouse);
+                break;
+            case DEACTIVATE:
+                break;
+            case ACTIVATE:
                 break;
         }
 

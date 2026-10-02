@@ -176,7 +176,7 @@ public class Map{
 
 				//init mycelium network node
 				if (q == 0 && r == 0){
-					Entity initMycelium = entityBuilder.createMycelium(q, r, 3,30,15);
+					Entity initMycelium = entityBuilder.createMycelium(q, r, 3,30,15,15,7);
 					this.entityBuilder.addToEngine(initMycelium);
 					this.map[index][TilePosition.MYCELIUM.value()] = initMycelium;
 

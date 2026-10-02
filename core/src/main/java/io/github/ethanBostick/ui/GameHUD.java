@@ -99,10 +99,23 @@ public class GameHUD implements Observer {
 				EventBus.instance().publish(toolChangeEvent);			
             }
         });
+
+        TextButton buildDeleteButton = new TextButton("Delete", uiSkin);
+        buildDeleteButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
+                toolChangeEvent.tool = ToolType.DELETE;
+                toolChangeEvent.buildTarget = null;
+				EventBus.instance().publish(toolChangeEvent);			
+            }
+        });
+
         // 6. Assemble the Hierarchy: Add Button -> Table -> Stage
         // The pad(10) adds 10 pixels of margin around the button
         buildOptions.add(buildExtractorButton); 
         buildOptions.add(buildCleanserButton); 
+        buildOptions.add(buildDeleteButton);
         //put back together
 
         Table bottomButtons = new Table();

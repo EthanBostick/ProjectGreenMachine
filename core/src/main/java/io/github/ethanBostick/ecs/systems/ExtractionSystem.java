@@ -42,6 +42,8 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                 this.processingArray = HexUtils.getAreaAround(position, radius, processingArray);
             }
 
+            int currentCarbon = nutrients.carbons + nutrients.carbonDelta;
+            int currentMineral = nutrients.minerals + nutrients.mineralDelta;
             //look for and proccess resource nodes in area
             for (int i = 0; i < this.processingArray.size; i += 2) {
                 Entity resourceNode = Map.instance().getEntityAt(
@@ -53,23 +55,29 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                 Nutrients nodeNutrients = Mappers.nutrientsCMap.get(resourceNode);
 
                 // Carbon extraction
-                if (nodeNutrients.carbons > 0 && nutrients.carbons < nutrientCapacity.carbonCapacity) {
-                    int capacityLeft = nutrientCapacity.carbonCapacity - nutrients.carbons;
-                    int desiredExtract = Math.min(extraction.carbonRate, capacityLeft);
-                    int finalExtract = Math.min(desiredExtract, nodeNutrients.carbons);
+                int nodeCarbonsAvail = Math.max(0, nodeNutrients.carbons + nodeNutrients.carbonDelta);
+                int extractorCarbonRoom = Math.max(0, nutrientCapacity.carbonCapacity - currentCarbon);
 
-                    nodeNutrients.carbons -= finalExtract;
-                    nutrients.carbons += finalExtract;
+                if (nodeCarbonsAvail > 0 && extractorCarbonRoom > 0) {
+                    int desiredExtract = Math.min(extraction.carbonRate, extractorCarbonRoom);
+                    int finalExtract = Math.min(desiredExtract, nodeCarbonsAvail);
+
+                    nodeNutrients.carbonDelta -= finalExtract;
+                    nutrients.carbonDelta += finalExtract;
+                    currentCarbon += finalExtract; // update local counter for subsequent nodes in loop
                 }
 
                 // Mineral extraction
-                if (nodeNutrients.minerals > 0 && nutrients.minerals < nutrientCapacity.mineralCapacity) {
-                    int capacityLeft = nutrientCapacity.mineralCapacity - nutrients.minerals;
-                    int desiredExtract = Math.min(extraction.mineralRate, capacityLeft);
-                    int finalExtract = Math.min(desiredExtract, nodeNutrients.minerals);
+                int nodeMineralsAvail = Math.max(0, nodeNutrients.minerals + nodeNutrients.mineralDelta);
+                int extractorMineralRoom = Math.max(0, nutrientCapacity.mineralCapacity - currentMineral);
 
-                    nodeNutrients.minerals -= finalExtract;
-                    nutrients.minerals += finalExtract;
+                if (nodeMineralsAvail > 0 && extractorMineralRoom > 0) {
+                    int desiredExtract = Math.min(extraction.mineralRate, extractorMineralRoom);
+                    int finalExtract = Math.min(desiredExtract, nodeMineralsAvail);
+
+                    nodeNutrients.mineralDelta -= finalExtract;
+                    nutrients.mineralDelta += finalExtract;
+                    currentMineral += finalExtract;
                 }
             }
         }

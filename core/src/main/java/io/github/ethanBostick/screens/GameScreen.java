@@ -14,9 +14,11 @@ import io.github.ethanBostick.ecs.systems.MultiRenderSystem;
 import io.github.ethanBostick.ecs.systems.NetworkFlowSystem;
 import io.github.ethanBostick.ecs.systems.NetworkGrowthSystem;
 import io.github.ethanBostick.ecs.systems.PlayerStateSystem;
+import io.github.ethanBostick.ecs.systems.StateCommitSystem;
 import io.github.ethanBostick.ecs.systems.RenderSystem;
 import io.github.ethanBostick.ecs.systems.RunnerSystem;
 import io.github.ethanBostick.ecs.systems.VectorRenderSystem;
+import io.github.ethanBostick.ecs.systems.ReclaimSystem;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
@@ -43,12 +45,7 @@ public class GameScreen implements Screen {
 		this.engine = new PooledEngine();
 		EntityBuilder.instance(engine);
 		Registry.init();
-		this.engine.addSystem(new RenderSystem(0));
-		this.engine.addSystem(new MultiRenderSystem(1));
-		this.engine.addSystem(new VectorRenderSystem(99)); //99 so it renders on top
-
 		this.engine.addSystem(new ActionSystem(2));
-		this.engine.addSystem(new BuildSystem(3));
 		this.engine.addSystem(new RunnerSystem(tickRate, 3));
 		this.engine.addSystem(new NetworkGrowthSystem(tickRate*2, 4));
 
@@ -56,7 +53,13 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new CleansingSystem(tickRate*2,4));
 		this.engine.addSystem(new FlowGradientSystem(tickRate,5));
 		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 6));
+		this.engine.addSystem(new StateCommitSystem(tickRate, 7));
+		this.engine.addSystem(new BuildSystem(tickRate,8));
+		this.engine.addSystem(new ReclaimSystem(tickRate, 9));
 
+		this.engine.addSystem(new RenderSystem(97));
+		this.engine.addSystem(new MultiRenderSystem(98));
+		this.engine.addSystem(new VectorRenderSystem(99)); //99 so it renders on top
 		this.engine.addSystem(new PlayerStateSystem());
 		this.engine.addSystem(new EntityManagementSystem(engine, 100));
 

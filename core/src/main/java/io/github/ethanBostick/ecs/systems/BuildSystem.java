@@ -1,6 +1,6 @@
 package io.github.ethanBostick.ecs.systems;
 
-import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.ashley.systems.IntervalIteratingSystem;
 
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Build;
@@ -15,35 +15,33 @@ import io.github.ethanBostick.map.TilePosition;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 
-public class BuildSystem extends IteratingSystem{
+public class BuildSystem extends IntervalIteratingSystem{
 
-    public BuildSystem(int priority) {
-        super(Family.all(Build.class).get(), priority);
-    }
+    public final float interval;
 
-    @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
+    public BuildSystem(float interval,int priority) {
+        super(Family.all(Build.class).get(),interval, priority);
+        this.interval = interval;
     }
 
     private Entity createTargetBuild(BuildType target, Position p){
         switch (target){
             case MYCELIUM_D1:
-                return EntityBuilder.instance().createMycelium(p.q, p.r, 1, 0, 0);
+                return EntityBuilder.instance().createMycelium(p.q, p.r, 1, 0, 0,target.carbonCost()/2,target.mineralCost()/2);
             case MYCELIUM_D2:
-                return EntityBuilder.instance().createMycelium(p.q, p.r, 2, 0, 0);
+                return EntityBuilder.instance().createMycelium(p.q, p.r, 2, 0, 0,target.carbonCost(),target.mineralCost());
             case MYCELIUM_D3:
-                return EntityBuilder.instance().createMycelium(p.q, p.r, 3, 0, 0);
+                return EntityBuilder.instance().createMycelium(p.q, p.r, 3, 0, 0,(target.carbonCost()*3)/2,(target.mineralCost()*3)/2);
             case EXTRACTOR:
-                return EntityBuilder.instance().createMyceliumExtractor(p.q, p.r,0,0);
+                return EntityBuilder.instance().createMyceliumExtractor(p.q, p.r,0,0,target.carbonCost()/2,target.mineralCost()/2);
             case CLEANSER:
-                return EntityBuilder.instance().createMyceliumCleanser(p.q, p.r,0,0);
+                return EntityBuilder.instance().createMyceliumCleanser(p.q, p.r,0,0,target.carbonCost()/2,target.mineralCost()/2);
         }
         return null;
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    protected void processEntity(Entity entity) {
         if (Mappers.deadCMap.get(entity) != null) return;
 
         Build targetBuild = Mappers.buildCMap.get(entity);
@@ -56,8 +54,10 @@ public class BuildSystem extends IteratingSystem{
             Entity creation = this.createTargetBuild(targetBuild.buildType, position);
             Map.instance().setEntityAt(position.q, position.r, creation, TilePosition.MYCELIUM);
             EntityBuilder.instance().addToEngine(creation);
-            //schedule for cleaning
-            EntityBuilder.instance().addDead(entity);
+            currentProgress.carbons -= nutrientsNeeded.carbonCapacity;
+            currentProgress.minerals -= nutrientsNeeded.mineralCapacity;
+            //schedule for reclaim
+            EntityBuilder.instance().reclaim(entity);
         }
     }
 }
