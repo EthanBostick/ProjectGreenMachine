@@ -18,6 +18,7 @@ import io.github.ethanBostick.ecs.components.MultiTilePosition;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.Position;
+import io.github.ethanBostick.ecs.components.Reclaim;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.VectorArrow;
@@ -53,12 +54,13 @@ public class EntityBuilder {
 		return entity;
     }
 
-	public Entity createMycelium(int q, int r, int density, int initCarbon, int initMineral){
+	public Entity createMycelium(int q, int r, int density, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim){
 		String texturePath = (density == 3)? "myceliumD3.png" : (density == 2)? "myceliumD2.png" : "myceliumD1.png";
 		Entity e = createRenderable(q, r, 3, 1,TilePosition.MYCELIUM, texturePath);
 		Direction direction = this.engine.createComponent(Direction.class);
 		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
 		NutrientFlow nutrientFlow = this.engine.createComponent(NutrientFlow.class);
+
 		nutrientFlow.maxThroughput = density;
 		nutrientCapacity.carbonCapacity = 10*density;
 		nutrientCapacity.mineralCapacity = 5*density;
@@ -67,12 +69,12 @@ public class EntityBuilder {
 		e.add(nutrientFlow);
 		e.add(direction);
 		addDensity(e, density);		
-		addNutrients(e, initCarbon, initMineral);
+		addNutrients(e, initCarbon, initMineral, carbonReclaim, mineralReclaim);
 
 		return e;
 	}
 
-	public Entity createMyceliumExtractor(int q, int r, int initCarbon, int initMineral){
+	public Entity createMyceliumExtractor(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim){
 		Entity e = createRenderable(q, r, 3, 1,TilePosition.MYCELIUM, "extractorMycelium.png");
 		Direction direction = this.engine.createComponent(Direction.class);
 		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
@@ -90,12 +92,12 @@ public class EntityBuilder {
 		e.add(direction);
 		e.add(extraction);
 		addDensity(e, 4);
-		addNutrients(e, initCarbon, initMineral);
+		addNutrients(e, initCarbon, initMineral, carbonReclaim, mineralReclaim);
 
 		return e;
 	}
 
-	public Entity createMyceliumCleanser(int q, int r, int initCarbon, int initMineral){
+	public Entity createMyceliumCleanser(int q, int r, int initCarbon, int initMineral,int carbonReclaim,int mineralReclaim){
 		Entity e = createRenderable(q, r, 3, 1,TilePosition.MYCELIUM, "cleanserMycelium.png");
 		Direction direction = this.engine.createComponent(Direction.class);
 		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
@@ -105,7 +107,7 @@ public class EntityBuilder {
 		nutrientCapacity.mineralCapacity = 20;
 		cleansing.carbonCost = 1;
 		cleansing.mineralCost = 1;
-		cleansing.rate = 5f;
+		cleansing.rate = 10f;
 		cleansing.radius = 1;
 
 		nutrientFlow.maxThroughput = 3;
@@ -118,7 +120,7 @@ public class EntityBuilder {
 		e.add(direction);
 		e.add(cleansing);
 		addDensity(e, 4);
-		addNutrients(e, initCarbon, initMineral);
+		addNutrients(e, initCarbon, initMineral,carbonReclaim,mineralReclaim);
 
 		return e;
 	}
@@ -248,6 +250,15 @@ public class EntityBuilder {
 		e.add(d);
 	}
 
+	public void addNutrients(Entity e, int carbonAmount, int mineralAmount, int cReclaim, int mReclaim){
+		Nutrients n = this.engine.createComponent(Nutrients.class);
+		n.carbonReclaim = cReclaim;
+		n.mineralReclaim = mReclaim;
+		n.carbons = carbonAmount;
+		n.minerals = mineralAmount;
+		e.add(n);
+	}
+
 	public void addNutrients(Entity e, int carbonAmount, int mineralAmount){
 		Nutrients n = this.engine.createComponent(Nutrients.class);
 		n.carbons = carbonAmount;
@@ -260,9 +271,14 @@ public class EntityBuilder {
 		e.add(n);
 	}
 
-	public void addDead(Entity e){
+	public void dead(Entity e){
 		Dead dead = this.engine.createComponent(Dead.class);
 		e.add(dead);
+	}
+
+	public void reclaim(Entity e){
+		Reclaim r = this.engine.createComponent(Reclaim.class);
+		e.add(r);
 	}
 
 	public void addToEngine(Entity e){

@@ -53,7 +53,7 @@ public class RunnerSystem extends IntervalIteratingSystem {
             direction.directionVector[1] = 0;
             Mappers.directionCMap.get(currentPosition).directionVector[0] = direction.directionVector[0];
             Mappers.directionCMap.get(currentPosition).directionVector[1] = direction.directionVector[1];
-            EntityBuilder.instance().addDead(runner); //schedule the entity for removal
+            EntityBuilder.instance().dead(runner); //schedule the entity for removal
             return;
         }
 

@@ -66,7 +66,7 @@ public class NetworkGrowthSystem extends IntervalIteratingSystem {
             EntityBuilder.instance().addToEngine(upgrade);
             Map.instance().setEntityAt(newQ, newR, upgrade, TilePosition.MYCELIUM);       
             //clear old mycelium
-            EntityBuilder.instance().addDead(entity);
+            EntityBuilder.instance().dead(entity);
         }
     }
 }

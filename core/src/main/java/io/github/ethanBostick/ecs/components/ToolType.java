@@ -2,5 +2,8 @@ package io.github.ethanBostick.ecs.components;
 
 public enum ToolType {
     DEFAULT,
-    BUILD
+    BUILD,
+    DELETE,
+    DEACTIVATE,
+    ACTIVATE
 }

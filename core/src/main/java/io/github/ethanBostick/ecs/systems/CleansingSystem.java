@@ -66,10 +66,10 @@ public class CleansingSystem extends IntervalIteratingSystem {
                 //node cleansing
                 if (nodeRegion.condition < 100){
                     uncleanTiles ++;
-                    if (carbonCost > nutrients.carbons || mineralCost > nutrients.minerals) continue;
+                    if (carbonCost >= nutrients.carbons + nutrients.carbonDelta || mineralCost >= nutrients.minerals + nutrients.mineralDelta) continue;
                     
-                    nutrients.carbons -= carbonCost; 
-                    nutrients.minerals -= mineralCost; 
+                    nutrients.carbonDelta -= carbonCost; 
+                    nutrients.mineralDelta -= mineralCost; 
                     nodeRegion.condition += Math.min(cleansingRate,100-nodeRegion.condition);                    
                 }
 

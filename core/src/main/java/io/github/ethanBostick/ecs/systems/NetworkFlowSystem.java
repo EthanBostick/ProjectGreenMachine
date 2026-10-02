@@ -44,7 +44,9 @@ public class NetworkFlowSystem extends IntervalIteratingSystem {
     private void routeMinerals(Position pos, Nutrients nutrients, NutrientFlow flow) {
         Entity bestNeighbor = null;
         int lowestDistance = flow.mineralDistance;
-        int availableTransfer = Math.min(flow.maxThroughput, nutrients.minerals);
+        // Available to push out = base nutrients plus negative deltas (outgoing), ignoring incoming positive deltas
+        int transferable = nutrients.minerals + Math.min(0, nutrients.mineralDelta);
+        int availableTransfer = Math.min(flow.maxThroughput, Math.max(0, transferable));
 
         for (int[] dir : hexDirections) {
             Entity neighbor = Map.instance().getEntityAt(pos.q + dir[0], pos.r + dir[1], TilePosition.MYCELIUM);
@@ -57,7 +59,7 @@ public class NetworkFlowSystem extends IntervalIteratingSystem {
             if (nFlow == null || nNutrients == null || nCap == null) continue;
 
             // Pick the neighbor strictly closer to the sink with storage headroom
-            if (nFlow.mineralDistance < lowestDistance && nNutrients.minerals < nCap.mineralCapacity) {
+            if (nFlow.mineralDistance < lowestDistance && nNutrients.minerals + nNutrients.mineralDelta < nCap.mineralCapacity) {
                 lowestDistance = nFlow.mineralDistance;
                 bestNeighbor = neighbor;
             }
@@ -67,18 +69,21 @@ public class NetworkFlowSystem extends IntervalIteratingSystem {
             Nutrients nNutrients = Mappers.nutrientsCMap.get(bestNeighbor);
             NutrientCapacity nCap = Mappers.nutrientCapacityCMap.get(bestNeighbor);
 
-            int spaceLeft = nCap.mineralCapacity - nNutrients.minerals;
-            int transferAmount = Math.min(availableTransfer, spaceLeft);
+            int projectedMinerals = nNutrients.minerals + nNutrients.mineralDelta;
+            int trueSpaceLeft = Math.max(0, nCap.mineralCapacity - projectedMinerals);
+            int transferAmount = Math.min(availableTransfer, trueSpaceLeft);
 
-            nutrients.minerals -= transferAmount;
-            nNutrients.minerals += transferAmount;
+            nutrients.mineralDelta -= transferAmount;
+            nNutrients.mineralDelta += transferAmount;
         }
     }
 
     private void routeCarbons(Position pos, Nutrients nutrients, NutrientFlow flow) {
         Entity bestNeighbor = null;
         int lowestDistance = flow.carbonDistance;
-        int availableTransfer = Math.min(flow.maxThroughput, nutrients.carbons);
+        // Available to push out = base nutrients plus negative deltas (outgoing), ignoring incoming positive deltas
+        int transferable = nutrients.carbons + Math.min(0, nutrients.carbonDelta);
+        int availableTransfer = Math.min(flow.maxThroughput, Math.max(0, transferable));
 
         for (int[] dir : hexDirections) {
             Entity neighbor = Map.instance().getEntityAt(pos.q + dir[0], pos.r + dir[1], TilePosition.MYCELIUM);
@@ -90,7 +95,7 @@ public class NetworkFlowSystem extends IntervalIteratingSystem {
 
             if (nFlow == null || nNutrients == null || nCap == null) continue;
 
-            if (nFlow.carbonDistance < lowestDistance && nNutrients.carbons < nCap.carbonCapacity) {
+            if (nFlow.carbonDistance < lowestDistance && nNutrients.carbons+nNutrients.carbonDelta < nCap.carbonCapacity) {
                 lowestDistance = nFlow.carbonDistance;
                 bestNeighbor = neighbor;
             }
@@ -100,11 +105,12 @@ public class NetworkFlowSystem extends IntervalIteratingSystem {
             Nutrients nNutrients = Mappers.nutrientsCMap.get(bestNeighbor);
             NutrientCapacity nCap = Mappers.nutrientCapacityCMap.get(bestNeighbor);
 
-            int spaceLeft = nCap.carbonCapacity - nNutrients.carbons;
-            int transferAmount = Math.min(availableTransfer, spaceLeft);
+            int projectedcarbons = nNutrients.carbons + nNutrients.carbonDelta;
+            int trueSpaceLeft = Math.max(0, nCap.carbonCapacity - projectedcarbons);
+            int transferAmount = Math.min(availableTransfer, trueSpaceLeft);
 
-            nutrients.carbons -= transferAmount;
-            nNutrients.carbons += transferAmount;
+            nutrients.carbonDelta -= transferAmount;
+            nNutrients.carbonDelta += transferAmount;
         }
     }
 }
