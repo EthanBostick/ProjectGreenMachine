@@ -129,7 +129,7 @@ public class Map{
 					tilePng = "mountain.png";
 					bType = RegionType.MOUNTAIN;						
 				} else if (duelGrid[0][index] == RegionType.RESTORED.tempValue()){
-					tilePng = "dirt.png";
+					tilePng = "restoredTile.png";
 					bType = RegionType.RESTORED;						
 				} else{
 					tilePng = "mountain.png";
@@ -148,7 +148,7 @@ public class Map{
 				this.map[index][TilePosition.SURFACE.value()] = tileEntity;
 
 				//underground gen
-				Entity underGroundTileEntity = entityBuilder.createRenderable(q,r,0,1,TilePosition.UNDERGROUND, "dirt.png");
+				Entity underGroundTileEntity = entityBuilder.createRenderable(q,r,0,1,TilePosition.UNDERGROUND, "dirtTile.png");
 				entityBuilder.addRegion(bType, underGroundTileEntity);
 				this.entityBuilder.addToEngine(underGroundTileEntity);
 				this.map[index][TilePosition.UNDERGROUND.value()] = underGroundTileEntity;
