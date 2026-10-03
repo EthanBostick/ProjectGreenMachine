@@ -9,6 +9,7 @@ import io.github.ethanBostick.ecs.systems.BuildSystem;
 import io.github.ethanBostick.ecs.systems.EntityManagementSystem;
 import io.github.ethanBostick.ecs.systems.ExtractionSystem;
 import io.github.ethanBostick.ecs.systems.CleansingSystem;
+import io.github.ethanBostick.ecs.systems.DegenerationSystem;
 import io.github.ethanBostick.ecs.systems.FlowGradientSystem;
 import io.github.ethanBostick.ecs.systems.MultiRenderSystem;
 import io.github.ethanBostick.ecs.systems.NetworkFlowSystem;
@@ -50,12 +51,13 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new NetworkGrowthSystem(tickRate*2, 4));
 
 		this.engine.addSystem(new ExtractionSystem(tickRate*2,4));
-		this.engine.addSystem(new CleansingSystem(tickRate*2,4));
-		this.engine.addSystem(new FlowGradientSystem(tickRate,5));
-		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 6));
-		this.engine.addSystem(new StateCommitSystem(tickRate, 7));
-		this.engine.addSystem(new BuildSystem(tickRate,8));
-		this.engine.addSystem(new ReclaimSystem(tickRate, 9));
+		this.engine.addSystem(new CleansingSystem(tickRate*2,5));
+		this.engine.addSystem(new DegenerationSystem(tickRate*2,6));
+		this.engine.addSystem(new FlowGradientSystem(tickRate,7));
+		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 8));
+		this.engine.addSystem(new StateCommitSystem(tickRate, 9));
+		this.engine.addSystem(new BuildSystem(tickRate,10));
+		this.engine.addSystem(new ReclaimSystem(tickRate, 11));
 
 		this.engine.addSystem(new RenderSystem(97));
 		this.engine.addSystem(new MultiRenderSystem(98));
