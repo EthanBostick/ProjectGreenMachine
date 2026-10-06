@@ -95,8 +95,6 @@ public class ReclaimSystem extends IntervalIteratingSystem {
         }
         finally{
             EntityBuilder.instance().dead(entity);
-
-            System.out.println("queued for deletion");
         }
     }
 }

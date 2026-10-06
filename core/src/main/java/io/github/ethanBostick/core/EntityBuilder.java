@@ -1,9 +1,10 @@
 package io.github.ethanBostick.core;
 
 import com.badlogic.ashley.core.Entity;
+//libGDX stuff
+import com.badlogic.ashley.core.PooledEngine;
 
 import io.github.ethanBostick.ecs.components.ActiveTool;
-import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.Build;
 import io.github.ethanBostick.ecs.components.BuildType;
 import io.github.ethanBostick.ecs.components.Cleansing;
@@ -13,21 +14,20 @@ import io.github.ethanBostick.ecs.components.Density;
 import io.github.ethanBostick.ecs.components.Depth;
 import io.github.ethanBostick.ecs.components.Direction;
 import io.github.ethanBostick.ecs.components.Extraction;
+import io.github.ethanBostick.ecs.components.Health;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
+import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Reclaim;
+import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.Sprite;
-import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.VectorArrow;
 import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.TextureUtils;
-
-//libGDX stuff
-import com.badlogic.ashley.core.PooledEngine;
 
 public class EntityBuilder {
 	private static EntityBuilder theInstance = null;
@@ -54,76 +54,79 @@ public class EntityBuilder {
 		return entity;
     }
 
-	public Entity createMycelium(int q, int r, int density, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim){
-		String texturePath = (density == 3)? "myceliumD3.png" : (density == 2)? "myceliumD2.png" : "myceliumD1.png";
-		Entity e = createRenderable(q, r, 3, 1,TilePosition.MYCELIUM, texturePath);
-		Direction direction = this.engine.createComponent(Direction.class);
-		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
-		NutrientFlow nutrientFlow = this.engine.createComponent(NutrientFlow.class);
+	// --- Shared Base Builder ---
 
-		nutrientFlow.maxThroughput = density;
-		nutrientCapacity.carbonCapacity = 10*density;
-		nutrientCapacity.mineralCapacity = 5*density;
+    private Entity createBaseMycelium(int q, int r, String texturePath, int density,
+                                      int carbonCap, int mineralCap, int maxThroughput,
+                                      int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
+        Entity e = createRenderable(q, r, 3, 1, TilePosition.MYCELIUM, texturePath);
 
-		e.add(nutrientCapacity);
-		e.add(nutrientFlow);
-		e.add(direction);
-		addDensity(e, density);		
-		addNutrients(e, initCarbon, initMineral, carbonReclaim, mineralReclaim);
+        Direction direction = this.engine.createComponent(Direction.class);
+        NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
+        NutrientFlow nutrientFlow = this.engine.createComponent(NutrientFlow.class);
+        Health health = this.engine.createComponent(Health.class);
 
-		return e;
-	}
+        health.health = 100;
+        nutrientCapacity.carbonCapacity = carbonCap;
+        nutrientCapacity.mineralCapacity = mineralCap;
+        nutrientFlow.maxThroughput = maxThroughput;
 
-	public Entity createMyceliumExtractor(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim){
-		Entity e = createRenderable(q, r, 3, 1,TilePosition.MYCELIUM, "extractorMycelium.png");
-		Direction direction = this.engine.createComponent(Direction.class);
-		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
-		NutrientFlow nutrientFlow = this.engine.createComponent(NutrientFlow.class);
-		Extraction extraction = this.engine.createComponent(Extraction.class);
-		nutrientCapacity.carbonCapacity = 30;
-		nutrientCapacity.mineralCapacity = 15;
-		extraction.carbonRate = 5;
-		extraction.mineralRate = 1;
-		extraction.radius = 0;
-		nutrientFlow.maxThroughput = 3;
+        e.add(direction);
+        e.add(nutrientCapacity);
+        e.add(nutrientFlow);
+        e.add(health);
 
-		e.add(nutrientCapacity);
-		e.add(nutrientFlow);
-		e.add(direction);
-		e.add(extraction);
-		addDensity(e, 4);
-		addNutrients(e, initCarbon, initMineral, carbonReclaim, mineralReclaim);
+        addDensity(e, density);
+        addNutrients(e, initCarbon, initMineral, carbonReclaim, mineralReclaim);
 
-		return e;
-	}
+        return e;
+    }
 
-	public Entity createMyceliumCleanser(int q, int r, int initCarbon, int initMineral,int carbonReclaim,int mineralReclaim){
-		Entity e = createRenderable(q, r, 3, 1,TilePosition.MYCELIUM, "cleanserMycelium.png");
-		Direction direction = this.engine.createComponent(Direction.class);
-		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
-		NutrientFlow nutrientFlow = this.engine.createComponent(NutrientFlow.class);
-		Cleansing cleansing = this.engine.createComponent(Cleansing.class);
-		nutrientCapacity.carbonCapacity = 20;
-		nutrientCapacity.mineralCapacity = 20;
-		cleansing.carbonCost = 1;
-		cleansing.mineralCost = 1;
-		cleansing.rate = 10f;
-		cleansing.radius = 1;
+    // --- Specialized Entity Builders ---
 
-		nutrientFlow.maxThroughput = 3;
-		//actively requests nutrients
-		nutrientFlow.needsCarbons = true;
-		nutrientFlow.needsMinerals = true;
+    public Entity createMycelium(int q, int r, int density, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
+        String texturePath = (density == 3) ? "myceliumD3.png" : (density == 2) ? "myceliumD2.png" : "myceliumD1.png";
+        
+        Entity e = createBaseMycelium(q, r, texturePath, density,
+                10 * density, 5 * density, density,
+                initCarbon, initMineral, carbonReclaim, mineralReclaim);
 
-		e.add(nutrientCapacity);
-		e.add(nutrientFlow);
-		e.add(direction);
-		e.add(cleansing);
-		addDensity(e, 4);
-		addNutrients(e, initCarbon, initMineral,carbonReclaim,mineralReclaim);
 
-		return e;
-	}
+        return e;
+    }
+
+    public Entity createMyceliumExtractor(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
+        Entity e = createBaseMycelium(q, r, "extractorMycelium.png", 4,
+                30, 15, 3,
+                initCarbon, initMineral, carbonReclaim, mineralReclaim);
+
+        Extraction extraction = this.engine.createComponent(Extraction.class);
+        extraction.carbonRate = 5;
+        extraction.mineralRate = 1;
+        extraction.radius = 0;
+        e.add(extraction);
+
+        return e;
+    }
+
+    public Entity createMyceliumCleanser(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
+        Entity e = createBaseMycelium(q, r, "cleanserMycelium.png", 4,
+                20, 20, 3,
+                initCarbon, initMineral, carbonReclaim, mineralReclaim);
+
+        NutrientFlow flow = e.getComponent(NutrientFlow.class);
+        flow.needsCarbons = true;
+        flow.needsMinerals = true;
+
+        Cleansing cleansing = this.engine.createComponent(Cleansing.class);
+        cleansing.carbonCost = 1;
+        cleansing.mineralCost = 1;
+        cleansing.rate = 10f;
+        cleansing.radius = 1;
+        e.add(cleansing);
+
+        return e;
+    }
 
 	public Entity createMyceliumRunner(int startQ, int startR, int endQ, int endR ){
 		Entity runner = this.engine.createEntity();

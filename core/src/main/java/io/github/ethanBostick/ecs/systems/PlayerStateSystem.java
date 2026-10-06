@@ -4,7 +4,6 @@ package io.github.ethanBostick.ecs.systems;
 import io.github.ethanBostick.core.Observer;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Registry;
-import io.github.ethanBostick.ecs.components.ToolType;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventType;

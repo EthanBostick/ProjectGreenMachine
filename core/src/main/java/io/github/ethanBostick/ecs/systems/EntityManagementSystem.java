@@ -26,7 +26,5 @@ public class EntityManagementSystem extends IteratingSystem{
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         this.theEngine.removeEntity(entity); //calls reset on all components and returns them to pool + removes entity
-
-        System.out.println("deleted");
     }
 }
