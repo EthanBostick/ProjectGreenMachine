@@ -2,30 +2,33 @@ package io.github.ethanBostick.screens;
 
 import io.github.ethanBostick.ui.GameHUD;
 import io.github.ethanBostick.input.GameController;
-
-import io.github.ethanBostick.ecs.RenderSystem;
-import io.github.ethanBostick.ecs.MultiRenderSystem;
-import io.github.ethanBostick.ecs.VectorRenderSystem;
-
-import io.github.ethanBostick.ecs.ActionSystem;
-import io.github.ethanBostick.ecs.NetworkGrowthSystem;
-import io.github.ethanBostick.ecs.NetworkFlowSystem;
-import io.github.ethanBostick.ecs.RunnerSystem;
-
-import io.github.ethanBostick.ecs.PlayerStateSystem;
-import io.github.ethanBostick.ecs.EntityBuilder;
-
+import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.Registry;
+import io.github.ethanBostick.ecs.systems.ActionSystem;
+import io.github.ethanBostick.ecs.systems.BuildSystem;
+import io.github.ethanBostick.ecs.systems.EntityManagementSystem;
+import io.github.ethanBostick.ecs.systems.ExtractionSystem;
+import io.github.ethanBostick.ecs.systems.CleansingSystem;
+import io.github.ethanBostick.ecs.systems.DegenerationSystem;
+import io.github.ethanBostick.ecs.systems.FlowGradientSystem;
+import io.github.ethanBostick.ecs.systems.MultiRenderSystem;
+import io.github.ethanBostick.ecs.systems.NetworkFlowSystem;
+import io.github.ethanBostick.ecs.systems.NetworkGrowthSystem;
+import io.github.ethanBostick.ecs.systems.PlayerStateSystem;
+import io.github.ethanBostick.ecs.systems.StateCommitSystem;
+import io.github.ethanBostick.ecs.systems.RenderSystem;
+import io.github.ethanBostick.ecs.systems.RunnerSystem;
+import io.github.ethanBostick.ecs.systems.VectorRenderSystem;
+import io.github.ethanBostick.ecs.systems.ReclaimSystem;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.InputMultiplexer;
 
 //testing
-import io.github.ethanBostick.map.BiomeType;
+import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.Map;
-import io.github.ethanBostick.ecs.Registry;
-//end testing
 
 public class GameScreen implements Screen {
 
@@ -33,53 +36,61 @@ public class GameScreen implements Screen {
 	private InputMultiplexer multiplexer = null;
 	private GameController gameController = null;
 	public float tickRate = 0.5f;
-	public Engine engine;
+	public PooledEngine engine;
 
 	public GameScreen(){}
 
 	@Override
 	public void show() {
 	//init Ashley ECS
-		this.engine = new Engine();
+		this.engine = new PooledEngine();
 		EntityBuilder.instance(engine);
 		Registry.init();
-		this.engine.addSystem(new RenderSystem());
-		this.engine.addSystem(new MultiRenderSystem());
-		this.engine.addSystem(new VectorRenderSystem());
+		this.engine.addSystem(new ActionSystem(2));
+		this.engine.addSystem(new RunnerSystem(tickRate, 3));
+		this.engine.addSystem(new NetworkGrowthSystem(tickRate*2, 4));
 
-		this.engine.addSystem(new ActionSystem());
-		this.engine.addSystem(new NetworkGrowthSystem(tickRate));
-		this.engine.addSystem(new NetworkFlowSystem(tickRate));
-		this.engine.addSystem(new RunnerSystem(tickRate));
+		this.engine.addSystem(new ExtractionSystem(tickRate*2,4));
+		this.engine.addSystem(new CleansingSystem(tickRate*2,5));
+		this.engine.addSystem(new DegenerationSystem(tickRate*2,6));
+		this.engine.addSystem(new FlowGradientSystem(tickRate,7));
+		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 8));
+		this.engine.addSystem(new StateCommitSystem(tickRate, 9));
+		this.engine.addSystem(new BuildSystem(tickRate,10));
+		this.engine.addSystem(new ReclaimSystem(tickRate, 11));
+
+		this.engine.addSystem(new RenderSystem(97));
+		this.engine.addSystem(new MultiRenderSystem(98));
+		this.engine.addSystem(new VectorRenderSystem(99)); //99 so it renders on top
 		this.engine.addSystem(new PlayerStateSystem());
+		this.engine.addSystem(new EntityManagementSystem(engine, 100));
 
 		Map map = Map.instance();
 		double[] concentrations = new double[] {
-			0.4,//blank tile
-			0.09,
-			0.09,
-			0.09,
+			0.35,//blank tile
 			0.15,
-			0.09,
-			0.09};
-		BiomeType[] biomes = new BiomeType[]{
-			BiomeType.BLANK,
-			BiomeType.DESERT,
-			BiomeType.GRASS_LAND,
-			BiomeType.FOREST,
-			BiomeType.MOUNTAIN,
-			BiomeType.BOREAL,
-			BiomeType.TAIGA
+			0.15,
+			0.20,
+			0.10,
+			0.05
+		};
+		RegionType[] regions = new RegionType[]{
+			RegionType.BLANK,
+			RegionType.MOUNTAIN,
+			RegionType.BARREN,
+			RegionType.POLLUTED,
+			RegionType.RADIOACTIVE,
+			RegionType.RESTORED
 		};
 
-		map.initConfig(100, concentrations,biomes,0.75 , 10, 67);
+		map.initConfig(100, concentrations,regions,0.75 , 0, 67);
 		map.initMap();
 
 	//init Input and UI
 		this.multiplexer = new InputMultiplexer();
 		this.gameHUD = new GameHUD();
-		this.multiplexer.addProcessor(0,this.gameHUD.stage); 
 		this.gameController = new GameController(500, 500);
+		this.multiplexer.addProcessor(this.gameHUD.stage); 
 		this.multiplexer.addProcessor(this.gameController);
 		Gdx.input.setInputProcessor(this.multiplexer);
 	}
@@ -92,6 +103,7 @@ public class GameScreen implements Screen {
 
         //engine systems update
 		this.engine.update(delta);
+		this.gameHUD.update();
 		this.gameHUD.stage.act(delta);
 		this.gameHUD.stage.draw();
     }

@@ -2,11 +2,14 @@ package io.github.ethanBostick.utils;
 
 import com.badlogic.gdx.utils.IntArray;
 
-import io.github.ethanBostick.ecs.Position;
+import io.github.ethanBostick.ecs.components.Position;
 
 public final class HexUtils {
     private HexUtils() {}
 
+    public static final int[][] hexDirections = {
+        {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}
+    };
     public static final float HEIGHT = 52f;
     public static final float WIDTH = 64f;
     public static final float SIZE = 30f;
@@ -65,7 +68,7 @@ public final class HexUtils {
         int centerR = p.r;
         output.clear();
 
-		for (int q = -size ; q < size ; q ++){
+		for (int q = -size ; q <= size ; q ++){
 			for (int r = Math.max(-size, -q - size); r < Math.min(size, -q + size); r ++){
                 output.add(q+centerQ);
                 output.add(r+centerR);

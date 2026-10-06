@@ -20,6 +20,20 @@ public class EventFactory {
         }
     };
 
+    public final Pool<ToolChangeEvent> toolChangeEventPool = new Pool<ToolChangeEvent>() {
+        @Override
+        protected ToolChangeEvent newObject() {
+            return new ToolChangeEvent();
+        }
+    };
+
+    public final Pool<TileSelectEvent> tileSelectEventPool = new Pool<TileSelectEvent>() {
+        @Override
+        protected TileSelectEvent newObject() {
+            return new TileSelectEvent();
+        }
+    };
+
 	private EventFactory(){}
 
 	public static EventFactory instance(){
