@@ -172,7 +172,9 @@ public class Map{
 					this.map[index][TilePosition.RESOURCE_NODE.value()] = resourceNode;
 				}
 
-				double rockThreshold = (tilePng == "mountain.png") ? 0.75 : 0.13; // rock obstacle
+				//TODO:
+				//underground obst
+				//double rockThreshold = (tilePng == "mountain.png") ? 0.75 : 0.13; // rock obstacle
 
 				//init mycelium network node
 				if (q == 0 && r == 0){

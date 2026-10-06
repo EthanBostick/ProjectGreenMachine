@@ -103,7 +103,6 @@ public class ActionSystem extends IteratingSystem{
     private void buildAction(Entity mouse, ActiveTool activeTool){
         Position mousePosition = Mappers.positionCMap.get(mouse);
         MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
-        MultiTilePosition mouseDragPosition = Mappers.multiTilePositionCMap.get(mouse);
         BuildType targetBuild = activeTool.buildTarget;
 
         if (targetBuild == null) return;

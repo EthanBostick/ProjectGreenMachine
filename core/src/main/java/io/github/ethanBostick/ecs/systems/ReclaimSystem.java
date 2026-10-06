@@ -16,12 +16,12 @@ import io.github.ethanBostick.utils.HexUtils;
 
 public class ReclaimSystem extends IntervalIteratingSystem {
     private int[][] hexDirections;
-    private final float interval;
+    //private final float interval;
     
     public ReclaimSystem(float interval, int priority) {
         super(Family.all(Reclaim.class).get(),interval, priority);
         this.hexDirections = HexUtils.hexDirections;
-        this.interval = interval;
+        //this.interval = interval;
     }
 
     @Override
