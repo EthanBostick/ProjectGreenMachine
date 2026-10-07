@@ -113,6 +113,11 @@ public class ActionSystem extends IteratingSystem{
         if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r) && !mouseState.heldDown){
 
             Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
+            Entity obstacle = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.UNDERGROUND_TERRAIN);
+            //cant build on obstacle
+            if(obstacle != null){
+                return;
+            }
 
             if(selectedTile != null && neighboringMycelium(mousePosition)){
                 Entity newBuild = EntityBuilder.instance().createBuild(targetBuild,mousePosition.q,mousePosition.r,carbonCost,mineralCost);

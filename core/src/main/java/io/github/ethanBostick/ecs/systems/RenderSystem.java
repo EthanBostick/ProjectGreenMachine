@@ -27,7 +27,33 @@ public class RenderSystem extends SortedIteratingSystem{
             int layer1 = -Mappers.positionCMap.get(e1).layer;
             int layer2 = -Mappers.positionCMap.get(e2).layer;
             
-            return Integer.compare(layer2, layer1);
+            //primary sort by layer
+            int layerComparison = Integer.compare(layer2, layer1);
+            if (layerComparison != 0){
+                return layerComparison;
+            }
+
+            //secondary sort by y-value
+            //inverted so lower sprites render first
+            float groundY1 = -HexUtils.getPixelY(Mappers.positionCMap.get(e1));
+            float groundY2 = -HexUtils.getPixelY(Mappers.positionCMap.get(e2));
+
+            int yComparison = Float.compare(groundY1, groundY2);
+            if(yComparison != 0){
+                return yComparison;
+            }
+
+            //tertiary row sort
+            float groundX1 = HexUtils.getPixelX(Mappers.positionCMap.get(e1));
+            float groundX2 = HexUtils.getPixelX(Mappers.positionCMap.get(e2));
+
+            int xComparison = Float.compare(groundX1, groundX2);
+            if(xComparison != 0){
+                return xComparison;
+            }
+
+            //fallback
+            return Integer.compare(e1.hashCode(), e2.hashCode());
         }
     }
 

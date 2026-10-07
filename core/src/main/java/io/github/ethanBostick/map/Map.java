@@ -110,6 +110,7 @@ public class Map{
 				Entity tileEntity = null;
 				String tilePng = "hex_template.png";
 				String extraPng = null;
+				int renderLayer = 0;
 				RegionType bType = RegionType.BLANK;
 
 				if (duelGrid[0][index] == RegionType.BARREN.tempValue()){
@@ -126,18 +127,20 @@ public class Map{
 						extraPng = "deadTree.png";							
 					}
 				} else if (duelGrid[0][index] == RegionType.MOUNTAIN.tempValue()){
-					tilePng = "mountain.png";
+					tilePng = "mountainTile.png";
+					renderLayer = 2;
 					bType = RegionType.MOUNTAIN;						
 				} else if (duelGrid[0][index] == RegionType.RESTORED.tempValue()){
 					tilePng = "restoredTile.png";
 					bType = RegionType.RESTORED;						
 				} else{
-					tilePng = "mountain.png";
+					tilePng = "mountainTile.png";
+					renderLayer = 2;
 					bType = RegionType.MOUNTAIN;						
 				}
 
 				//Put the Entities together and update map
-				tileEntity = entityBuilder.createRenderable(q,r,0,0,TilePosition.SURFACE, tilePng);
+				tileEntity = entityBuilder.createRenderable(q,r,renderLayer,0,TilePosition.SURFACE, tilePng);
 				entityBuilder.addRegion(bType, tileEntity);
 				if(extraPng != null){
 					Entity terrainEntity = entityBuilder.createRenderable(q,r,1, 0,TilePosition.TERRAIN, extraPng);
@@ -173,8 +176,15 @@ public class Map{
 				}
 
 				//TODO:
-				//underground obst
-				//double rockThreshold = (tilePng == "mountain.png") ? 0.75 : 0.13; // rock obstacle
+				//make the rock obstacle an actual obstacle
+				double rockRoll = this.random.nextDouble();
+				double rockThreshold = (tilePng == "mountainTile.png") ? 0.75 : 0.13; // rock obstacle
+
+				if (rockRoll < rockThreshold){
+					Entity rock = entityBuilder.createRenderable(q, r, 2, 1, TilePosition.UNDERGROUND_TERRAIN, "stone.png");	
+					this.entityBuilder.addToEngine(rock);
+					this.map[index][TilePosition.UNDERGROUND_TERRAIN.value()] = rock;
+				}
 
 				//init mycelium network node
 				if (q == 0 && r == 0){
@@ -183,10 +193,10 @@ public class Map{
 					this.map[index][TilePosition.MYCELIUM.value()] = initMycelium;
 
 					//do not track, for visual only
-					Entity center = entityBuilder.createRenderable(0,0, 3,0,null, "hexCenter.png");
-					this.entityBuilder.addToEngine(center);
-					Entity centerUnder = entityBuilder.createRenderable(0,0, 3,1,null, "hexCenter.png");
-					this.entityBuilder.addToEngine(centerUnder);
+					// Entity center = entityBuilder.createRenderable(0,0, 3,0,null, "hexCenter.png");
+					// this.entityBuilder.addToEngine(center);
+					// Entity centerUnder = entityBuilder.createRenderable(0,0, 3,1,null, "hexCenter.png");
+					// this.entityBuilder.addToEngine(centerUnder);
 				}
 			}
 		}

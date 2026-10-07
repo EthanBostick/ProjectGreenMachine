@@ -36,6 +36,7 @@ public class GameHUD implements Observer {
     
     // 1. The tracked entity and the labels to update
     private Position selectedTilePosition;
+    private Label positionLabel;
     private Label carbonLabel;
     private Label mineralLabel;
     private Label directionLabel;
@@ -55,12 +56,14 @@ public class GameHUD implements Observer {
         infoPanel.setVisible(true); // Hide until something is clicked
 
         // 3. Initialize the dynamic labels
+        positionLabel = new Label("q = 0, r = 0", uiSkin);
         carbonLabel = new Label("Carbons: 0", uiSkin);
         mineralLabel = new Label("Minerals: 0", uiSkin);
         directionLabel = new Label("Direction: 0,0", uiSkin );
         carbonLabel2 = new Label("Carbons: 0", uiSkin);
         mineralLabel2 = new Label("Minerals: 0", uiSkin);
         
+        infoPanel.add(positionLabel).left().row();
         infoPanel.add(new Label("-- Mycelium --", uiSkin)).row();
         infoPanel.add(carbonLabel).left().row();
         infoPanel.add(mineralLabel).left().row();
@@ -149,6 +152,7 @@ public class GameHUD implements Observer {
         if(selectedTilePosition == null){
             return;
         }
+        positionLabel.setText("q = " + selectedTilePosition.q +", r = " + selectedTilePosition.r);
 
         Entity selectedMycelium = Map.instance().getEntityAt(selectedTilePosition.q, selectedTilePosition.r, TilePosition.MYCELIUM);
         Entity selectedResourceNode = Map.instance().getEntityAt(selectedTilePosition.q, selectedTilePosition.r, TilePosition.RESOURCE_NODE);
