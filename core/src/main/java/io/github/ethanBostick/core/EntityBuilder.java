@@ -140,6 +140,7 @@ public class EntityBuilder {
 		targetHighlight.texture = TextureUtils.pathToTexture("runnerTarget.png");
 		targetPosition.q = endQ;
 		targetPosition.r = endR;
+		targetPosition.layer = 99; //so it renders on top
 		depth.depth = 1;
 
 		startAndEnd.points.add(startQ);
