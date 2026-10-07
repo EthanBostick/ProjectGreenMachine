@@ -25,6 +25,7 @@ import io.github.ethanBostick.ecs.components.Reclaim;
 import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.ecs.components.VectorArrow;
+import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.TextureUtils;
@@ -50,6 +51,15 @@ public class EntityBuilder {
 		entity.add(p);
 		entity.add(d);
 		entity.add(s);
+
+		return entity;
+    }
+
+    public Entity createRenderable(int q, int r, int renderLayer, int depth, TilePosition tilePosition, String texturePath, String name){
+		Entity entity = this.createRenderable(q, r, renderLayer, depth, tilePosition, texturePath);
+		Name nameComp = this.engine.createComponent(Name.class);
+
+		entity.add(nameComp);
 
 		return entity;
     }
@@ -166,10 +176,14 @@ public class EntityBuilder {
 		NutrientFlow nutrientFlow = this.engine.createComponent(NutrientFlow.class);
 		Nutrients nutrients = this.engine.createComponent(Nutrients.class);
 		Build buildTarget = this.engine.createComponent(Build.class);
+		Depth depth = this.engine.createComponent(Depth.class);
+
 
 		position.q = q;
 		position.r = r;
 		position.layer = 3;
+
+		depth.depth = 1;
 
 		nutrientCapacity.carbonCapacity = carbonCost;
 		nutrientCapacity.mineralCapacity = mineralCost;
@@ -185,6 +199,7 @@ public class EntityBuilder {
 		buildTarget.buildType = buildType;
 		sprite.texture = TextureUtils.pathToTexture(buildType.spritePath());
 		
+		build.add(depth);
 		build.add(nutrients);
 		build.add(position);
 		build.add(sprite);

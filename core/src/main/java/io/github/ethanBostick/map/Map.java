@@ -109,38 +109,45 @@ public class Map{
 
 				Entity tileEntity = null;
 				String tilePng = "hex_template.png";
+				String name = "";
 				String extraPng = null;
 				int renderLayer = 0;
 				RegionType bType = RegionType.BLANK;
 
 				if (duelGrid[0][index] == RegionType.BARREN.tempValue()){
 					tilePng = "barrenTile.png";
+					name = "barrenTile";
 					bType = RegionType.BARREN;						
 
 				} else if (duelGrid[0][index] == RegionType.RADIOACTIVE.tempValue()){
 					tilePng = "radioactiveTile.png";
+					name = "radioactiveTile";
 					bType = RegionType.RADIOACTIVE;						
 				} else if (duelGrid[0][index] == RegionType.POLLUTED.tempValue()){
 					tilePng = "pollutedTile.png";
+					name = "pollutedTile";
 					bType = RegionType.POLLUTED;						
 					if (rDouble <= 0.45){
 						extraPng = "deadTree.png";							
 					}
 				} else if (duelGrid[0][index] == RegionType.MOUNTAIN.tempValue()){
 					tilePng = "mountainTile.png";
+					name = "mountainTile";
 					renderLayer = 2;
 					bType = RegionType.MOUNTAIN;						
 				} else if (duelGrid[0][index] == RegionType.RESTORED.tempValue()){
 					tilePng = "restoredTile.png";
+					name = "restoredTile";
 					bType = RegionType.RESTORED;						
 				} else{
 					tilePng = "mountainTile.png";
+					name = "mountainTile";
 					renderLayer = 2;
 					bType = RegionType.MOUNTAIN;						
 				}
 
 				//Put the Entities together and update map
-				tileEntity = entityBuilder.createRenderable(q,r,renderLayer,0,TilePosition.SURFACE, tilePng);
+				tileEntity = entityBuilder.createRenderable(q,r,renderLayer,0,TilePosition.SURFACE, tilePng, name);
 				entityBuilder.addRegion(bType, tileEntity);
 				if(extraPng != null){
 					Entity terrainEntity = entityBuilder.createRenderable(q,r,1, 0,TilePosition.TERRAIN, extraPng);
@@ -175,8 +182,6 @@ public class Map{
 					this.map[index][TilePosition.RESOURCE_NODE.value()] = resourceNode;
 				}
 
-				//TODO:
-				//make the rock obstacle an actual obstacle
 				double rockRoll = this.random.nextDouble();
 				double rockThreshold = (tilePng == "mountainTile.png") ? 0.75 : 0.13; // rock obstacle
 

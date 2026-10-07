@@ -23,4 +23,5 @@ public class Mappers {
     public static final ComponentMapper<Dead> deadCMap = ComponentMapper.getFor(Dead.class);
     public static final ComponentMapper<Build> buildCMap = ComponentMapper.getFor(Build.class);
     public static final ComponentMapper<Health> healthCMap = ComponentMapper.getFor(Health.class);
+    public static final ComponentMapper<Name> nameCMap = ComponentMapper.getFor(Name.class);
 }

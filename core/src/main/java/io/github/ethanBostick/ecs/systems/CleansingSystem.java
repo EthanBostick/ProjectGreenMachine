@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.ecs.components.Cleansing;
 import io.github.ethanBostick.ecs.components.Mappers;
+import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
@@ -74,10 +75,24 @@ public class CleansingSystem extends IntervalIteratingSystem {
                 }
 
                 //node cleansed
+                Name tileName = Mappers.nameCMap.get(surfaceNode);
                 if (nodeRegion.condition >= 100){
                     nodeRegion.condition = 100;
                     nodeRegion.regionType = RegionType.RESTORED;
                     Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture("restoredTile.png");
+                }
+                //tile sprite updates
+                else if(tileName == null){
+                    continue;
+                }
+                else if(nodeRegion.condition >= 75){
+                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(tileName.name+"R3.png");
+                }
+                else if(nodeRegion.condition >= 50){
+                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(tileName.name+"R2.png");
+                }
+                else if(nodeRegion.condition >= 25){
+                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(tileName.name+"R1.png");
                 }
             }
 
