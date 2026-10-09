@@ -27,15 +27,17 @@ public class BuildSystem extends IntervalIteratingSystem{
     private Entity createTargetBuild(BuildType target, Position p){
         switch (target){
             case MYCELIUM_D1:
-                return EntityBuilder.instance().createMycelium(p.q, p.r, 1, 0, 0,target.carbonCost()/2,target.mineralCost()/2);
+                return EntityBuilder.instance().createMycelium(p.q, p.r, 1, 0, 0,target.carbonCost/2,target.mineralCost/2);
             case MYCELIUM_D2:
-                return EntityBuilder.instance().createMycelium(p.q, p.r, 2, 0, 0,target.carbonCost(),target.mineralCost());
+                return EntityBuilder.instance().createMycelium(p.q, p.r, 2, 0, 0,target.carbonCost,target.mineralCost);
             case MYCELIUM_D3:
-                return EntityBuilder.instance().createMycelium(p.q, p.r, 3, 0, 0,(target.carbonCost()*3)/2,(target.mineralCost()*3)/2);
+                return EntityBuilder.instance().createMycelium(p.q, p.r, 3, 0, 0,(target.carbonCost*3)/2,(target.mineralCost*3)/2);
             case EXTRACTOR:
-                return EntityBuilder.instance().createMyceliumExtractor(p.q, p.r,0,0,target.carbonCost()/2,target.mineralCost()/2);
+                return EntityBuilder.instance().createMyceliumExtractor(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
             case CLEANSER:
-                return EntityBuilder.instance().createMyceliumCleanser(p.q, p.r,0,0,target.carbonCost()/2,target.mineralCost()/2);
+                return EntityBuilder.instance().createMyceliumCleanser(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
+            case STORAGE:
+                return EntityBuilder.instance().createMyceliumStorage(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
         }
         return null;
     }

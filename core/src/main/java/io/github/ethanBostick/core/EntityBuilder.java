@@ -23,6 +23,7 @@ import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Reclaim;
 import io.github.ethanBostick.ecs.components.Region;
+import io.github.ethanBostick.ecs.components.Vision;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.ecs.components.VectorArrow;
 import io.github.ethanBostick.ecs.components.Name;
@@ -40,7 +41,6 @@ public class EntityBuilder {
 		Depth d = this.engine.createComponent(Depth.class);
 		Sprite s = this.engine.createComponent(Sprite.class);
 		Position p = this.engine.createComponent(Position.class);
-
 		d.depth = depth;
         s.texture = TextureUtils.pathToTexture(texturePath);
         p.q = q;
@@ -75,12 +75,14 @@ public class EntityBuilder {
         NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
         NutrientFlow nutrientFlow = this.engine.createComponent(NutrientFlow.class);
         Health health = this.engine.createComponent(Health.class);
+		Vision vision = this.engine.createComponent(Vision.class);
 
         health.health = 100;
         nutrientCapacity.carbonCapacity = carbonCap;
         nutrientCapacity.mineralCapacity = mineralCap;
         nutrientFlow.maxThroughput = maxThroughput;
 
+		e.add(vision);
         e.add(direction);
         e.add(nutrientCapacity);
         e.add(nutrientFlow);
@@ -101,6 +103,19 @@ public class EntityBuilder {
                 10 * density, 5 * density, density,
                 initCarbon, initMineral, carbonReclaim, mineralReclaim);
 
+
+        return e;
+    }
+
+    public Entity createMyceliumStorage(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
+        String texturePath = "myceliumD3.png";
+        
+        Entity e = createBaseMycelium(q, r, texturePath, 4,
+                60, 45, 2,
+                initCarbon, initMineral, carbonReclaim, mineralReclaim);
+
+        NutrientFlow flow = e.getComponent(NutrientFlow.class);
+		flow.isStorageNode = true;
 
         return e;
     }
@@ -178,7 +193,6 @@ public class EntityBuilder {
 		Build buildTarget = this.engine.createComponent(Build.class);
 		Depth depth = this.engine.createComponent(Depth.class);
 
-
 		position.q = q;
 		position.r = r;
 		position.layer = 3;
@@ -197,7 +211,7 @@ public class EntityBuilder {
 		nutrientFlow.needsMinerals = mineralCost > 0;
 
 		buildTarget.buildType = buildType;
-		sprite.texture = TextureUtils.pathToTexture(buildType.spritePath());
+		sprite.texture = TextureUtils.pathToTexture(buildType.spritePath);
 		
 		build.add(depth);
 		build.add(nutrients);
@@ -214,7 +228,6 @@ public class EntityBuilder {
 		Entity entity = this.engine.createEntity();
 		Sprite s = this.engine.createComponent(Sprite.class);
 		Position p = this.engine.createComponent(Position.class);
-
 		p.q = 0;
 		p.r = 0;
 		p.layer = 99;

@@ -1,7 +1,8 @@
 package io.github.ethanBostick.core;
 
 public enum CommonValues {
-    DEGENERATION_CARBON_PER_TICK(0.2f),
+    SIGHT_RADIUS(3f),
+    DEGENERATION_CARBON_PER_TICK(0f),
     DEGENERATION_MINERAL_PER_TICK(0f);
 
     public float value;

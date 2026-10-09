@@ -7,10 +7,12 @@ import java.util.Random;
 import com.badlogic.ashley.core.Entity;
 
 import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.Position;
 
 public class Map{
 	private static Map theInstance = null;
 	private Entity[][] map;
+	private int[] revealedMap;
 	private EntityBuilder entityBuilder = null;
 
 	//map config
@@ -30,6 +32,20 @@ public class Map{
 	public void setEntityAt(int q, int r, Entity e, TilePosition t){
 		int i = getIndex(q, r);
 		this.map[i][t.value()] = e;
+	}
+
+	public void setRevealed(int q, int r){
+		int i = getIndex(q, r);
+		this.revealedMap[i] = 1;
+	}
+
+	public int getRevealState(int q, int r){
+		int i = getIndex(q, r);
+		return this.revealedMap[i];
+	}
+	public int getRevealState(Position p){
+		int i = getIndex(p.q, p.r);
+		return this.revealedMap[i];
 	}
 
 	public int getMapSize(){
@@ -86,9 +102,11 @@ public class Map{
 
 	public void initMap(){
 		int[] regionGrid = new int[w*w];
+		this.revealedMap = new int[w*w];
 		for (int q = -this.size ; q <= this.size ; q ++){
 			for (int r = Math.max(-this.size, -q - this.size); r <= Math.min(this.size, -q + this.size); r ++){
 				int index = this.getIndex(q, r);
+				this.revealedMap[index] = 0; //default unrevealed
 				if(Math.abs(q) <= startingArea && Math.abs(r) <= startingArea && Math.abs(q+r) <= startingArea){
 					regionGrid[index] = RegionType.RESTORED.tempValue();
 				}

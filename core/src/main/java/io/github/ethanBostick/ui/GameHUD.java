@@ -103,6 +103,17 @@ public class GameHUD implements Observer {
             }
         });
 
+        TextButton buildStorageButton = new TextButton("Storage", uiSkin);
+        buildCleanserButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
+                toolChangeEvent.tool = ToolType.BUILD;
+                toolChangeEvent.buildTarget = BuildType.STORAGE;
+				EventBus.instance().publish(toolChangeEvent);			
+            }
+        });
+
         TextButton buildDeleteButton = new TextButton("Delete", uiSkin);
         buildDeleteButton.addListener(new ClickListener() {
             @Override
@@ -118,6 +129,7 @@ public class GameHUD implements Observer {
         // The pad(10) adds 10 pixels of margin around the button
         buildOptions.add(buildExtractorButton); 
         buildOptions.add(buildCleanserButton); 
+        buildOptions.add(buildStorageButton); 
         buildOptions.add(buildDeleteButton);
         //put back together
 

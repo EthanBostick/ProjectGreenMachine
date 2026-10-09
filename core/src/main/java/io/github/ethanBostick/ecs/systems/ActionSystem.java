@@ -107,8 +107,8 @@ public class ActionSystem extends IteratingSystem{
 
         if (targetBuild == null) return;
 
-        int carbonCost = targetBuild.carbonCost();
-        int mineralCost = targetBuild.mineralCost();
+        int carbonCost = targetBuild.carbonCost;
+        int mineralCost = targetBuild.mineralCost;
 
         if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r) && !mouseState.heldDown){
 
