@@ -190,10 +190,12 @@ public class Map{
 					if(bType.resourceType() == ResourceType.CARBON){
 						resourceNode = entityBuilder.createRenderable(q, r, 1, 1, TilePosition.RESOURCE_NODE, "carbonNode"+nodeLevel+".png");
 						this.entityBuilder.addNutrients(resourceNode, resourceConcentration, 0);
+						this.entityBuilder.addResourceType(underGroundTileEntity, ResourceType.CARBON);					
 					}
 					else{
 						resourceNode = entityBuilder.createRenderable(q, r, 1, 1, TilePosition.RESOURCE_NODE, "mineralNode"+nodeLevel+".png");
 						this.entityBuilder.addNutrients(resourceNode, 0, resourceConcentration);
+						this.entityBuilder.addResourceType(underGroundTileEntity, ResourceType.MINERAL);					
 					}
 					//commit it to engine and map
 					this.entityBuilder.addToEngine(resourceNode);

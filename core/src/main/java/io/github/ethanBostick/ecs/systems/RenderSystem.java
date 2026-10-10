@@ -1,5 +1,6 @@
 package io.github.ethanBostick.ecs.systems;
 
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Depth;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Position;
@@ -61,7 +62,7 @@ public class RenderSystem extends SortedIteratingSystem{
     }
 
     public RenderSystem(int priority) {
-        super(Family.all(Position.class, Sprite.class).get(), new LayerComparator(), priority);
+        super(Family.all(Position.class, Sprite.class).exclude(Dead.class).get(), new LayerComparator(), priority);
         this.batch = Registry.spriteBatch;
         this.camera = Registry.camera;
     }
@@ -85,7 +86,6 @@ public class RenderSystem extends SortedIteratingSystem{
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        if (Mappers.deadCMap.get(entity) != null) return;
 
         Depth depth = Mappers.depthCMap.get(entity);
         if(depth != null && depth.depth != Mappers.depthCMap.get(Registry.player).depth){

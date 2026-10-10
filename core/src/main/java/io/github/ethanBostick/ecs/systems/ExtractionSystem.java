@@ -5,22 +5,29 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.utils.IntArray;
 
+import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Extraction;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.Position;
+import io.github.ethanBostick.ecs.components.Resource;
+import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.map.Map;
+import io.github.ethanBostick.map.ResourceType;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.HexUtils;
+import io.github.ethanBostick.utils.TextureUtils;
 
 public class ExtractionSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
     private IntArray processingArray = new IntArray(12);
     
     public ExtractionSystem(float interval, int priority) {
-        super(Family.all(Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Extraction.class).get(), interval, priority);
+        super(Family.all(Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Extraction.class)
+        .exclude(Dead.class).get(), interval, priority);
         this.interval = interval;
     }
 
@@ -53,6 +60,7 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                 if (resourceNode == null) continue;
 
                 Nutrients nodeNutrients = Mappers.nutrientsCMap.get(resourceNode);
+                Sprite nodeSprite = Mappers.spriteCMap.get(resourceNode);
 
                 // Carbon extraction
                 int nodeCarbonsAvail = Math.max(0, nodeNutrients.carbons + nodeNutrients.carbonDelta);
@@ -78,6 +86,30 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                     nodeNutrients.mineralDelta -= finalExtract;
                     nutrients.mineralDelta += finalExtract;
                     currentMineral += finalExtract;
+                }
+
+                // update node sprite 
+                Resource resourceType = Mappers.resourceCMap.get(resourceNode);
+
+                if(resourceType.resourceType == ResourceType.CARBON){
+                    nodeCarbonsAvail = Math.max(0, nodeNutrients.carbons + nodeNutrients.carbonDelta);
+                    int carbonLevel  = (nodeCarbonsAvail > 40)? 3: (nodeCarbonsAvail > 30) ? 2: (nodeCarbonsAvail>0)? 1 : 0;
+                    if (carbonLevel > 0){
+                        nodeSprite.texture = TextureUtils.pathToTexture("carbonNode"+carbonLevel+".png");
+                    }
+                    else{
+                        EntityBuilder.instance().dead(resourceNode);
+                    }
+                }
+                else if (resourceType.resourceType == ResourceType.MINERAL){
+                    nodeMineralsAvail = Math.max(0, nodeNutrients.minerals + nodeNutrients.mineralDelta);
+                    int mineralLevel  = (nodeMineralsAvail > 40)? 3: (nodeMineralsAvail > 30) ? 2: (nodeMineralsAvail > 0)? 1 : 0;
+                    if (mineralLevel > 0){
+                        nodeSprite.texture = TextureUtils.pathToTexture("mineralNode"+mineralLevel+".png");
+                    }
+                    else{
+                        EntityBuilder.instance().dead(resourceNode);
+                    }
                 }
             }
         }

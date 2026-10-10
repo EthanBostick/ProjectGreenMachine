@@ -6,7 +6,7 @@ public enum BuildType {
     MYCELIUM_D3("myceliumD3Build.png", 3, 1),
     CLEANSER("cleanserMyceliumBuild.png", 6, 2),
     EXTRACTOR("extractorMyceliumBuild.png", 9, 3),
-    STORAGE("myceliumD3Build.png", 9, 3);
+    STORAGE("storageMyceliumBuild.png", 9, 3);
 
     public String spritePath;
     public int carbonCost;

@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
 import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
@@ -18,7 +19,7 @@ public class ReclaimSystem extends IteratingSystem {
     private int[][] hexDirections;
     
     public ReclaimSystem( int priority) {
-        super(Family.all(Reclaim.class).get(), priority);
+        super(Family.all(Reclaim.class).exclude(Dead.class).get(), priority);
         this.hexDirections = HexUtils.hexDirections;
     }
 

@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.ecs.components.Cleansing;
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
@@ -24,7 +25,8 @@ public class CleansingSystem extends IntervalIteratingSystem {
     private IntArray processingArray = new IntArray(12);
     
     public CleansingSystem(float interval, int priority) {
-        super(Family.all(Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Cleansing.class).get(), interval, priority);
+        super(Family.all(Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Cleansing.class)
+            .exclude(Dead.class).get(), interval, priority);
         this.interval = interval;
     }
 

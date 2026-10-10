@@ -5,6 +5,8 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.IntArray;
+
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
@@ -27,7 +29,8 @@ public class FlowGradientSystem extends IntervalSystem {
     @Override
     protected void updateInterval() {
         ImmutableArray<Entity> nodes = getEngine().getEntitiesFor(
-            Family.all(NutrientFlow.class, Position.class).get()
+            Family.all(NutrientFlow.class, Position.class)
+            .exclude(Dead.class).get()
         );
 
         computeMineralGradients(nodes);

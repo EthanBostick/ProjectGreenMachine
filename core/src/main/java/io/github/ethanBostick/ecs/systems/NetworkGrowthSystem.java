@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.BuildType;
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Density;
 import io.github.ethanBostick.ecs.components.Direction;
 import io.github.ethanBostick.ecs.components.Mappers;
@@ -23,13 +24,13 @@ public class NetworkGrowthSystem extends IntervalIteratingSystem {
      * @param interval The time in seconds between each system execution (e.g., 0.5f)
      */
     public NetworkGrowthSystem(float interval,int priority) {
-        super(Family.all(Nutrients.class,NutrientCapacity.class,NutrientFlow.class, Direction.class,Position.class).get(), interval, priority);
+        super(Family.all(Nutrients.class,NutrientCapacity.class,NutrientFlow.class, Direction.class,Position.class)
+            .exclude(Dead.class).get(), interval, priority);
         this.interval = interval;
     }
 
     @Override
     protected void processEntity(Entity entity) {
-        if (Mappers.deadCMap.get(entity) != null) return;
     
         Position position = Mappers.positionCMap.get(entity);
         Direction direction = Mappers.directionCMap.get(entity);

@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.core.CommonValues;
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Vision;
@@ -17,7 +18,7 @@ public class RevealSystem extends IntervalIteratingSystem {
     private IntArray processingArray = new IntArray(2*(int)CommonValues.SIGHT_RADIUS.value);
     
     public RevealSystem(float interval, int priority) {
-        super(Family.all(Vision.class).get(), interval, priority);
+        super(Family.all(Vision.class).exclude(Dead.class).get(), interval, priority);
         this.interval = interval;
     }
 

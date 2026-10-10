@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Density;
 import io.github.ethanBostick.ecs.components.Health;
 import io.github.ethanBostick.ecs.components.Mappers;
@@ -22,7 +23,8 @@ public class DegenerationSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
     
     public DegenerationSystem(float interval, int priority) {
-        super(Family.all(Density.class, Sprite.class, Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Health.class).get(), interval, priority);
+        super(Family.all(Density.class, Sprite.class, Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Health.class)
+            .exclude(Dead.class).get(), interval, priority);
         this.interval = interval;
     }
 

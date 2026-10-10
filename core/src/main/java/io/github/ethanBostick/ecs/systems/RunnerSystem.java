@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Complete;
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Direction;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
@@ -26,14 +27,14 @@ public class RunnerSystem extends IntervalIteratingSystem {
      * @param interval The time in seconds between each system execution (e.g., 0.5f)
      */
     public RunnerSystem(float interval, int priority) {
-        super(Family.all(MultiTilePosition.class, Position.class, Sprite.class,Direction.class,Complete.class).get(), interval,priority);
+        super(Family.all(MultiTilePosition.class, Position.class, Sprite.class,Direction.class,Complete.class)
+            .exclude(Dead.class).get(), interval,priority);
         this.interval = interval;
         this.hexDirections = HexUtils.hexDirections;
     }
 
     @Override
     protected void processEntity(Entity runner) {
-        if (Mappers.deadCMap.get(runner) != null) return;
 
         MultiTilePosition startAndEndPosition = Mappers.multiTilePositionCMap.get(runner);
         Direction direction = Mappers.directionCMap.get(runner);

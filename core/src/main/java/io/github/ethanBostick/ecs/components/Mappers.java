@@ -25,4 +25,5 @@ public class Mappers {
     public static final ComponentMapper<Health> healthCMap = ComponentMapper.getFor(Health.class);
     public static final ComponentMapper<Vision> visionCMap = ComponentMapper.getFor(Vision.class);
     public static final ComponentMapper<Name> nameCMap = ComponentMapper.getFor(Name.class);
+    public static final ComponentMapper<Resource> resourceCMap = ComponentMapper.getFor(Resource.class);
 }

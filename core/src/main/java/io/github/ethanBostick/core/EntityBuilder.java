@@ -23,11 +23,13 @@ import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Reclaim;
 import io.github.ethanBostick.ecs.components.Region;
+import io.github.ethanBostick.ecs.components.Resource;
 import io.github.ethanBostick.ecs.components.Vision;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.ecs.components.VectorArrow;
 import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.map.RegionType;
+import io.github.ethanBostick.map.ResourceType;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.TextureUtils;
 
@@ -110,7 +112,7 @@ public class EntityBuilder {
     }
 
     public Entity createMyceliumStorage(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
-        String texturePath = "myceliumD3.png";
+        String texturePath = "storageMycelium.png";
         
         Entity e = createBaseMycelium(q, r, texturePath, 4,
                 60, 45, 2,
@@ -265,8 +267,12 @@ public class EntityBuilder {
 	public Entity initPlayer(){
 		Depth depth = this.engine.createComponent(Depth.class);
 		ActiveTool tool = this.engine.createComponent(ActiveTool.class);
+		Nutrients nutrients = this.engine.createComponent(Nutrients.class);
+		NutrientCapacity maxNutrients = this.engine.createComponent(NutrientCapacity.class);
 		Entity entity = this.engine.createEntity();
 
+		entity.add(maxNutrients);
+		entity.add(nutrients);
 		entity.add(tool);
 		entity.add(depth);
 
@@ -305,6 +311,20 @@ public class EntityBuilder {
 	public void addNutrients(Entity e){
 		Nutrients n = this.engine.createComponent(Nutrients.class);
 		e.add(n);
+	}
+
+	public void addName(Entity e, String name){
+		Name nameComp = this.engine.createComponent(Name.class);
+		nameComp.name = name;
+
+		e.add(nameComp);
+	}
+
+	public void addResourceType(Entity e, ResourceType rt){
+		Resource r = this.engine.createComponent(Resource.class);
+		r.resourceType = rt;
+
+		e.add(r);
 	}
 
 	public void dead(Entity e){

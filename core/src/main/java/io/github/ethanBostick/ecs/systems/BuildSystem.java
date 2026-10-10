@@ -5,6 +5,7 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Build;
 import io.github.ethanBostick.ecs.components.BuildType;
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
@@ -20,7 +21,7 @@ public class BuildSystem extends IntervalIteratingSystem{
     public final float interval;
 
     public BuildSystem(float interval,int priority) {
-        super(Family.all(Build.class).get(),interval, priority);
+        super(Family.all(Build.class).exclude(Dead.class).get(),interval, priority);
         this.interval = interval;
     }
 
