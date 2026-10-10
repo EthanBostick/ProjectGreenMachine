@@ -2,7 +2,7 @@ package io.github.ethanBostick.ecs.systems;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IntervalIteratingSystem;
+import com.badlogic.ashley.systems.IteratingSystem;
 
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Mappers;
@@ -14,18 +14,16 @@ import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.HexUtils;
 
-public class ReclaimSystem extends IntervalIteratingSystem {
+public class ReclaimSystem extends IteratingSystem {
     private int[][] hexDirections;
-    //private final float interval;
     
-    public ReclaimSystem(float interval, int priority) {
-        super(Family.all(Reclaim.class).get(),interval, priority);
+    public ReclaimSystem( int priority) {
+        super(Family.all(Reclaim.class).get(), priority);
         this.hexDirections = HexUtils.hexDirections;
-        //this.interval = interval;
     }
 
     @Override
-    protected void processEntity(Entity entity) {
+    protected void processEntity(Entity entity, float deltaTime) {
         try{
             Nutrients nutrientsHeld = Mappers.nutrientsCMap.get(entity);
             Position lastPosition = Mappers.positionCMap.get(entity);

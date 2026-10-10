@@ -104,7 +104,7 @@ public class GameHUD implements Observer {
         });
 
         TextButton buildStorageButton = new TextButton("Storage", uiSkin);
-        buildCleanserButton.addListener(new ClickListener() {
+        buildStorageButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
 				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();

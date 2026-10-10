@@ -94,7 +94,7 @@ public class RenderSystem extends SortedIteratingSystem{
 
         Position position = Mappers.positionCMap.get(entity);
         Sprite sprite = Mappers.spriteCMap.get(entity);
-        Texture targetDrawing = (Map.instance().getRevealState(position) == 0)?
+        Texture targetDrawing = (Map.instance().getRevealState(position) == 0 && !sprite.revealed)?
             TextureUtils.pathToTexture("fog.png"):
             sprite.texture;
 

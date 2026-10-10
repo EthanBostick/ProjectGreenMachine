@@ -53,12 +53,12 @@ public class GameScreen implements Screen {
 
 		this.engine.addSystem(new ExtractionSystem(tickRate*2,4));
 		this.engine.addSystem(new CleansingSystem(tickRate*2,5));
-		this.engine.addSystem(new DegenerationSystem(tickRate*10,6));
+		this.engine.addSystem(new DegenerationSystem(tickRate,6));
 		this.engine.addSystem(new FlowGradientSystem(tickRate,7));
 		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 8));
 		this.engine.addSystem(new StateCommitSystem(tickRate, 9));
 		this.engine.addSystem(new BuildSystem(tickRate,10));
-		this.engine.addSystem(new ReclaimSystem(tickRate, 11));
+		this.engine.addSystem(new ReclaimSystem(11));
 
 		this.engine.addSystem(new RevealSystem(tickRate,96));
 		this.engine.addSystem(new RenderSystem(97));

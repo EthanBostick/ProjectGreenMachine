@@ -18,7 +18,6 @@ public class PlayerStateSystem extends EntitySystem implements Observer{
     private final Entity player;
 
     public PlayerStateSystem() {
-        // Optional: Set system priority. Lower numbers execute first.
         super(0);
         this.player = Registry.player;
 		EventBus.instance().subscribe(EventType.DEPTH_CHANGE,this);

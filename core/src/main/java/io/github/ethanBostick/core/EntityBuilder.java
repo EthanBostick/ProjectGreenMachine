@@ -59,6 +59,8 @@ public class EntityBuilder {
 		Entity entity = this.createRenderable(q, r, renderLayer, depth, tilePosition, texturePath);
 		Name nameComp = this.engine.createComponent(Name.class);
 
+		nameComp.name = name;
+
 		entity.add(nameComp);
 
 		return entity;
@@ -163,6 +165,7 @@ public class EntityBuilder {
 		Depth depth = this.engine.createComponent(Depth.class);
 
 		targetHighlight.texture = TextureUtils.pathToTexture("runnerTarget.png");
+		targetHighlight.revealed = true;
 		targetPosition.q = endQ;
 		targetPosition.r = endR;
 		targetPosition.layer = 99; //so it renders on top
@@ -231,6 +234,7 @@ public class EntityBuilder {
 		p.q = 0;
 		p.r = 0;
 		p.layer = 99;
+		s.revealed = true;
 		p.tilePosition = TilePosition.SURFACE;
 
 		entity.add(p);

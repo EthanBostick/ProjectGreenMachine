@@ -147,7 +147,6 @@ public class GameController extends InputAdapter{
 
 		switch(keycode){
 			case Input.Keys.ESCAPE:
-                System.out.println("clearing selected");
                 Mappers.mouseStateCMap.get(this.mouse).clearSelect = true;
 		        return true;
 		}

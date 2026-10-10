@@ -45,8 +45,15 @@ public class DegenerationSystem extends IntervalIteratingSystem {
                 regionScalar = Mappers.regionCMap.get(tileNode).regionType.degenerationScalar();
             }
             //cost of maintanence 
-            int carbonRate = (int)(this.interval * CommonValues.DEGENERATION_CARBON_PER_TICK.value * regionScalar);
-            int mineralRate = (int)(this.interval * CommonValues.DEGENERATION_MINERAL_PER_TICK.value * regionScalar);
+            float carbonBuildup = (CommonValues.DEGENERATION_CARBON_PER_TICK.value * regionScalar);
+            float mineralBuildup = (CommonValues.DEGENERATION_MINERAL_PER_TICK.value * regionScalar);
+            health.degenerationCarbonBuildup += carbonBuildup;
+            health.degenerationMineralBuildup += mineralBuildup;
+            int carbonRate = (int)health.degenerationCarbonBuildup;
+            int mineralRate = (int)health.degenerationMineralBuildup;
+            health.degenerationCarbonBuildup -= carbonRate;
+            health.degenerationMineralBuildup -= mineralRate;
+
 
             //if node health < 50 request nutrient
             if (health.health < 50){

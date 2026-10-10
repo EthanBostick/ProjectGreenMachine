@@ -152,8 +152,10 @@ public class RunnerSystem extends IntervalIteratingSystem {
         }
 
         //update current position to get growth 
-        Mappers.directionCMap.get(currentPosition).directionVector[0] = direction.directionVector[0];
-        Mappers.directionCMap.get(currentPosition).directionVector[1] = direction.directionVector[1];
-
+        Direction nodeHeadDirection = Mappers.directionCMap.get(currentPosition);
+        if(nodeHeadDirection !=null){
+            nodeHeadDirection.directionVector[0] = direction.directionVector[0];
+            nodeHeadDirection.directionVector[1] = direction.directionVector[1];
+        }
     }
 }
