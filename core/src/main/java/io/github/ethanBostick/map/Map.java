@@ -7,10 +7,12 @@ import java.util.Random;
 import com.badlogic.ashley.core.Entity;
 
 import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.Position;
 
 public class Map{
 	private static Map theInstance = null;
 	private Entity[][] map;
+	private int[] revealedMap;
 	private EntityBuilder entityBuilder = null;
 
 	//map config
@@ -30,6 +32,20 @@ public class Map{
 	public void setEntityAt(int q, int r, Entity e, TilePosition t){
 		int i = getIndex(q, r);
 		this.map[i][t.value()] = e;
+	}
+
+	public void setRevealed(int q, int r){
+		int i = getIndex(q, r);
+		this.revealedMap[i] = 1;
+	}
+
+	public int getRevealState(int q, int r){
+		int i = getIndex(q, r);
+		return this.revealedMap[i];
+	}
+	public int getRevealState(Position p){
+		int i = getIndex(p.q, p.r);
+		return this.revealedMap[i];
 	}
 
 	public int getMapSize(){
@@ -86,9 +102,11 @@ public class Map{
 
 	public void initMap(){
 		int[] regionGrid = new int[w*w];
+		this.revealedMap = new int[w*w];
 		for (int q = -this.size ; q <= this.size ; q ++){
 			for (int r = Math.max(-this.size, -q - this.size); r <= Math.min(this.size, -q + this.size); r ++){
 				int index = this.getIndex(q, r);
+				this.revealedMap[index] = 0; //default unrevealed
 				if(Math.abs(q) <= startingArea && Math.abs(r) <= startingArea && Math.abs(q+r) <= startingArea){
 					regionGrid[index] = RegionType.RESTORED.tempValue();
 				}
@@ -109,41 +127,43 @@ public class Map{
 
 				Entity tileEntity = null;
 				String tilePng = "hex_template.png";
+				String name = "";
 				String extraPng = null;
+				int renderLayer = 0;
 				RegionType bType = RegionType.BLANK;
 
 				if (duelGrid[0][index] == RegionType.BARREN.tempValue()){
 					tilePng = "barrenTile.png";
+					name = "barrenTile";
 					bType = RegionType.BARREN;						
 
 				} else if (duelGrid[0][index] == RegionType.RADIOACTIVE.tempValue()){
 					tilePng = "radioactiveTile.png";
+					name = "radioactiveTile";
 					bType = RegionType.RADIOACTIVE;						
 				} else if (duelGrid[0][index] == RegionType.POLLUTED.tempValue()){
 					tilePng = "pollutedTile.png";
+					name = "pollutedTile";
 					bType = RegionType.POLLUTED;						
-					if (rDouble <= 0.45){
-						extraPng = "deadTree.png";							
-					}
 				} else if (duelGrid[0][index] == RegionType.MOUNTAIN.tempValue()){
-					tilePng = "mountain.png";
+					tilePng = "mountainTile.png";
+					name = "mountainTile";
+					renderLayer = 2;
 					bType = RegionType.MOUNTAIN;						
 				} else if (duelGrid[0][index] == RegionType.RESTORED.tempValue()){
 					tilePng = "restoredTile.png";
+					name = "restoredTile";
 					bType = RegionType.RESTORED;						
 				} else{
-					tilePng = "mountain.png";
+					tilePng = "mountainTile.png";
+					name = "mountainTile";
+					renderLayer = 2;
 					bType = RegionType.MOUNTAIN;						
 				}
 
 				//Put the Entities together and update map
-				tileEntity = entityBuilder.createRenderable(q,r,0,0,TilePosition.SURFACE, tilePng);
+				tileEntity = entityBuilder.createRenderable(q,r,renderLayer,0,TilePosition.SURFACE, tilePng, name);
 				entityBuilder.addRegion(bType, tileEntity);
-				if(extraPng != null){
-					Entity terrainEntity = entityBuilder.createRenderable(q,r,1, 0,TilePosition.TERRAIN, extraPng);
-					this.map[index][TilePosition.TERRAIN.value()] = terrainEntity;
-					this.entityBuilder.addToEngine(terrainEntity);
-				}
 				this.entityBuilder.addToEngine(tileEntity);
 				this.map[index][TilePosition.SURFACE.value()] = tileEntity;
 
@@ -162,17 +182,26 @@ public class Map{
 					if(bType.resourceType() == ResourceType.CARBON){
 						resourceNode = entityBuilder.createRenderable(q, r, 1, 1, TilePosition.RESOURCE_NODE, "carbonNode"+nodeLevel+".png");
 						this.entityBuilder.addNutrients(resourceNode, resourceConcentration, 0);
+						this.entityBuilder.addResourceType(resourceNode, ResourceType.CARBON);					
 					}
 					else{
 						resourceNode = entityBuilder.createRenderable(q, r, 1, 1, TilePosition.RESOURCE_NODE, "mineralNode"+nodeLevel+".png");
 						this.entityBuilder.addNutrients(resourceNode, 0, resourceConcentration);
+						this.entityBuilder.addResourceType(resourceNode, ResourceType.MINERAL);					
 					}
 					//commit it to engine and map
 					this.entityBuilder.addToEngine(resourceNode);
 					this.map[index][TilePosition.RESOURCE_NODE.value()] = resourceNode;
 				}
 
-				double rockThreshold = (tilePng == "mountain.png") ? 0.75 : 0.13; // rock obstacle
+				double rockRoll = this.random.nextDouble();
+				double rockThreshold = (tilePng == "mountainTile.png") ? 0.75 : 0.13; // rock obstacle
+
+				if (rockRoll < rockThreshold){
+					Entity rock = entityBuilder.createRenderable(q, r, 2, 1, TilePosition.UNDERGROUND_TERRAIN, "stone.png");	
+					this.entityBuilder.addToEngine(rock);
+					this.map[index][TilePosition.UNDERGROUND_TERRAIN.value()] = rock;
+				}
 
 				//init mycelium network node
 				if (q == 0 && r == 0){
@@ -181,10 +210,10 @@ public class Map{
 					this.map[index][TilePosition.MYCELIUM.value()] = initMycelium;
 
 					//do not track, for visual only
-					Entity center = entityBuilder.createRenderable(0,0, 3,0,null, "hexCenter.png");
-					this.entityBuilder.addToEngine(center);
-					Entity centerUnder = entityBuilder.createRenderable(0,0, 3,1,null, "hexCenter.png");
-					this.entityBuilder.addToEngine(centerUnder);
+					// Entity center = entityBuilder.createRenderable(0,0, 3,0,null, "hexCenter.png");
+					// this.entityBuilder.addToEngine(center);
+					// Entity centerUnder = entityBuilder.createRenderable(0,0, 3,1,null, "hexCenter.png");
+					// this.entityBuilder.addToEngine(centerUnder);
 				}
 			}
 		}

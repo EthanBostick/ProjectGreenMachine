@@ -17,10 +17,15 @@ public class Mappers {
     public static final ComponentMapper<NutrientFlow> nutrientFlowCMap = ComponentMapper.getFor(NutrientFlow.class);
     public static final ComponentMapper<Extraction> extractionCMap = ComponentMapper.getFor(Extraction.class);
     public static final ComponentMapper<Cleansing> cleansingCMap = ComponentMapper.getFor(Cleansing.class);
+    public static final ComponentMapper<Cultivator> cultivatorCMap = ComponentMapper.getFor(Cultivator.class);
     public static final ComponentMapper<Direction> directionCMap = ComponentMapper.getFor(Direction.class);
     public static final ComponentMapper<VectorArrow> VectorArrowCMap = ComponentMapper.getFor(VectorArrow.class);
     public static final ComponentMapper<Complete> completeCMap = ComponentMapper.getFor(Complete.class);
     public static final ComponentMapper<Dead> deadCMap = ComponentMapper.getFor(Dead.class);
     public static final ComponentMapper<Build> buildCMap = ComponentMapper.getFor(Build.class);
     public static final ComponentMapper<Health> healthCMap = ComponentMapper.getFor(Health.class);
+    public static final ComponentMapper<Vision> visionCMap = ComponentMapper.getFor(Vision.class);
+    public static final ComponentMapper<Name> nameCMap = ComponentMapper.getFor(Name.class);
+    public static final ComponentMapper<Resource> resourceCMap = ComponentMapper.getFor(Resource.class);
+    public static final ComponentMapper<Green> greenCMap = ComponentMapper.getFor(Green.class);
 }

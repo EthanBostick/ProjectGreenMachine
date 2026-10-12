@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.BuildType;
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Density;
 import io.github.ethanBostick.ecs.components.Direction;
 import io.github.ethanBostick.ecs.components.Mappers;
@@ -13,10 +14,8 @@ import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.Position;
-import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
-import io.github.ethanBostick.utils.TextureUtils;
 
 public class NetworkGrowthSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
@@ -25,13 +24,13 @@ public class NetworkGrowthSystem extends IntervalIteratingSystem {
      * @param interval The time in seconds between each system execution (e.g., 0.5f)
      */
     public NetworkGrowthSystem(float interval,int priority) {
-        super(Family.all(Nutrients.class,NutrientCapacity.class,NutrientFlow.class, Direction.class,Position.class).get(), interval, priority);
+        super(Family.all(Nutrients.class,NutrientCapacity.class,NutrientFlow.class, Direction.class,Position.class)
+            .exclude(Dead.class).get(), interval, priority);
         this.interval = interval;
     }
 
     @Override
     protected void processEntity(Entity entity) {
-        if (Mappers.deadCMap.get(entity) != null) return;
     
         Position position = Mappers.positionCMap.get(entity);
         Direction direction = Mappers.directionCMap.get(entity);
@@ -66,7 +65,7 @@ public class NetworkGrowthSystem extends IntervalIteratingSystem {
             EntityBuilder.instance().addToEngine(upgrade);
             Map.instance().setEntityAt(newQ, newR, upgrade, TilePosition.MYCELIUM);       
             //clear old mycelium
-            EntityBuilder.instance().dead(entity);
+            EntityBuilder.instance().dead(oldMycelium);
         }
     }
 }

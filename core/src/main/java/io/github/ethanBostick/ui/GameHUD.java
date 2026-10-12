@@ -9,18 +9,24 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
+
 import com.badlogic.ashley.core.Entity;
 
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
+import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.Observer;
 import io.github.ethanBostick.ecs.components.BuildType;
 import io.github.ethanBostick.ecs.components.Direction;
 import io.github.ethanBostick.ecs.components.Mappers;
+import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.ToolType;
+import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.events.DepthChangeEvent;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventBus;
@@ -31,11 +37,20 @@ import io.github.ethanBostick.events.ToolChangeEvent;
 
 
 public class GameHUD implements Observer {
+    // private IntArray carbonRateWindow;
+    // private IntArray mineralRateWindow;
+
     public Stage stage; 
     private Skin uiSkin;
     
-    // 1. The tracked entity and the labels to update
+    private final Nutrients networkNutrients; 
+    private final NutrientCapacity networkCap; 
+    private Table networkPanel;
+
+    private Label networkMineralLabel;
+    private Label networkCarbonLabel;
     private Position selectedTilePosition;
+    private Label positionLabel;
     private Label carbonLabel;
     private Label mineralLabel;
     private Label directionLabel;
@@ -45,22 +60,44 @@ public class GameHUD implements Observer {
 
     public GameHUD() {
         EventBus.instance().subscribe(EventType.TILE_SELECTED, this);
+
+        // carbonRateWindow = new IntArray(false,(int)CommonValues.DELTA_WINDOW_SIZE.value);
+        // mineralRateWindow = new IntArray(false,(int)CommonValues.DELTA_WINDOW_SIZE.value);
+
         stage = new Stage(new ScreenViewport());
         uiSkin = new Skin(Gdx.files.internal("uiskin.json"));
+
+        //get network/player permanent refs
+        this.networkNutrients = Mappers.nutrientsCMap.get(Registry.player);
+        this.networkCap = Mappers.nutrientCapacityCMap.get(Registry.player);
+
+        networkPanel = new Table(uiSkin);
+        networkPanel.setBackground("default-pane"); // Assuming your skin has a background drawable
+        networkPanel.pad(10);
+        networkPanel.setVisible(true);
+
+        networkCarbonLabel = new Label("Network Carbon: 0/0", uiSkin);
+        networkMineralLabel = new Label("Network Mineral 0/0", uiSkin);
+
+        networkPanel.add(networkCarbonLabel).left().row();
+        networkPanel.add(networkMineralLabel).left().row();
+
 
         // 2. Build the permanent Info Panel
         infoPanel = new Table(uiSkin);
         infoPanel.setBackground("default-pane"); // Assuming your skin has a background drawable
         infoPanel.pad(10);
-        infoPanel.setVisible(true); // Hide until something is clicked
+        infoPanel.setVisible(true);
 
         // 3. Initialize the dynamic labels
+        positionLabel = new Label("q = 0, r = 0", uiSkin);
         carbonLabel = new Label("Carbons: 0", uiSkin);
         mineralLabel = new Label("Minerals: 0", uiSkin);
         directionLabel = new Label("Direction: 0,0", uiSkin );
         carbonLabel2 = new Label("Carbons: 0", uiSkin);
         mineralLabel2 = new Label("Minerals: 0", uiSkin);
         
+        infoPanel.add(positionLabel).left().row();
         infoPanel.add(new Label("-- Mycelium --", uiSkin)).row();
         infoPanel.add(carbonLabel).left().row();
         infoPanel.add(mineralLabel).left().row();
@@ -100,6 +137,28 @@ public class GameHUD implements Observer {
             }
         });
 
+        TextButton buildCultivatorButton = new TextButton("Cultivator", uiSkin);
+        buildCultivatorButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
+                toolChangeEvent.tool = ToolType.BUILD;
+                toolChangeEvent.buildTarget = BuildType.CULTIVATOR;
+				EventBus.instance().publish(toolChangeEvent);			
+            }
+        });
+
+        TextButton buildStorageButton = new TextButton("Storage", uiSkin);
+        buildStorageButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
+                toolChangeEvent.tool = ToolType.BUILD;
+                toolChangeEvent.buildTarget = BuildType.STORAGE;
+				EventBus.instance().publish(toolChangeEvent);			
+            }
+        });
+
         TextButton buildDeleteButton = new TextButton("Delete", uiSkin);
         buildDeleteButton.addListener(new ClickListener() {
             @Override
@@ -115,6 +174,8 @@ public class GameHUD implements Observer {
         // The pad(10) adds 10 pixels of margin around the button
         buildOptions.add(buildExtractorButton); 
         buildOptions.add(buildCleanserButton); 
+        buildOptions.add(buildCultivatorButton); 
+        buildOptions.add(buildStorageButton); 
         buildOptions.add(buildDeleteButton);
         //put back together
 
@@ -134,9 +195,10 @@ public class GameHUD implements Observer {
 
         bottomButtons.add(depthButton).padRight(5); 
         //put back together
-        rootTable.add(buildOptions).expand().top().left().pad(10);
+        rootTable.add(networkPanel).top().right().pad(10);
         rootTable.add(infoPanel).top().right().pad(10);
         rootTable.row();
+        rootTable.add(buildOptions).expand().bottom().left().pad(10);
         rootTable.add(bottomButtons).bottom().right().pad(10);
 
         //only add master root table
@@ -146,39 +208,66 @@ public class GameHUD implements Observer {
 
     public void update() {
 
-        if(selectedTilePosition == null){
-            return;
-        }
+        //update network panel
+        // if(carbonRateWindow.size >= (int)CommonValues.DELTA_WINDOW_SIZE.value){
+        //     carbonRateWindow.removeIndex(0);
+        //     carbonRateWindow.add(networkNutrients.carbonDelta);
+        //     mineralRateWindow.removeIndex(0);
+        //     mineralRateWindow.add(networkNutrients.mineralDelta);
+        // }
+        // else{
+        //     carbonRateWindow.add(networkNutrients.carbonDelta);
+        //     mineralRateWindow.add(networkNutrients.mineralDelta);
+        // }
 
-        Entity selectedMycelium = Map.instance().getEntityAt(selectedTilePosition.q, selectedTilePosition.r, TilePosition.MYCELIUM);
-        Entity selectedResourceNode = Map.instance().getEntityAt(selectedTilePosition.q, selectedTilePosition.r, TilePosition.RESOURCE_NODE);
-        if(selectedMycelium != null && infoPanel.isVisible()){
-            Direction growthDirection = Mappers.directionCMap.get(selectedMycelium);
-            Nutrients selectedNutrients = Mappers.nutrientsCMap.get(selectedMycelium);
+        // float carbonSum = 0;
+        // float mineralSum = 0;
+        // for (int i =0; i < carbonRateWindow.size;i++){
+        //     carbonSum += carbonRateWindow.get(i);
+        //     mineralSum += mineralRateWindow.get(i);
+        // }
 
-            int dirQ = (growthDirection != null)? growthDirection.directionVector[0] : 0;
-            int dirR = (growthDirection != null)? growthDirection.directionVector[1] : 1;
 
-            carbonLabel.setText("Carbons: " + selectedNutrients.carbons);
-            mineralLabel.setText("Minerals: " + selectedNutrients.minerals);
-            directionLabel.setText("Direction: "+ dirQ +"," + dirR);
+        // float carbonMean = carbonSum / carbonRateWindow.size;
+        // float mineralMean = mineralSum / mineralRateWindow.size;
 
-        }
-        else{
-            carbonLabel.setText("Carbons: N/A");
-            mineralLabel.setText("Minerals: N/A");
-            directionLabel.setText("Direction: N/A");
-        }
-        if(selectedResourceNode != null && infoPanel.isVisible()){
-            Nutrients selectedNutrients = Mappers.nutrientsCMap.get(selectedResourceNode);
+        networkCarbonLabel.setText("Network Carbon: " + networkNutrients.carbons );
+        networkMineralLabel.setText("Network Mineral: " + networkNutrients.minerals);
 
-            carbonLabel2.setText("Carbons: " + selectedNutrients.carbons);
-            mineralLabel2.setText("Minerals: " + selectedNutrients.minerals);
+        //update info panel
+        if(selectedTilePosition != null){
+            positionLabel.setText("q = " + selectedTilePosition.q +", r = " + selectedTilePosition.r);
 
-        }
-        else{
-            carbonLabel2.setText("Carbons: N/A");
-            mineralLabel2.setText("Minerals: N/A");
+            Entity selectedMycelium = Map.instance().getEntityAt(selectedTilePosition.q, selectedTilePosition.r, TilePosition.MYCELIUM);
+            Entity selectedResourceNode = Map.instance().getEntityAt(selectedTilePosition.q, selectedTilePosition.r, TilePosition.RESOURCE_NODE);
+            if(selectedMycelium != null && infoPanel.isVisible()){
+                Direction growthDirection = Mappers.directionCMap.get(selectedMycelium);
+                Nutrients selectedNutrients = Mappers.nutrientsCMap.get(selectedMycelium);
+
+                int dirQ = (growthDirection != null)? growthDirection.directionVector[0] : 0;
+                int dirR = (growthDirection != null)? growthDirection.directionVector[1] : 1;
+
+                carbonLabel.setText("Carbons: " + selectedNutrients.carbons);
+                mineralLabel.setText("Minerals: " + selectedNutrients.minerals);
+                directionLabel.setText("Direction: "+ dirQ +"," + dirR);
+
+            }
+            else{
+                carbonLabel.setText("Carbons: N/A");
+                mineralLabel.setText("Minerals: N/A");
+                directionLabel.setText("Direction: N/A");
+            }
+            if(selectedResourceNode != null && infoPanel.isVisible()){
+                Nutrients selectedNutrients = Mappers.nutrientsCMap.get(selectedResourceNode);
+
+                carbonLabel2.setText("Carbons: " + selectedNutrients.carbons);
+                mineralLabel2.setText("Minerals: " + selectedNutrients.minerals);
+
+            }
+            else{
+                carbonLabel2.setText("Carbons: N/A");
+                mineralLabel2.setText("Minerals: N/A");
+            }
         }
     }
         

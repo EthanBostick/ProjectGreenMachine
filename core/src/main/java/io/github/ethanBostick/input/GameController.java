@@ -2,6 +2,9 @@ package io.github.ethanBostick.input;
 
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Registry;
+import io.github.ethanBostick.events.DepthChangeEvent;
+import io.github.ethanBostick.events.EventBus;
+import io.github.ethanBostick.events.EventFactory;
 import io.github.ethanBostick.utils.HexUtils;
 
 import com.badlogic.gdx.Gdx;
@@ -24,7 +27,7 @@ public class GameController extends InputAdapter{
     // Movement speeds & limits
     private float moveSpeed = 400f; // pixels per second
     private float minZoom = 0.5f;
-    private float maxZoom = 4.0f;
+    private float maxZoom = 2.0f;
     private final Vector2 targetPosition = new Vector2();
 
     public GameController(float virtualWidth, float virtualHeight) {
@@ -147,8 +150,12 @@ public class GameController extends InputAdapter{
 
 		switch(keycode){
 			case Input.Keys.ESCAPE:
-                System.out.println("clearing selected");
                 Mappers.mouseStateCMap.get(this.mouse).clearSelect = true;
+		        return true;
+            case Input.Keys.E:
+				DepthChangeEvent depthChangeEvent = EventFactory.instance().depthChangeEventPool.obtain();
+				depthChangeEvent.newDepthDir = 1;
+				EventBus.instance().publish(depthChangeEvent);			
 		        return true;
 		}
 		return false;

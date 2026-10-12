@@ -3,6 +3,8 @@ package io.github.ethanBostick.ecs.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
+
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
@@ -16,7 +18,8 @@ public class NetworkFlowSystem extends IntervalIteratingSystem {
     private final int[][] hexDirections;
 
     public NetworkFlowSystem(float interval, int priority) {
-        super(Family.all(Position.class, Nutrients.class, NutrientCapacity.class, NutrientFlow.class).get(), interval, priority);
+        super(Family.all(Position.class, Nutrients.class, NutrientCapacity.class, NutrientFlow.class)
+            .exclude(Dead.class).get(), interval, priority);
         this.hexDirections = HexUtils.hexDirections;
     }
 

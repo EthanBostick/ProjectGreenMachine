@@ -6,7 +6,9 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.ecs.components.Cleansing;
+import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
+import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
@@ -20,10 +22,11 @@ import io.github.ethanBostick.utils.TextureUtils;
 
 public class CleansingSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
-    private IntArray processingArray = new IntArray(12);
+    private IntArray processingArray = new IntArray(14);
     
     public CleansingSystem(float interval, int priority) {
-        super(Family.all(Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Cleansing.class).get(), interval, priority);
+        super(Family.all(Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Cleansing.class)
+            .exclude(Dead.class).get(), interval, priority);
         this.interval = interval;
     }
 
@@ -38,15 +41,8 @@ public class CleansingSystem extends IntervalIteratingSystem {
 
             //get radius vector
             int radius = cleansing.radius;
-            if (radius <= 0){
-                this.processingArray.add(position.q);
-                this.processingArray.add(position.r);
-            }
-            else{
-                this.processingArray = HexUtils.getAreaAround(position, radius, processingArray);
-            }
+            this.processingArray = HexUtils.getAreaAround(position, radius, processingArray);
 
-            //look for and proccess resource nodes in area
             for (int i = 0; i < this.processingArray.size; i += 2) {
                 Entity surfaceNode = Map.instance().getEntityAt(
                     this.processingArray.get(i), 
@@ -62,11 +58,13 @@ public class CleansingSystem extends IntervalIteratingSystem {
                 if (nodeRegion.regionType.cleansingScalar() <= 0) continue;
 
                 float cleansingRate = cleansing.rate * nodeRegion.regionType.cleansingScalar();
+                int usableMinerals = nutrients.minerals + Math.min(0, nutrients.mineralDelta);
+                int usableCarbons = nutrients.carbons + Math.min(0, nutrients.carbonDelta);
 
                 //node cleansing
                 if (nodeRegion.condition < 100){
                     uncleanTiles ++;
-                    if (carbonCost >= nutrients.carbons + nutrients.carbonDelta || mineralCost >= nutrients.minerals + nutrients.mineralDelta) continue;
+                    if (carbonCost >= usableCarbons || mineralCost >= usableMinerals) continue;
                     
                     nutrients.carbonDelta -= carbonCost; 
                     nutrients.mineralDelta -= mineralCost; 
@@ -74,10 +72,24 @@ public class CleansingSystem extends IntervalIteratingSystem {
                 }
 
                 //node cleansed
+                Name tileName = Mappers.nameCMap.get(surfaceNode);
                 if (nodeRegion.condition >= 100){
                     nodeRegion.condition = 100;
                     nodeRegion.regionType = RegionType.RESTORED;
                     Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture("restoredTile.png");
+                }
+                //tile sprite updates
+                else if(tileName == null){
+                    continue;
+                }
+                else if(nodeRegion.condition >= 75){
+                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(tileName.name+"R3.png");
+                }
+                else if(nodeRegion.condition >= 50){
+                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(tileName.name+"R2.png");
+                }
+                else if(nodeRegion.condition >= 25){
+                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(tileName.name+"R1.png");
                 }
             }
 

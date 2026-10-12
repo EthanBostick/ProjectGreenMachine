@@ -4,7 +4,6 @@ package io.github.ethanBostick.ecs.systems;
 import io.github.ethanBostick.core.Observer;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Registry;
-import io.github.ethanBostick.ecs.components.ToolType;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventType;
@@ -18,9 +17,8 @@ import com.badlogic.ashley.core.EntitySystem;
 public class PlayerStateSystem extends EntitySystem implements Observer{
     private final Entity player;
 
-    public PlayerStateSystem() {
-        // Optional: Set system priority. Lower numbers execute first.
-        super(0);
+    public PlayerStateSystem(int priority) {
+        super(priority);
         this.player = Registry.player;
 		EventBus.instance().subscribe(EventType.DEPTH_CHANGE,this);
 		EventBus.instance().subscribe(EventType.TOOL_CHANGE,this);

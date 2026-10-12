@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class Sprite implements Component, Poolable{
 	public Texture texture = null;
+	public boolean revealed = false;
 
 	public Sprite(){
 	}
@@ -14,5 +15,6 @@ public class Sprite implements Component, Poolable{
 	@Override
 	public void reset(){
 		texture = null;
+		revealed = false;
 	}
 }

@@ -93,7 +93,7 @@ public class ActionSystem extends IteratingSystem{
         boolean friendNear = false;
         for (int i = 0; i < 6; i++){
             Entity neighbor = Map.instance().getEntityAt(p.q + this.hexDirections[i][0], p.r + this.hexDirections[i][1], TilePosition.MYCELIUM);
-            friendNear = neighbor != null && Mappers.buildCMap.get(neighbor) == null && Mappers.deadCMap.get(neighbor) == null;
+            friendNear = neighbor != null && Mappers.deadCMap.get(neighbor) == null;
             if (friendNear) break;
         }
 
@@ -103,17 +103,21 @@ public class ActionSystem extends IteratingSystem{
     private void buildAction(Entity mouse, ActiveTool activeTool){
         Position mousePosition = Mappers.positionCMap.get(mouse);
         MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
-        MultiTilePosition mouseDragPosition = Mappers.multiTilePositionCMap.get(mouse);
         BuildType targetBuild = activeTool.buildTarget;
 
         if (targetBuild == null) return;
 
-        int carbonCost = targetBuild.carbonCost();
-        int mineralCost = targetBuild.mineralCost();
+        int carbonCost = targetBuild.carbonCost;
+        int mineralCost = targetBuild.mineralCost;
 
-        if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r) && !mouseState.heldDown){
+        if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
 
             Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
+            Entity obstacle = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.UNDERGROUND_TERRAIN);
+            //cant build on obstacle
+            if(obstacle != null){
+                return;
+            }
 
             if(selectedTile != null && neighboringMycelium(mousePosition)){
                 Entity newBuild = EntityBuilder.instance().createBuild(targetBuild,mousePosition.q,mousePosition.r,carbonCost,mineralCost);
@@ -137,13 +141,12 @@ public class ActionSystem extends IteratingSystem{
         Position mousePosition = Mappers.positionCMap.get(mouse);
         MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
 
-        if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r) && !mouseState.heldDown){
+        if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
 
             Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
             if(selectedTile != null){
                 Map.instance().setEntityAt(mousePosition.q, mousePosition.r, null, TilePosition.MYCELIUM);       
                 //queue for reclaim nutrients
-                System.out.println("queued for reclaim");
                 EntityBuilder.instance().reclaim(selectedTile);
             }
         }
