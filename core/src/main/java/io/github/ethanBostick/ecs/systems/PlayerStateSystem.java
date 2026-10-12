@@ -17,8 +17,8 @@ import com.badlogic.ashley.core.EntitySystem;
 public class PlayerStateSystem extends EntitySystem implements Observer{
     private final Entity player;
 
-    public PlayerStateSystem() {
-        super(0);
+    public PlayerStateSystem(int priority) {
+        super(priority);
         this.player = Registry.player;
 		EventBus.instance().subscribe(EventType.DEPTH_CHANGE,this);
 		EventBus.instance().subscribe(EventType.TOOL_CHANGE,this);

@@ -2,6 +2,7 @@ package io.github.ethanBostick.screens;
 
 import io.github.ethanBostick.ui.GameHUD;
 import io.github.ethanBostick.input.GameController;
+import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.ecs.systems.ActionSystem;
@@ -9,8 +10,10 @@ import io.github.ethanBostick.ecs.systems.BuildSystem;
 import io.github.ethanBostick.ecs.systems.EntityManagementSystem;
 import io.github.ethanBostick.ecs.systems.ExtractionSystem;
 import io.github.ethanBostick.ecs.systems.CleansingSystem;
+import io.github.ethanBostick.ecs.systems.CultivationSystem;
 import io.github.ethanBostick.ecs.systems.DegenerationSystem;
 import io.github.ethanBostick.ecs.systems.FlowGradientSystem;
+import io.github.ethanBostick.ecs.systems.GreenSystem;
 import io.github.ethanBostick.ecs.systems.MultiRenderSystem;
 import io.github.ethanBostick.ecs.systems.NetworkFlowSystem;
 import io.github.ethanBostick.ecs.systems.NetworkGrowthSystem;
@@ -36,7 +39,7 @@ public class GameScreen implements Screen {
 	private GameHUD gameHUD = null;
 	private InputMultiplexer multiplexer = null;
 	private GameController gameController = null;
-	public float tickRate = 0.5f;
+	public float tickRate = CommonValues.TICK_SPEED.value;
 	public PooledEngine engine;
 
 	public GameScreen(){}
@@ -47,24 +50,26 @@ public class GameScreen implements Screen {
 		this.engine = new PooledEngine();
 		EntityBuilder.instance(engine);
 		Registry.init();
-		this.engine.addSystem(new ActionSystem(2));
-		this.engine.addSystem(new RunnerSystem(tickRate, 3));
-		this.engine.addSystem(new NetworkGrowthSystem(tickRate*2, 4));
+		this.engine.addSystem(new PlayerStateSystem(0));
+		this.engine.addSystem(new ActionSystem(1));
+		this.engine.addSystem(new RunnerSystem(tickRate, 2));
+		this.engine.addSystem(new NetworkGrowthSystem(tickRate*2, 3));
 
 		this.engine.addSystem(new ExtractionSystem(tickRate*2,4));
 		this.engine.addSystem(new CleansingSystem(tickRate*2,5));
-		this.engine.addSystem(new DegenerationSystem(tickRate,6));
-		this.engine.addSystem(new FlowGradientSystem(tickRate,7));
-		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 8));
-		this.engine.addSystem(new StateCommitSystem(tickRate, 9));
-		this.engine.addSystem(new BuildSystem(tickRate,10));
-		this.engine.addSystem(new ReclaimSystem(11));
+		this.engine.addSystem(new CultivationSystem(tickRate*2, 6));
+		this.engine.addSystem(new DegenerationSystem(tickRate,7));
+		this.engine.addSystem(new GreenSystem(tickRate*2, 8));
+		this.engine.addSystem(new FlowGradientSystem(tickRate,9));
+		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 10));
+		this.engine.addSystem(new StateCommitSystem(tickRate, 11));
+		this.engine.addSystem(new BuildSystem(tickRate,12));
+		this.engine.addSystem(new ReclaimSystem(13));
 
 		this.engine.addSystem(new RevealSystem(tickRate,96));
 		this.engine.addSystem(new RenderSystem(97));
 		this.engine.addSystem(new MultiRenderSystem(98));
 		this.engine.addSystem(new VectorRenderSystem(99)); //99 so it renders on top
-		this.engine.addSystem(new PlayerStateSystem());
 		this.engine.addSystem(new EntityManagementSystem(engine, 100));
 
 		Map map = Map.instance();

@@ -37,6 +37,8 @@ public class BuildSystem extends IntervalIteratingSystem{
                 return EntityBuilder.instance().createMyceliumExtractor(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
             case CLEANSER:
                 return EntityBuilder.instance().createMyceliumCleanser(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
+            case CULTIVATOR:
+                return EntityBuilder.instance().createMyceliumCultivator(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
             case STORAGE:
                 return EntityBuilder.instance().createMyceliumStorage(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
         }

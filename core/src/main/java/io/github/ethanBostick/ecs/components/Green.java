@@ -6,7 +6,7 @@ import com.badlogic.ashley.core.Component;
 public class Green implements Component, Poolable{
 
     public float mineralUsage = 0;
-    public int carbonOutput = 0;
+    public float carbonOutput = 0; //max output per hex in radius
 
     public Green(){}
     

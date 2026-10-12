@@ -93,7 +93,7 @@ public class ActionSystem extends IteratingSystem{
         boolean friendNear = false;
         for (int i = 0; i < 6; i++){
             Entity neighbor = Map.instance().getEntityAt(p.q + this.hexDirections[i][0], p.r + this.hexDirections[i][1], TilePosition.MYCELIUM);
-            friendNear = neighbor != null && Mappers.buildCMap.get(neighbor) == null && Mappers.deadCMap.get(neighbor) == null;
+            friendNear = neighbor != null && Mappers.deadCMap.get(neighbor) == null;
             if (friendNear) break;
         }
 

@@ -56,6 +56,8 @@ public class DegenerationSystem extends IntervalIteratingSystem {
             health.degenerationCarbonBuildup -= carbonRate;
             health.degenerationMineralBuildup -= mineralRate;
 
+            int usableCarbons = nutrients.carbons + Math.min(0, nutrients.carbonDelta);
+            int usableMinerals = nutrients.minerals + Math.min(0, nutrients.mineralDelta);
 
             //if node health < 50 request nutrient
             if (health.health < 50){
@@ -63,11 +65,12 @@ public class DegenerationSystem extends IntervalIteratingSystem {
                 flow.needsCarbons = true;
 
                 String texturePath = "myceliumD" + density.density + "Dying.png";
+                //DD-1
                 sprite.texture = TextureUtils.pathToTexture(texturePath);
             }
 
             //if not enough nutrients, degrade
-            if(nutrients.carbons + nutrients.carbonDelta < carbonRate || nutrients.minerals + nutrients.mineralDelta < mineralRate){
+            if(usableCarbons < carbonRate || usableMinerals < mineralRate){
                 health.health -= 1;
             }
             else{

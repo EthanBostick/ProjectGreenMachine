@@ -141,8 +141,8 @@ public class EntityBuilder {
     }
 
     public Entity createMyceliumCultivator(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
-        Entity e = createBaseMycelium(q, r, "cleanserMycelium.png", 4,
-                20, 20, 3,
+        Entity e = createBaseMycelium(q, r, "cultivatorMycelium.png", 4,
+                20, 20,2,
                 initCarbon, initMineral, carbonReclaim, mineralReclaim);
 
         NutrientFlow flow = e.getComponent(NutrientFlow.class);
@@ -159,7 +159,7 @@ public class EntityBuilder {
 
     public Entity createMyceliumCleanser(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
         Entity e = createBaseMycelium(q, r, "cleanserMycelium.png", 4,
-                20, 20, 3,
+                20, 20, 2,
                 initCarbon, initMineral, carbonReclaim, mineralReclaim);
 
         NutrientFlow flow = e.getComponent(NutrientFlow.class);
@@ -258,13 +258,15 @@ public class EntityBuilder {
 		Green greenComp = this.engine.createComponent(Green.class);
 
 		greenComp.mineralUsage = CommonValues.GREEN_DECAY_MINERAL_PER_TICK.value;
-		greenComp.carbonOutput = (int)(CommonValues.GREEN_BASE_CARBON_OUTPUT_PER_TICK.value * level); 
-		health.health = 100;
+		greenComp.carbonOutput = (CommonValues.GREEN_BASE_CARBON_OUTPUT_PER_HEX_PER_TICK.value * level); 
+		nutrientCapacity.mineralCapacity = (int)(CommonValues.GREEN_BASE_LEVEL_SCALAR.value * (level - 1));
+		health.health = 50;
 
 		this.addDensity(green, level);
 		green.add(health);
 		green.add(nutrients);
 		green.add(nutrientCapacity);
+		green.add(greenComp);
 
 		return green;
 	}
