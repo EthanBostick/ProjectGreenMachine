@@ -9,11 +9,13 @@ import io.github.ethanBostick.ecs.components.Build;
 import io.github.ethanBostick.ecs.components.BuildType;
 import io.github.ethanBostick.ecs.components.Cleansing;
 import io.github.ethanBostick.ecs.components.Complete;
+import io.github.ethanBostick.ecs.components.Cultivator;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Density;
 import io.github.ethanBostick.ecs.components.Depth;
 import io.github.ethanBostick.ecs.components.Direction;
 import io.github.ethanBostick.ecs.components.Extraction;
+import io.github.ethanBostick.ecs.components.Green;
 import io.github.ethanBostick.ecs.components.Health;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
@@ -138,6 +140,23 @@ public class EntityBuilder {
         return e;
     }
 
+    public Entity createMyceliumCultivator(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
+        Entity e = createBaseMycelium(q, r, "cleanserMycelium.png", 4,
+                20, 20, 3,
+                initCarbon, initMineral, carbonReclaim, mineralReclaim);
+
+        NutrientFlow flow = e.getComponent(NutrientFlow.class);
+		Cultivator cultivatorComp = this.engine.createComponent(Cultivator.class);
+
+        flow.needsCarbons = false;
+        flow.needsMinerals = true;
+		cultivatorComp.radius = 1;
+
+		e.add(cultivatorComp);
+
+        return e;
+    }
+
     public Entity createMyceliumCleanser(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
         Entity e = createBaseMycelium(q, r, "cleanserMycelium.png", 4,
                 20, 20, 3,
@@ -201,6 +220,7 @@ public class EntityBuilder {
 		position.q = q;
 		position.r = r;
 		position.layer = 3;
+		position.tilePosition = TilePosition.MYCELIUM;
 
 		depth.depth = 1;
 
@@ -227,6 +247,26 @@ public class EntityBuilder {
 		build.add(buildTarget);
 
 		return build; 
+	}
+
+	public Entity createGreen(int q, int r, int level){
+		//render lower than mountains
+		Entity green = this.createRenderable(q, r, 1, 0, TilePosition.GREEN, "greenS" + level +".png");
+		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
+		Nutrients nutrients = this.engine.createComponent(Nutrients.class);
+		Health health = this.engine.createComponent(Health.class);
+		Green greenComp = this.engine.createComponent(Green.class);
+
+		greenComp.mineralUsage = CommonValues.GREEN_DECAY_MINERAL_PER_TICK.value;
+		greenComp.carbonOutput = (int)(CommonValues.GREEN_BASE_CARBON_OUTPUT_PER_TICK.value * level); 
+		health.health = 100;
+
+		this.addDensity(green, level);
+		green.add(health);
+		green.add(nutrients);
+		green.add(nutrientCapacity);
+
+		return green;
 	}
 
     public Entity initHighlighter(){

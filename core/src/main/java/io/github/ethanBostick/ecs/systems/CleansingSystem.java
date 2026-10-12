@@ -22,7 +22,7 @@ import io.github.ethanBostick.utils.TextureUtils;
 
 public class CleansingSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
-    private IntArray processingArray = new IntArray(12);
+    private IntArray processingArray = new IntArray(14);
     
     public CleansingSystem(float interval, int priority) {
         super(Family.all(Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Cleansing.class)
@@ -41,15 +41,8 @@ public class CleansingSystem extends IntervalIteratingSystem {
 
             //get radius vector
             int radius = cleansing.radius;
-            if (radius <= 0){
-                this.processingArray.add(position.q);
-                this.processingArray.add(position.r);
-            }
-            else{
-                this.processingArray = HexUtils.getAreaAround(position, radius, processingArray);
-            }
+            this.processingArray = HexUtils.getAreaAround(position, radius, processingArray);
 
-            //look for and proccess resource nodes in area
             for (int i = 0; i < this.processingArray.size; i += 2) {
                 Entity surfaceNode = Map.instance().getEntityAt(
                     this.processingArray.get(i), 
@@ -65,11 +58,13 @@ public class CleansingSystem extends IntervalIteratingSystem {
                 if (nodeRegion.regionType.cleansingScalar() <= 0) continue;
 
                 float cleansingRate = cleansing.rate * nodeRegion.regionType.cleansingScalar();
+                int usableMinerals = nutrients.minerals + Math.min(0, nutrients.mineralDelta);
+                int usableCarbons = nutrients.carbons + Math.min(0, nutrients.carbonDelta);
 
                 //node cleansing
                 if (nodeRegion.condition < 100){
                     uncleanTiles ++;
-                    if (carbonCost >= nutrients.carbons + nutrients.carbonDelta || mineralCost >= nutrients.minerals + nutrients.mineralDelta) continue;
+                    if (carbonCost >= usableCarbons || mineralCost >= usableMinerals) continue;
                     
                     nutrients.carbonDelta -= carbonCost; 
                     nutrients.mineralDelta -= mineralCost; 

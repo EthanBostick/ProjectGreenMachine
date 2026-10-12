@@ -41,13 +41,7 @@ public class ExtractionSystem extends IntervalIteratingSystem {
 
             //get radius vector
             int radius = extraction.radius;
-            if (radius <= 0){
-                this.processingArray.add(position.q);
-                this.processingArray.add(position.r);
-            }
-            else{
-                this.processingArray = HexUtils.getAreaAround(position, radius, processingArray);
-            }
+            this.processingArray = HexUtils.getAreaAround(position, radius, processingArray);
 
             int currentCarbon = nutrients.carbons + nutrients.carbonDelta;
             int currentMineral = nutrients.minerals + nutrients.mineralDelta;
@@ -90,25 +84,32 @@ public class ExtractionSystem extends IntervalIteratingSystem {
 
                 // update node sprite 
                 Resource resourceType = Mappers.resourceCMap.get(resourceNode);
+                Position nodePosition = Mappers.positionCMap.get(resourceNode);
 
                 if(resourceType.resourceType == ResourceType.CARBON){
                     nodeCarbonsAvail = Math.max(0, nodeNutrients.carbons + nodeNutrients.carbonDelta);
                     int carbonLevel  = (nodeCarbonsAvail > 40)? 3: (nodeCarbonsAvail > 30) ? 2: (nodeCarbonsAvail>0)? 1 : 0;
-                    if (carbonLevel > 0){
-                        nodeSprite.texture = TextureUtils.pathToTexture("carbonNode"+carbonLevel+".png");
+
+                    //cleanup or update the sprite
+                    if (carbonLevel <= 0 && nodePosition != null && nodePosition.tilePosition != null){
+                        Map.instance().setEntityAt(nodePosition.q, nodePosition.r, null, nodePosition.tilePosition);
+                        EntityBuilder.instance().dead(resourceNode);
                     }
                     else{
-                        EntityBuilder.instance().dead(resourceNode);
+                        nodeSprite.texture = TextureUtils.pathToTexture("carbonNode"+carbonLevel+".png");
                     }
                 }
                 else if (resourceType.resourceType == ResourceType.MINERAL){
                     nodeMineralsAvail = Math.max(0, nodeNutrients.minerals + nodeNutrients.mineralDelta);
                     int mineralLevel  = (nodeMineralsAvail > 40)? 3: (nodeMineralsAvail > 30) ? 2: (nodeMineralsAvail > 0)? 1 : 0;
-                    if (mineralLevel > 0){
-                        nodeSprite.texture = TextureUtils.pathToTexture("mineralNode"+mineralLevel+".png");
+
+                    //cleanup or update the sprite
+                    if (mineralLevel <= 0 && nodePosition != null && nodePosition.tilePosition != null){
+                        Map.instance().setEntityAt(nodePosition.q, nodePosition.r, null, nodePosition.tilePosition);
+                        EntityBuilder.instance().dead(resourceNode);
                     }
                     else{
-                        EntityBuilder.instance().dead(resourceNode);
+                        nodeSprite.texture = TextureUtils.pathToTexture("mineralNode"+mineralLevel+".png");
                     }
                 }
             }

@@ -59,7 +59,7 @@ public class DegenerationSystem extends IntervalIteratingSystem {
 
             //if node health < 50 request nutrient
             if (health.health < 50){
-                flow.needsMinerals = true;
+                //flow.needsMinerals = true;
                 flow.needsCarbons = true;
 
                 String texturePath = "myceliumD" + density.density + "Dying.png";

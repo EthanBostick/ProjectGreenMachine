@@ -145,9 +145,6 @@ public class Map{
 					tilePng = "pollutedTile.png";
 					name = "pollutedTile";
 					bType = RegionType.POLLUTED;						
-					if (rDouble <= 0.45){
-						extraPng = "deadTree.png";							
-					}
 				} else if (duelGrid[0][index] == RegionType.MOUNTAIN.tempValue()){
 					tilePng = "mountainTile.png";
 					name = "mountainTile";
@@ -167,11 +164,6 @@ public class Map{
 				//Put the Entities together and update map
 				tileEntity = entityBuilder.createRenderable(q,r,renderLayer,0,TilePosition.SURFACE, tilePng, name);
 				entityBuilder.addRegion(bType, tileEntity);
-				if(extraPng != null){
-					Entity terrainEntity = entityBuilder.createRenderable(q,r,1, 0,TilePosition.TERRAIN, extraPng);
-					this.map[index][TilePosition.TERRAIN.value()] = terrainEntity;
-					this.entityBuilder.addToEngine(terrainEntity);
-				}
 				this.entityBuilder.addToEngine(tileEntity);
 				this.map[index][TilePosition.SURFACE.value()] = tileEntity;
 
@@ -190,12 +182,12 @@ public class Map{
 					if(bType.resourceType() == ResourceType.CARBON){
 						resourceNode = entityBuilder.createRenderable(q, r, 1, 1, TilePosition.RESOURCE_NODE, "carbonNode"+nodeLevel+".png");
 						this.entityBuilder.addNutrients(resourceNode, resourceConcentration, 0);
-						this.entityBuilder.addResourceType(underGroundTileEntity, ResourceType.CARBON);					
+						this.entityBuilder.addResourceType(resourceNode, ResourceType.CARBON);					
 					}
 					else{
 						resourceNode = entityBuilder.createRenderable(q, r, 1, 1, TilePosition.RESOURCE_NODE, "mineralNode"+nodeLevel+".png");
 						this.entityBuilder.addNutrients(resourceNode, 0, resourceConcentration);
-						this.entityBuilder.addResourceType(underGroundTileEntity, ResourceType.MINERAL);					
+						this.entityBuilder.addResourceType(resourceNode, ResourceType.MINERAL);					
 					}
 					//commit it to engine and map
 					this.entityBuilder.addToEngine(resourceNode);

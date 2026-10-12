@@ -6,7 +6,7 @@ public enum TilePosition {
     UNDERGROUND_TERRAIN(2),
     MYCELIUM(3),
     SURFACE(4),
-    TERRAIN(5),
+    GREEN(5),
     MAX_POSITIONS(6);
 
     private int position;
