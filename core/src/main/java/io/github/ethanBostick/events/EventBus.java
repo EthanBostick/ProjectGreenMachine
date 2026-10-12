@@ -54,5 +54,8 @@ public class EventBus{
 		else if (event instanceof TileSelectEvent){
 			EventFactory.instance().tileSelectEventPool.free((TileSelectEvent)event);
 		}
+		else if (event instanceof OverlayChangeEvent){
+			EventFactory.instance().overlayChangeEventPool.free((OverlayChangeEvent)event);
+		}
 	}
 }

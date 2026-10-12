@@ -11,6 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
 
 import com.badlogic.ashley.core.Entity;
@@ -19,6 +24,7 @@ import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.Observer;
+import io.github.ethanBostick.core.OverlayMap;
 import io.github.ethanBostick.ecs.components.BuildType;
 import io.github.ethanBostick.ecs.components.Direction;
 import io.github.ethanBostick.ecs.components.Mappers;
@@ -32,6 +38,7 @@ import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventFactory;
 import io.github.ethanBostick.events.EventType;
+import io.github.ethanBostick.events.OverlayChangeEvent;
 import io.github.ethanBostick.events.TileSelectEvent;
 import io.github.ethanBostick.events.ToolChangeEvent;
 
@@ -110,6 +117,44 @@ public class GameHUD implements Observer {
         rootTable.setFillParent(true);
         //goes to the top right, expand claims all available vertical and horizontal space for this cell
         //rootTable.setDebug(true); //shows grid lines
+
+        //overlays
+        Table overlayOptions = new Table();
+        CheckBox regionOverlay = new CheckBox("region", uiSkin);
+        CheckBox greenOverlay  = new CheckBox("greenery", uiSkin);
+        regionOverlay.setChecked(false);
+        greenOverlay.setChecked(false);
+
+        // 2. Create the ButtonGroup and add the buttons
+        ButtonGroup<CheckBox> radioGroup = new ButtonGroup<>();
+        radioGroup.add(regionOverlay, greenOverlay);
+
+        radioGroup.setMaxCheckCount(1);
+        radioGroup.setMinCheckCount(0);
+        radioGroup.setUncheckLast(true);
+        overlayOptions.add(regionOverlay).top().left();
+        overlayOptions.add(greenOverlay).top().left();
+
+        ChangeListener radioListener = new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                CheckBox checked = (CheckBox) actor;
+				OverlayChangeEvent overlayChangeEvent = EventFactory.instance().overlayChangeEventPool.obtain();
+
+                if (regionOverlay.isChecked()) {
+                    overlayChangeEvent.selectedOverlay = OverlayMap.REGION;
+                }
+                else if (greenOverlay.isChecked()){
+                    overlayChangeEvent.selectedOverlay = OverlayMap.GREEN;
+                }
+                else{
+                    overlayChangeEvent.selectedOverlay = OverlayMap.NONE;
+                }
+				EventBus.instance().publish(overlayChangeEvent);			
+            }
+        };
+        regionOverlay.addListener(radioListener);
+        greenOverlay.addListener(radioListener);
 
 
         //group buttons in table
@@ -195,6 +240,7 @@ public class GameHUD implements Observer {
 
         bottomButtons.add(depthButton).padRight(5); 
         //put back together
+        rootTable.add(overlayOptions).top().left().pad(10);
         rootTable.add(networkPanel).top().right().pad(10);
         rootTable.add(infoPanel).top().right().pad(10);
         rootTable.row();

@@ -19,11 +19,13 @@ import io.github.ethanBostick.ecs.systems.NetworkFlowSystem;
 import io.github.ethanBostick.ecs.systems.NetworkGrowthSystem;
 import io.github.ethanBostick.ecs.systems.PlayerStateSystem;
 import io.github.ethanBostick.ecs.systems.StateCommitSystem;
+import io.github.ethanBostick.ecs.systems.SystemUpdater;
 import io.github.ethanBostick.ecs.systems.RenderSystem;
 import io.github.ethanBostick.ecs.systems.RevealSystem;
 import io.github.ethanBostick.ecs.systems.RunnerSystem;
 import io.github.ethanBostick.ecs.systems.VectorRenderSystem;
 import io.github.ethanBostick.ecs.systems.ReclaimSystem;
+import io.github.ethanBostick.ecs.systems.RegionOverlay;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
@@ -66,11 +68,15 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new BuildSystem(tickRate,12));
 		this.engine.addSystem(new ReclaimSystem(13));
 
-		this.engine.addSystem(new RevealSystem(tickRate,96));
-		this.engine.addSystem(new RenderSystem(97));
-		this.engine.addSystem(new MultiRenderSystem(98));
+		this.engine.addSystem(new RevealSystem(tickRate,95));
+		this.engine.addSystem(new RenderSystem(96));
+		this.engine.addSystem(new MultiRenderSystem(97));
+		this.engine.addSystem(new RegionOverlay(98));
 		this.engine.addSystem(new VectorRenderSystem(99)); //99 so it renders on top
 		this.engine.addSystem(new EntityManagementSystem(engine, 100));
+
+		this.engine.addSystem(new SystemUpdater(engine, 0)); //must be added after Overlays
+
 
 		Map map = Map.instance();
 		double[] concentrations = new double[] {

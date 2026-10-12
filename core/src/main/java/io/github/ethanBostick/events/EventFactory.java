@@ -34,6 +34,12 @@ public class EventFactory {
         }
     };
 
+    public final Pool<OverlayChangeEvent> overlayChangeEventPool = new Pool<OverlayChangeEvent>() {
+        @Override
+        protected OverlayChangeEvent newObject() {
+            return new OverlayChangeEvent();
+        }
+    };
 	private EventFactory(){}
 
 	public static EventFactory instance(){
