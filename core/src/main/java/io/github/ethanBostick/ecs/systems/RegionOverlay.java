@@ -49,36 +49,19 @@ public class RegionOverlay extends IteratingSystem{
 
         Position position = Mappers.positionCMap.get(entity);
         Sprite sprite = Mappers.spriteCMap.get(entity);
-        Name tileName = Mappers.nameCMap.get(entity);
-        Texture overlayTexture = (tileName != null)? TextureUtils.pathToTexture(tileName.name +"Overlay.png") :null;
+        RegionType regionType = Mappers.regionCMap.get(entity).regionType;
 
-        // switch(regionType){
-        //     case RESTORED:
-        //         break;
-        //     case POLLUTED:
-        //         break;
-        //     case RADIOACTIVE:
-        //         break;
-        //     case BARREN:
-        //         break;
-        //     case MOUNTAIN:
-        //         break;
-        //     default:
-        //         overlayTexture = null;
-        // }
-
-
-        Texture targetDrawing = (Map.instance().getRevealState(position) == 0 && !sprite.revealed)?
+        Texture overlayTexture = (Map.instance().getRevealState(position) == 0 && !sprite.revealed)?
             null:
-            overlayTexture;
+            regionType.overlayTexture;
 
-        if (targetDrawing != null){
+        if (overlayTexture != null){
             float pixelX = HexUtils.getPixelX(position);
             float pixelY = HexUtils.getPixelY(position);
 
             // Only draw if the sprite's bounding box intersects the camera's view
             if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
-                batch.draw(targetDrawing, pixelX, pixelY);
+                batch.draw(overlayTexture, pixelX, pixelY);
             }
         }
     }

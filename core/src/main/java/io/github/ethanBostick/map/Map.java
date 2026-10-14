@@ -169,7 +169,7 @@ public class Map{
 
 				//underground gen
 				Entity underGroundTileEntity = entityBuilder.createRenderable(q,r,0,1,TilePosition.UNDERGROUND, "dirtTile.png");
-				entityBuilder.addRegion(bType, underGroundTileEntity);
+				//Dont give region to underground tile
 				this.entityBuilder.addToEngine(underGroundTileEntity);
 				this.map[index][TilePosition.UNDERGROUND.value()] = underGroundTileEntity;
 

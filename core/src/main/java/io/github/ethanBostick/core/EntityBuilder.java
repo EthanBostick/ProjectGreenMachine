@@ -260,7 +260,7 @@ public class EntityBuilder {
 		greenComp.mineralUsage = CommonValues.GREEN_DECAY_MINERAL_PER_TICK.value;
 		greenComp.carbonOutput = (CommonValues.GREEN_BASE_CARBON_OUTPUT_PER_HEX_PER_TICK.value * level); 
 		nutrientCapacity.mineralCapacity = (int)(CommonValues.GREEN_BASE_LEVEL_SCALAR.value * (level - 1));
-		health.health = 50;
+		health.health = 100;
 
 		this.addDensity(green, level);
 		green.add(health);

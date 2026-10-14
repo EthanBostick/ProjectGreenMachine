@@ -122,8 +122,6 @@ public class GameHUD implements Observer {
         Table overlayOptions = new Table();
         CheckBox regionOverlay = new CheckBox("region", uiSkin);
         CheckBox greenOverlay  = new CheckBox("greenery", uiSkin);
-        regionOverlay.setChecked(false);
-        greenOverlay.setChecked(false);
 
         // 2. Create the ButtonGroup and add the buttons
         ButtonGroup<CheckBox> radioGroup = new ButtonGroup<>();
@@ -134,6 +132,8 @@ public class GameHUD implements Observer {
         radioGroup.setUncheckLast(true);
         overlayOptions.add(regionOverlay).top().left();
         overlayOptions.add(greenOverlay).top().left();
+        regionOverlay.setChecked(false);
+        greenOverlay.setChecked(false);
 
         ChangeListener radioListener = new ChangeListener() {
             @Override

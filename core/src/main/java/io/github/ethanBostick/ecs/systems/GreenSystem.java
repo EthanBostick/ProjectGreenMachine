@@ -59,7 +59,7 @@ public class GreenSystem extends IntervalIteratingSystem {
 
             //if not enough nutrients, degrade
             if(usableMinerals < mineralRate){
-                health.health -= 1*(this.interval/CommonValues.TICK_SPEED.value);
+                health.health -= CommonValues.GREEN_DECAY_HEALTH_PER_TICK.value*(this.interval/CommonValues.TICK_SPEED.value);
                 withering = true;
                 //DD-1
                 //update sprite to withering 
@@ -83,7 +83,7 @@ public class GreenSystem extends IntervalIteratingSystem {
                 }
                 green.carbonOutput = (int)(CommonValues.GREEN_BASE_CARBON_OUTPUT_PER_HEX_PER_TICK.value * level.density);
                 sprite.texture = TextureUtils.pathToTexture("greenS"+level.density+".png");
-                health.health = 50;
+                health.health = 100;
             }
 
         //check for green upgrade & then reset
@@ -92,7 +92,7 @@ public class GreenSystem extends IntervalIteratingSystem {
                 green.carbonOutput = (int)(CommonValues.GREEN_BASE_CARBON_OUTPUT_PER_HEX_PER_TICK.value * level.density);
                 sprite.texture = TextureUtils.pathToTexture("greenS"+level.density+".png");
                 levelThreshold.mineralCapacity += this.getLevelThresh(level.density);
-                health.health = 50;
+                health.health = 100;
             }
         
         //carbon out step
