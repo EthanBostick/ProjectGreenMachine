@@ -33,130 +33,169 @@ public class RunnerSystem extends IntervalIteratingSystem {
         this.hexDirections = HexUtils.hexDirections;
     }
 
-    @Override
-    protected void processEntity(Entity runner) {
+    private boolean getNextStep(int currentQ, int currentR, int targetQ, int targetR, Direction runnerDirection){
+        //create direction for next step
+        this.processingArray.clear();
 
-        MultiTilePosition startAndEndPosition = Mappers.multiTilePositionCMap.get(runner);
-        Direction direction = Mappers.directionCMap.get(runner);
-        Sprite targetSprite = Mappers.spriteCMap.get(runner);
+        int dq = targetQ - currentQ;
+        int dr = targetR - currentR;
+        int distance = (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
 
-        int currentQ = startAndEndPosition.points.get(0);
-        int currentR = startAndEndPosition.points.get(1);
-        int targetQ = startAndEndPosition.points.get(2);
-        int targetR = startAndEndPosition.points.get(3);
-
-        Entity currentPosition = Map.instance().getEntityAt(currentQ, currentR, TilePosition.MYCELIUM);
-
-        //no mycelium in current start, do not continue runner
-        if(currentPosition == null) return; 
-
-        //check if reached target
-        if(currentQ == targetQ && currentR == targetR){
-            targetSprite.texture = null; //stop displaying runner target
-            //update growth
-            direction.directionVector[0] = 0;
-            direction.directionVector[1] = 0;
-            Mappers.directionCMap.get(currentPosition).directionVector[0] = direction.directionVector[0];
-            Mappers.directionCMap.get(currentPosition).directionVector[1] = direction.directionVector[1];
-            EntityBuilder.instance().dead(runner); //schedule the entity for removal
-            return;
+        //at target
+        if (distance == 0) {
+            return false;
         }
 
-        //loops to check the next step, if its been filled it checks the next, until untaken step
-        for(;;){
-            //check if reached next step && its been built
-            Entity nextStepPosition = Map.instance().getEntityAt(currentQ+direction.directionVector[0], currentR+direction.directionVector[1], TilePosition.MYCELIUM);
-            if (nextStepPosition != null && Mappers.buildCMap.get(nextStepPosition) == null){
-                //update last steps direction to stop growth
-                Mappers.directionCMap.get(currentPosition).directionVector[0] = 0;
-                Mappers.directionCMap.get(currentPosition).directionVector[1] = 0;
+        int minRemainingDist = Integer.MAX_VALUE;
 
-                //update starting position
-                startAndEndPosition.points.set(0, currentQ + direction.directionVector[0]);
-                startAndEndPosition.points.set(1, currentR + direction.directionVector[1]);
+        for (int[] dir : hexDirections) {
+            int nextQ = currentQ + dir[0];
+            int nextR = currentR + dir[1];
 
-                //update currentPosition
-                currentQ = currentQ+direction.directionVector[0];
-                currentR = currentR+direction.directionVector[1];
-                currentPosition = nextStepPosition;
+            // Distance from this step to the target
+            int ndq = targetQ - nextQ;
+            int ndr = targetR - nextR;
+            int remDist = (Math.abs(ndq) + Math.abs(ndr) + Math.abs(ndq + ndr)) / 2;
 
-                //create direction for next step
+            if (remDist < minRemainingDist) {
+                // Found a strictly better step: clear older ones and record this
+                minRemainingDist = remDist;
                 this.processingArray.clear();
-
-                int dq = targetQ - currentQ;
-                int dr = targetR - currentR;
-                int distance = (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
-
-                if (distance == 0) {
-                    return;
-                }
-
-                int minRemainingDist = Integer.MAX_VALUE;
-
-                for (int[] dir : hexDirections) {
-                    int nextQ = currentQ + dir[0];
-                    int nextR = currentR + dir[1];
-
-                    // Distance from this step to the target
-                    int ndq = targetQ - nextQ;
-                    int ndr = targetR - nextR;
-                    int remDist = (Math.abs(ndq) + Math.abs(ndr) + Math.abs(ndq + ndr)) / 2;
-
-                    if (remDist < minRemainingDist) {
-                        // Found a strictly better step: clear older ones and record this
-                        minRemainingDist = remDist;
-                        this.processingArray.clear();
-                        this.processingArray.add(dir[0]);
-                        this.processingArray.add(dir[1]);
-                    } else if (remDist == minRemainingDist) {
-                        // Exact tie with the current best: add the second alternative
-                        this.processingArray.add(dir[0]);
-                        this.processingArray.add(dir[1]);
-                    }
-                }
-
-                boolean moved = false;
-
-                for (int i = 0; i < this.processingArray.size; i += 2) {
-                    int stepQ = this.processingArray.get(i);
-                    int stepR = this.processingArray.get(i + 1);
-
-                    Entity obstacle = Map.instance().getEntityAt(
-                        currentQ + stepQ, 
-                        currentR + stepR, 
-                        TilePosition.UNDERGROUND_TERRAIN
-                    );
-
-                    // Take the first unblocked valid vector
-                    if (obstacle == null) {
-                        direction.directionVector[0] = stepQ;
-                        direction.directionVector[1] = stepR;
-                        moved = true;
-                        break;
-                    }
-                }
-
-                // All available steps were blocked
-                if (!moved) {
-                    targetSprite.texture = null; // stop displaying runner target
-                    direction.directionVector[0] = 0;
-                    direction.directionVector[1] = 0;
-                    Mappers.directionCMap.get(currentPosition).directionVector[0] = 0;
-                    Mappers.directionCMap.get(currentPosition).directionVector[1] = 0;
-                    EntityBuilder.instance().dead(runner); // schedule entity removal
-                    return;
-                }
+                this.processingArray.add(dir[0]);
+                this.processingArray.add(dir[1]);
+            } else if (remDist == minRemainingDist) {
+                // Exact tie with the current best: add the second alternative
+                this.processingArray.add(dir[0]);
+                this.processingArray.add(dir[1]);
             }
-            else{
+        }
+
+        boolean moved = false;
+
+        for (int i = 0; i < this.processingArray.size; i += 2) {
+            int stepQ = this.processingArray.get(i);
+            int stepR = this.processingArray.get(i + 1);
+
+            Entity obstacle = Map.instance().getEntityAt(
+                currentQ + stepQ, 
+                currentR + stepR, 
+                TilePosition.UNDERGROUND_TERRAIN
+            );
+
+            // Take the first unblocked valid vector
+            if (obstacle == null) {
+                runnerDirection.directionVector[0] = stepQ;
+                runnerDirection.directionVector[1] = stepR;
+                moved = true;
                 break;
             }
         }
+        return moved;
+    }
 
-        //update current position to get growth 
-        Direction nodeHeadDirection = Mappers.directionCMap.get(currentPosition);
-        if(nodeHeadDirection !=null){
-            nodeHeadDirection.directionVector[0] = direction.directionVector[0];
-            nodeHeadDirection.directionVector[1] = direction.directionVector[1];
+    @Override
+    protected void processEntity(Entity runner) {
+
+        try{
+            MultiTilePosition startAndEndPosition = Mappers.multiTilePositionCMap.get(runner);
+            Direction direction = Mappers.directionCMap.get(runner);
+            Sprite targetSprite = Mappers.spriteCMap.get(runner);
+
+            int currentQ = startAndEndPosition.points.get(0);
+            int currentR = startAndEndPosition.points.get(1);
+            int targetQ = startAndEndPosition.points.get(2);
+            int targetR = startAndEndPosition.points.get(3);
+
+            Entity currentPosition = Map.instance().getEntityAt(currentQ, currentR, TilePosition.MYCELIUM);
+
+            //no mycelium in current start, do not continue runner
+            //if the current position is a build don't attempt to continue runner yet
+            if(currentPosition == null){
+                int tempQ = direction.directionVector[0];
+                int tempR = direction.directionVector[1];
+                boolean moved = this.getNextStep(currentQ, currentR, targetQ, targetR, direction);
+
+                //check the next step anyways
+                if(!moved){
+                    //no valid next step
+                    direction.directionVector[0] = 0;
+                    direction.directionVector[1] = 0;
+                    EntityBuilder.instance().dead(runner); //schedule the entity for removal
+                    return;
+                }
+                else{
+                    Entity nextStepPosition = Map.instance().getEntityAt(currentQ+direction.directionVector[0], currentR+direction.directionVector[1], TilePosition.MYCELIUM);
+                    if (nextStepPosition != null && Mappers.buildCMap.get(nextStepPosition) == null){
+                        //update starting position
+                        startAndEndPosition.points.set(0, currentQ + direction.directionVector[0]);
+                        startAndEndPosition.points.set(1, currentR + direction.directionVector[1]);
+                    }
+                    else{
+                        direction.directionVector[0] = tempQ;
+                        direction.directionVector[1] = tempR;
+                    }
+                    return;
+                }
+            }
+            else if (Mappers.buildCMap.get(currentPosition) != null) return; 
+
+            //check if reached target
+            if(currentQ == targetQ && currentR == targetR){
+                targetSprite.texture = null; //stop displaying runner target
+                //update growth
+                direction.directionVector[0] = 0;
+                direction.directionVector[1] = 0;
+                Mappers.directionCMap.get(currentPosition).directionVector[0] = direction.directionVector[0];
+                Mappers.directionCMap.get(currentPosition).directionVector[1] = direction.directionVector[1];
+                EntityBuilder.instance().dead(runner); //schedule the entity for removal
+                return;
+            }
+
+            //loops to check the next step, if its been filled it checks the next, until untaken step
+            for(;;){
+                //check if reached next step && its been built
+                Entity nextStepPosition = Map.instance().getEntityAt(currentQ+direction.directionVector[0], currentR+direction.directionVector[1], TilePosition.MYCELIUM);
+                if (nextStepPosition != null && Mappers.buildCMap.get(nextStepPosition) == null){
+                    //update last steps direction to stop growth
+                    Mappers.directionCMap.get(currentPosition).directionVector[0] = 0;
+                    Mappers.directionCMap.get(currentPosition).directionVector[1] = 0;
+
+                    //update starting position
+                    startAndEndPosition.points.set(0, currentQ + direction.directionVector[0]);
+                    startAndEndPosition.points.set(1, currentR + direction.directionVector[1]);
+
+                    //update currentPosition
+                    currentQ = currentQ+direction.directionVector[0];
+                    currentR = currentR+direction.directionVector[1];
+                    currentPosition = nextStepPosition;
+
+                    boolean moved = this.getNextStep(currentQ, currentR, targetQ, targetR, direction);
+
+                    // All available steps were blocked
+                    if (!moved) {
+                        targetSprite.texture = null; // stop displaying runner target
+                        direction.directionVector[0] = 0;
+                        direction.directionVector[1] = 0;
+                        Mappers.directionCMap.get(currentPosition).directionVector[0] = 0;
+                        Mappers.directionCMap.get(currentPosition).directionVector[1] = 0;
+                        EntityBuilder.instance().dead(runner); // schedule entity removal
+                        return;
+                    }
+                }
+                else{
+                    break;
+                }
+            }
+
+            //update current position to get growth 
+            Direction nodeHeadDirection = Mappers.directionCMap.get(currentPosition);
+            if(nodeHeadDirection !=null){
+                nodeHeadDirection.directionVector[0] = direction.directionVector[0];
+                nodeHeadDirection.directionVector[1] = direction.directionVector[1];
+            }
+        }
+        catch(Exception e){
+            System.out.println("Runner Error: " + e.getMessage());
         }
     }
 }
