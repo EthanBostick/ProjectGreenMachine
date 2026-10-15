@@ -3,8 +3,10 @@ package io.github.ethanBostick.ecs.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 
+import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Cleansing;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
@@ -43,6 +45,9 @@ public class CleansingSystem extends IntervalIteratingSystem {
             int radius = cleansing.radius;
             this.processingArray = HexUtils.getAreaAround(position, radius, processingArray);
 
+            int totalMineralOutput = 0;
+            int totalCarbonOutput = 0;
+
             for (int i = 0; i < this.processingArray.size; i += 2) {
                 Entity surfaceNode = Map.instance().getEntityAt(
                     this.processingArray.get(i), 
@@ -68,6 +73,8 @@ public class CleansingSystem extends IntervalIteratingSystem {
                     
                     nutrients.carbonDelta -= carbonCost; 
                     nutrients.mineralDelta -= mineralCost; 
+                    totalCarbonOutput += carbonCost;
+                    totalMineralOutput += mineralCost;
                     nodeRegion.condition += Math.min(cleansingRate,100-nodeRegion.condition);                    
                 }
 
@@ -92,6 +99,21 @@ public class CleansingSystem extends IntervalIteratingSystem {
                     Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(tileName.name+"R1.png");
                 }
             }
+
+            if (totalMineralOutput > 0 || totalCarbonOutput > 0) {
+                String carbonText = (totalCarbonOutput >0)? "+"+totalCarbonOutput +"C " : "";
+                String mineralText = (totalMineralOutput >0)? "+"+totalMineralOutput +"C" : "";
+
+                EntityBuilder.instance().createFloatingText(
+                    position.q, 
+                    position.r, 
+                    1,
+                    carbonText + mineralText, 
+                    Color.RED,
+                    true
+                );
+            }
+
 
             if(uncleanTiles == 0){
                 flow.needsCarbons = false;

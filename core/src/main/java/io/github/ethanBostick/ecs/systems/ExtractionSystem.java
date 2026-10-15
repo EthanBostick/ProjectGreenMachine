@@ -46,6 +46,7 @@ public class ExtractionSystem extends IntervalIteratingSystem {
 
             int currentCarbon = nutrients.carbons + nutrients.carbonDelta;
             int currentMineral = nutrients.minerals + nutrients.mineralDelta;
+
             //look for and proccess resource nodes in area
             for (int i = 0; i < this.processingArray.size; i += 2) {
                 int q = this.processingArray.get(i);
@@ -70,15 +71,6 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                     nodeNutrients.carbonDelta -= finalExtract;
                     nutrients.carbonDelta += finalExtract;
                     currentCarbon += finalExtract; // update local counter for subsequent nodes in loop
-
-                    if (finalExtract > 0) {
-                        EntityBuilder.instance().createFloatingText(
-                            q, 
-                            r, 
-                            "+" + finalExtract + "C", 
-                            Color.FOREST
-                        );
-                    }
                 }
 
                 // Mineral extraction
@@ -92,15 +84,6 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                     nodeNutrients.mineralDelta -= finalExtract;
                     nutrients.mineralDelta += finalExtract;
                     currentMineral += finalExtract;
-
-                    if (finalExtract > 0) {
-                        EntityBuilder.instance().createFloatingText(
-                            q, 
-                            r, 
-                            "+" + finalExtract + "M", 
-                            Color.CYAN
-                        );
-                    }
                 }
 
                 // update node sprite 
@@ -133,6 +116,28 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                         nodeSprite.texture = TextureUtils.pathToTexture("mineralNode"+mineralLevel+".png");
                     }
                 }
+            }
+            int totalCarbonGain = currentCarbon - nutrients.carbons;
+            if (totalCarbonGain > 0) {
+                EntityBuilder.instance().createFloatingText(
+                    position.q, 
+                    position.r, 
+                    1,
+                    "+" + totalCarbonGain + "C", 
+                    Color.GREEN,
+                    true
+                );
+            }
+            int totalMineralGain = currentMineral - nutrients.minerals;
+            if (totalMineralGain > 0) {
+                EntityBuilder.instance().createFloatingText(
+                    position.q, 
+                    position.r, 
+                    1,
+                    "+" + totalMineralGain + "M", 
+                    Color.CYAN,
+                    true
+                );
             }
         }
         catch(Exception e){

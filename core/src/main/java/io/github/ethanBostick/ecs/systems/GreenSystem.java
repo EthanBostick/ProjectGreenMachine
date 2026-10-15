@@ -3,6 +3,7 @@ package io.github.ethanBostick.ecs.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.core.CommonValues;
@@ -121,6 +122,17 @@ public class GreenSystem extends IntervalIteratingSystem {
 
                     int finalOutput = Math.min(carbonOutput, carbonRoom);
                     myceliumNutrients.carbonDelta += finalOutput;
+
+                    if (finalOutput > 0) {
+                        EntityBuilder.instance().createFloatingText(
+                            position.q, 
+                            position.r, 
+                            1,
+                            "+" + finalOutput + "C", 
+                            Color.GREEN,
+                            true
+                        );
+                    }
                 }
             }
         }

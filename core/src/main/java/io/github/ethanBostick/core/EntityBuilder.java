@@ -32,6 +32,7 @@ import io.github.ethanBostick.ecs.components.Resource;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.ecs.components.VectorArrow;
 import io.github.ethanBostick.ecs.components.Vision;
+import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.ResourceType;
 import io.github.ethanBostick.map.TilePosition;
@@ -274,15 +275,24 @@ public class EntityBuilder {
 		return green;
 	}
 
-	public Entity createFloatingText(int q, int r, String text, Color color) {
+	public Entity createFloatingText(int q, int r, int displayDepth, String text, Color color, boolean randomDeviate) {
 		Entity e = this.engine.createEntity();
 		
 		FloatingText ft = this.engine.createComponent(FloatingText.class);
+		Depth depth = this.engine.createComponent(Depth.class);
+
+		depth.depth = displayDepth;
 		ft.text = text;
-		ft.worldX = HexUtils.getPixelX(q) + 15f;
-		ft.worldY = HexUtils.getPixelY(q, r) + 30f;
+
+		//random deviation 
+        float XDeviate = (randomDeviate)?(float)(3d * Map.instance().random.nextGaussian()):0f;
+        float YDeviate = (randomDeviate)?(float)(3d * Map.instance().random.nextGaussian()):0f;
+
+		ft.worldX = HexUtils.getPixelX(q) + 18f + XDeviate;
+		ft.worldY = HexUtils.getPixelY(q, r) + 30f + YDeviate;
 		ft.color.set(color);
 		
+		e.add(depth);
 		e.add(ft);
 		this.addToEngine(e);; 
 		return e;

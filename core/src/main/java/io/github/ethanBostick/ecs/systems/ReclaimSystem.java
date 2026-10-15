@@ -3,6 +3,7 @@ package io.github.ethanBostick.ecs.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.graphics.Color;
 
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Dead;
@@ -60,7 +61,9 @@ public class ReclaimSystem extends IteratingSystem {
                 for (int[] dir : hexDirections) {
                     if (totalCarbonReclaim <= 0 && totalMineralReclaim <= 0) break;
 
-                    Entity neighbor = Map.instance().getEntityAt(lastPosition.q + dir[0], lastPosition.r + dir[1], TilePosition.MYCELIUM);
+                    int targetQ = lastPosition.q + dir[0];
+                    int targetR = lastPosition.r + dir[1];
+                    Entity neighbor = Map.instance().getEntityAt(targetQ, targetR, TilePosition.MYCELIUM);
                     if (neighbor == null || neighbor == entity) continue;
 
                     Nutrients nNutrients = Mappers.nutrientsCMap.get(neighbor);
@@ -77,6 +80,12 @@ public class ReclaimSystem extends IteratingSystem {
 
                     nNutrients.carbonDelta += cDeposit;
                     nNutrients.mineralDelta += mDeposit;
+                    if (cDeposit > 0) {
+                        EntityBuilder.instance().createFloatingText(targetQ, targetR, 1, "+" + cDeposit + "C", Color.GREEN, true);
+                    }
+                    if (mDeposit > 0) {
+                        EntityBuilder.instance().createFloatingText( targetQ, targetR, 1, "+" + mDeposit + "M", Color.CYAN, true);
+                    }
 
                     totalCarbonReclaim -= cDeposit;
                     totalMineralReclaim -= mDeposit;

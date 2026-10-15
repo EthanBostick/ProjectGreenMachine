@@ -3,6 +3,7 @@ package io.github.ethanBostick.ecs.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.core.CommonValues;
@@ -44,6 +45,7 @@ public class CultivationSystem extends IntervalIteratingSystem {
 
             //only process if enough minerals to do whole area
             if(usableMinerals >= (int)((this.processingArray.size/2)*CommonValues.CULTIVATE_MINERAL_PER_TILE.value)){
+                int totalMineralOutput = 0;
                 for (int i = 0; i < this.processingArray.size; i += 2) {
                     int q = this.processingArray.get(i);
                     int r = this.processingArray.get(i+1);
@@ -64,6 +66,7 @@ public class CultivationSystem extends IntervalIteratingSystem {
                     //if none, make one
                     if (greenNode == null){
                         nutrients.mineralDelta -= (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
+                        totalMineralOutput -= (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
                         Entity newGreenNode = EntityBuilder.instance().createGreen(q, r, 1);
 
                         Map.instance().setEntityAt(q, r, newGreenNode, TilePosition.GREEN);
@@ -78,7 +81,18 @@ public class CultivationSystem extends IntervalIteratingSystem {
                         int finalOutput = Math.min((int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value, mineralRoom);
                         nutrients.mineralDelta -= finalOutput;
                         greenNutrients.mineralDelta += finalOutput;
+                        totalMineralOutput += (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
                     }
+                }
+                if (totalMineralOutput > 0) {
+                    EntityBuilder.instance().createFloatingText(
+                        position.q, 
+                        position.r, 
+                        1,
+                        "-" + totalMineralOutput + "M", 
+                        Color.RED,
+                        true
+                    );
                 }
             }
         }

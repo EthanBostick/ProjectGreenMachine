@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import io.github.ethanBostick.ecs.components.Depth;
 import io.github.ethanBostick.ecs.components.FloatingText;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Registry;
@@ -21,10 +22,7 @@ public class FloatingTextSystem extends IteratingSystem {
     public FloatingTextSystem(int priority) {
         super(Family.all(FloatingText.class).get(), priority); // Priority 26
         this.batch = Registry.spriteBatch;
-        this.font = Registry.uiSkin.getFont("default-font");
-        this.font.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        //this.font.getData().setScale(0.75f); // 75% size
-        this.font.setUseIntegerPositions(false); //use non int pixel pos
+        this.font = Registry.worldFont;
         this.camera = Registry.camera;
     }
 
@@ -32,15 +30,17 @@ public class FloatingTextSystem extends IteratingSystem {
     public void update(float deltaTime) {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        this.font.getData().setScale(0.75f);
         super.update(deltaTime);
-        font.setColor(Color.WHITE); //references the same Texture regions so color must be reset
-        this.font.getData().setScale(1f);
         batch.end();
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+        Depth depth = Mappers.depthCMap.get(entity);
+        if(depth != null && depth.depth != Mappers.depthCMap.get(Registry.player).depth){
+            return;
+        }
+
         FloatingText ft = Mappers.floatingTextCMap.get(entity);
         ft.elapsed += deltaTime;
 
