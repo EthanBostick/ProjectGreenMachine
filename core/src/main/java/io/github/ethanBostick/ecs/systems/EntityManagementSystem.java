@@ -9,16 +9,11 @@ import io.github.ethanBostick.map.Map;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.core.PooledEngine;
 
 public class EntityManagementSystem extends IteratingSystem{
 
-    private final PooledEngine theEngine;
-
-    public EntityManagementSystem(PooledEngine engine, int priority) {
-        //prio 99 so it goes last
+    public EntityManagementSystem(int priority) {
         super(Family.all(Dead.class).get(), priority);
-        this.theEngine = engine;
     }
 
     @Override
@@ -39,7 +34,7 @@ public class EntityManagementSystem extends IteratingSystem{
                 }
             }
 
-            this.theEngine.removeEntity(entity); //calls reset on all components and returns them to pool + removes entity
+            this.getEngine().removeEntity(entity); //calls reset on all components and returns them to pool + removes entity
         }
         catch(Exception e){
             System.out.println("EntityManagementError: "+ e.getMessage());

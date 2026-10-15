@@ -9,6 +9,7 @@ import io.github.ethanBostick.ecs.systems.ActionSystem;
 import io.github.ethanBostick.ecs.systems.BuildSystem;
 import io.github.ethanBostick.ecs.systems.EntityManagementSystem;
 import io.github.ethanBostick.ecs.systems.ExtractionSystem;
+import io.github.ethanBostick.ecs.systems.FloatingTextSystem;
 import io.github.ethanBostick.ecs.systems.CleansingSystem;
 import io.github.ethanBostick.ecs.systems.CultivationSystem;
 import io.github.ethanBostick.ecs.systems.DegenerationSystem;
@@ -72,10 +73,11 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new RenderSystem(96));
 		this.engine.addSystem(new MultiRenderSystem(97));
 		this.engine.addSystem(new RegionOverlay(98));
-		this.engine.addSystem(new VectorRenderSystem(99)); //99 so it renders on top
-		this.engine.addSystem(new EntityManagementSystem(engine, 100));
+		this.engine.addSystem(new FloatingTextSystem(99));
+		this.engine.addSystem(new VectorRenderSystem(100)); //99 so it renders on top
+		this.engine.addSystem(new EntityManagementSystem(101));
 
-		this.engine.addSystem(new SystemUpdater(engine, 0)); //must be added after Overlays
+		this.engine.addSystem(new SystemUpdater(0)); //must be added after Overlays
 
 
 		Map map = Map.instance();

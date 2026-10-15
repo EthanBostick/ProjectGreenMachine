@@ -28,4 +28,5 @@ public class Mappers {
     public static final ComponentMapper<Name> nameCMap = ComponentMapper.getFor(Name.class);
     public static final ComponentMapper<Resource> resourceCMap = ComponentMapper.getFor(Resource.class);
     public static final ComponentMapper<Green> greenCMap = ComponentMapper.getFor(Green.class);
+    public static final ComponentMapper<FloatingText> floatingTextCMap = ComponentMapper.getFor(FloatingText.class);
 }

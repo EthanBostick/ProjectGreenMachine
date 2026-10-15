@@ -3,6 +3,7 @@ package io.github.ethanBostick.ecs.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.core.EntityBuilder;
@@ -10,8 +11,8 @@ import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Extraction;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
-import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
+import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Resource;
 import io.github.ethanBostick.ecs.components.Sprite;
@@ -47,9 +48,11 @@ public class ExtractionSystem extends IntervalIteratingSystem {
             int currentMineral = nutrients.minerals + nutrients.mineralDelta;
             //look for and proccess resource nodes in area
             for (int i = 0; i < this.processingArray.size; i += 2) {
+                int q = this.processingArray.get(i);
+                int r = this.processingArray.get(i+1);
                 Entity resourceNode = Map.instance().getEntityAt(
-                    this.processingArray.get(i), 
-                    this.processingArray.get(i + 1), 
+                    q,
+                    r,
                     TilePosition.RESOURCE_NODE);
                 if (resourceNode == null) continue;
 
@@ -67,6 +70,15 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                     nodeNutrients.carbonDelta -= finalExtract;
                     nutrients.carbonDelta += finalExtract;
                     currentCarbon += finalExtract; // update local counter for subsequent nodes in loop
+
+                    if (finalExtract > 0) {
+                        EntityBuilder.instance().createFloatingText(
+                            q, 
+                            r, 
+                            "+" + finalExtract + "C", 
+                            Color.FOREST
+                        );
+                    }
                 }
 
                 // Mineral extraction
@@ -80,6 +92,15 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                     nodeNutrients.mineralDelta -= finalExtract;
                     nutrients.mineralDelta += finalExtract;
                     currentMineral += finalExtract;
+
+                    if (finalExtract > 0) {
+                        EntityBuilder.instance().createFloatingText(
+                            q, 
+                            r, 
+                            "+" + finalExtract + "M", 
+                            Color.CYAN
+                        );
+                    }
                 }
 
                 // update node sprite 

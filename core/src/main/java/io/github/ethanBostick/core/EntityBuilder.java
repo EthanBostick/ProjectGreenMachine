@@ -3,6 +3,7 @@ package io.github.ethanBostick.core;
 import com.badlogic.ashley.core.Entity;
 //libGDX stuff
 import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.graphics.Color;
 
 import io.github.ethanBostick.ecs.components.ActiveTool;
 import io.github.ethanBostick.ecs.components.Build;
@@ -15,10 +16,12 @@ import io.github.ethanBostick.ecs.components.Density;
 import io.github.ethanBostick.ecs.components.Depth;
 import io.github.ethanBostick.ecs.components.Direction;
 import io.github.ethanBostick.ecs.components.Extraction;
+import io.github.ethanBostick.ecs.components.FloatingText;
 import io.github.ethanBostick.ecs.components.Green;
 import io.github.ethanBostick.ecs.components.Health;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
+import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.Nutrients;
@@ -26,13 +29,13 @@ import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Reclaim;
 import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.Resource;
-import io.github.ethanBostick.ecs.components.Vision;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.ecs.components.VectorArrow;
-import io.github.ethanBostick.ecs.components.Name;
+import io.github.ethanBostick.ecs.components.Vision;
 import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.ResourceType;
 import io.github.ethanBostick.map.TilePosition;
+import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
 
 public class EntityBuilder {
@@ -269,6 +272,20 @@ public class EntityBuilder {
 		green.add(greenComp);
 
 		return green;
+	}
+
+	public Entity createFloatingText(int q, int r, String text, Color color) {
+		Entity e = this.engine.createEntity();
+		
+		FloatingText ft = this.engine.createComponent(FloatingText.class);
+		ft.text = text;
+		ft.worldX = HexUtils.getPixelX(q) + 15f;
+		ft.worldY = HexUtils.getPixelY(q, r) + 30f;
+		ft.color.set(color);
+		
+		e.add(ft);
+		this.addToEngine(e);; 
+		return e;
 	}
 
     public Entity initHighlighter(){

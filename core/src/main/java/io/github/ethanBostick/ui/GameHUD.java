@@ -72,7 +72,7 @@ public class GameHUD implements Observer {
         // mineralRateWindow = new IntArray(false,(int)CommonValues.DELTA_WINDOW_SIZE.value);
 
         stage = new Stage(new ScreenViewport());
-        uiSkin = new Skin(Gdx.files.internal("uiskin.json"));
+        uiSkin = Registry.uiSkin;
 
         //get network/player permanent refs
         this.networkNutrients = Mappers.nutrientsCMap.get(Registry.player);
