@@ -1,8 +1,9 @@
 package io.github.ethanBostick.core;
 
 public enum CommonValues {
+//game settings
     TICK_SPEED(0.25f),
-    DELTA_WINDOW_SIZE(30f),
+    //DELTA_WINDOW_SIZE(30f), //unused, prev for calculating mineral and carbon gains over window size
     SIGHT_RADIUS(3f),
     DEGENERATION_CARBON_PER_TICK(0.025f),
     DEGENERATION_HEALTH_PER_TICK(5f),
@@ -12,6 +13,7 @@ public enum CommonValues {
     GREEN_BASE_LEVEL_SCALAR(10f),
     GREEN_DECAY_HEALTH_PER_TICK(5f),
     CULTIVATE_MINERAL_PER_TILE(1f);
+
 
     public float value;
 

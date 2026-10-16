@@ -58,16 +58,20 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new RunnerSystem(tickRate, 2));
 		this.engine.addSystem(new NetworkGrowthSystem(tickRate*2, 3));
 
-		this.engine.addSystem(new ExtractionSystem(tickRate*2,4));
-		this.engine.addSystem(new CleansingSystem(tickRate*2,5));
-		this.engine.addSystem(new CultivationSystem(tickRate*2, 6));
-		this.engine.addSystem(new DegenerationSystem(tickRate,7));
-		this.engine.addSystem(new GreenSystem(tickRate*2, 8));
-		this.engine.addSystem(new FlowGradientSystem(tickRate,9));
-		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 10));
-		this.engine.addSystem(new StateCommitSystem(tickRate, 11));
-		this.engine.addSystem(new BuildSystem(tickRate,12));
-		this.engine.addSystem(new ReclaimSystem(13));
+		//gradient and routing
+		this.engine.addSystem(new FlowGradientSystem(tickRate,4));
+		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 5));
+		//producers
+		this.engine.addSystem(new ExtractionSystem(tickRate*2,6));
+		this.engine.addSystem(new GreenSystem(tickRate*2, 7));
+		//consumers
+		this.engine.addSystem(new CleansingSystem(tickRate*2,8));
+		this.engine.addSystem(new CultivationSystem(tickRate*2, 9));
+		this.engine.addSystem(new DegenerationSystem(tickRate,10));
+		//commits and final calculations
+		this.engine.addSystem(new BuildSystem(tickRate,11));
+		this.engine.addSystem(new ReclaimSystem(12));
+		this.engine.addSystem(new StateCommitSystem(tickRate, 13));
 
 		this.engine.addSystem(new RevealSystem(tickRate,95));
 		this.engine.addSystem(new RenderSystem(96));

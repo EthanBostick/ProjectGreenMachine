@@ -26,6 +26,7 @@ import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.Position;
+import io.github.ethanBostick.ecs.components.PriorityRole;
 import io.github.ethanBostick.ecs.components.Reclaim;
 import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.Resource;
@@ -91,6 +92,8 @@ public class EntityBuilder {
         nutrientCapacity.carbonCapacity = carbonCap;
         nutrientCapacity.mineralCapacity = mineralCap;
         nutrientFlow.maxThroughput = maxThroughput;
+		nutrientFlow.mineralRole = PriorityRole.NONE;
+		nutrientFlow.carbonRole = PriorityRole.NONE;
 
 		e.add(vision);
         e.add(direction);
@@ -125,7 +128,8 @@ public class EntityBuilder {
                 initCarbon, initMineral, carbonReclaim, mineralReclaim);
 
         NutrientFlow flow = e.getComponent(NutrientFlow.class);
-		flow.isStorageNode = true;
+		flow.mineralRole = PriorityRole.SURPLUS_CAPACITOR;
+		flow.carbonRole = PriorityRole.SURPLUS_CAPACITOR;
 
         return e;
     }
@@ -152,8 +156,8 @@ public class EntityBuilder {
         NutrientFlow flow = e.getComponent(NutrientFlow.class);
 		Cultivator cultivatorComp = this.engine.createComponent(Cultivator.class);
 
-        flow.needsCarbons = false;
-        flow.needsMinerals = true;
+		flow.mineralRole = PriorityRole.UPKEEP;
+		flow.carbonRole = PriorityRole.UPKEEP;
 		cultivatorComp.radius = 1;
 
 		e.add(cultivatorComp);
@@ -167,8 +171,8 @@ public class EntityBuilder {
                 initCarbon, initMineral, carbonReclaim, mineralReclaim);
 
         NutrientFlow flow = e.getComponent(NutrientFlow.class);
-        flow.needsCarbons = true;
-        flow.needsMinerals = true;
+		flow.mineralRole = PriorityRole.UPKEEP;
+		flow.carbonRole = PriorityRole.UPKEEP;
 
         Cleansing cleansing = this.engine.createComponent(Cleansing.class);
         cleansing.carbonCost = 1;
@@ -231,13 +235,10 @@ public class EntityBuilder {
 		nutrientCapacity.carbonCapacity = carbonCost;
 		nutrientCapacity.mineralCapacity = mineralCost;
 
-		nutrientFlow.carbonDistance = (carbonCost > 0)? 0: Integer.MAX_VALUE;
-		nutrientFlow.mineralDistance = (mineralCost > 0)? 0: Integer.MAX_VALUE;
+		nutrientFlow.carbonRole = (carbonCost > 0)? PriorityRole.TOP: PriorityRole.NONE;
+		nutrientFlow.mineralRole = (mineralCost > 0)? PriorityRole.TOP: PriorityRole.NONE;
 
-		nutrientFlow.isStorageNode = false;
 		nutrientFlow.maxThroughput = 0;
-		nutrientFlow.needsCarbons = carbonCost > 0;
-		nutrientFlow.needsMinerals = mineralCost > 0;
 
 		buildTarget.buildType = buildType;
 		sprite.texture = TextureUtils.pathToTexture(buildType.spritePath);

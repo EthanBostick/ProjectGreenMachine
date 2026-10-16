@@ -48,14 +48,9 @@ public class FlowGradientSystem extends IntervalSystem {
             NutrientCapacity cap = Mappers.nutrientCapacityCMap.get(e);
             Position pos = Mappers.positionCMap.get(e);
 
-            if (flow.needsMinerals && nutrients != null && cap != null && nutrients.minerals < cap.mineralCapacity) {
-                // Tier 1 Priority: Active consumers needing minerals
-                flow.mineralDistance = 0;
-                queue.add(pos.q);
-                queue.add(pos.r);
-            } else if (flow.isStorageNode && nutrients != null && cap != null && nutrients.minerals < cap.mineralCapacity) {
-                // Tier 2 Priority: Storage buffer absorbing surplus
-                flow.mineralDistance = 100;
+            flow.mineralDistance = (flow.mineralRoleOverride != null)? flow.mineralRoleOverride.value : flow.mineralRole.value;
+            int projectedMinerals = (nutrients != null) ? nutrients.minerals + nutrients.mineralDelta : 0;
+            if (flow.mineralDistance < Integer.MAX_VALUE && nutrients != null && cap != null && projectedMinerals < cap.mineralCapacity) {
                 queue.add(pos.q);
                 queue.add(pos.r);
             } else {
@@ -100,12 +95,9 @@ public class FlowGradientSystem extends IntervalSystem {
             NutrientCapacity cap = Mappers.nutrientCapacityCMap.get(e);
             Position pos = Mappers.positionCMap.get(e);
 
-            if (flow.needsCarbons && nutrients != null && cap != null && nutrients.carbons < cap.carbonCapacity) {
-                flow.carbonDistance = 0;
-                queue.add(pos.q);
-                queue.add(pos.r);
-            } else if (flow.isStorageNode && nutrients != null && cap != null && nutrients.carbons < cap.carbonCapacity) {
-                flow.carbonDistance = 100;
+            flow.carbonDistance = (flow.carbonRoleOverride != null)? flow.carbonRoleOverride.value : flow.carbonRole.value;
+            int projectedCarbons = (nutrients != null) ? nutrients.carbons + nutrients.carbonDelta : 0;
+            if (flow.carbonDistance < Integer.MAX_VALUE && nutrients != null && cap != null && projectedCarbons < cap.carbonCapacity) {
                 queue.add(pos.q);
                 queue.add(pos.r);
             } else {

@@ -14,6 +14,7 @@ import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.Position;
+import io.github.ethanBostick.ecs.components.PriorityRole;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
@@ -62,11 +63,14 @@ public class DegenerationSystem extends IntervalIteratingSystem {
             //if node health < 50 request nutrient
             if (health.health < 50){
                 //flow.needsMinerals = true;
-                flow.needsCarbons = true;
+                flow.carbonRoleOverride = PriorityRole.TOP;
 
                 String texturePath = "myceliumD" + density.density + "Dying.png";
                 //DD-1
                 sprite.texture = TextureUtils.pathToTexture(texturePath);
+            }
+            else if(health.health > 75){
+                flow.carbonRoleOverride = null;
             }
 
             //if not enough nutrients, degrade

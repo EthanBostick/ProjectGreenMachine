@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Depth;
 import io.github.ethanBostick.ecs.components.FloatingText;
 import io.github.ethanBostick.ecs.components.Mappers;
@@ -45,7 +46,7 @@ public class FloatingTextSystem extends IteratingSystem {
         ft.elapsed += deltaTime;
 
         if (ft.elapsed >= ft.duration) {
-            getEngine().removeEntity(entity); // PooledEngine automatically frees components
+            EntityBuilder.instance().dead(entity);
             return;
         }
 

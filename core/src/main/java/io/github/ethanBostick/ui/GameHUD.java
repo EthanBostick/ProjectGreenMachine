@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -71,7 +71,7 @@ public class GameHUD implements Observer {
         // carbonRateWindow = new IntArray(false,(int)CommonValues.DELTA_WINDOW_SIZE.value);
         // mineralRateWindow = new IntArray(false,(int)CommonValues.DELTA_WINDOW_SIZE.value);
 
-        stage = new Stage(new ScreenViewport());
+        stage = new Stage(new ExtendViewport(1920, 1080));
         uiSkin = Registry.uiSkin;
 
         //get network/player permanent refs
