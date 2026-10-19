@@ -9,6 +9,7 @@ import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
+import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.ToxicWave;
 import io.github.ethanBostick.map.Map;
@@ -40,17 +41,45 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
         return false;
     }
 
+    // Checks if (nq, nr) sits diagonally behind a tile on currentRingDist that was blocked
+    private boolean isShadowedByBlockedInnerNeighbor(int nq, int nr, int emitterQ, int emitterR, int currentRingDist, IntArray activeWavefront) {
+        for (int[] dir : hexDirections) {
+            int innerQ = nq + dir[0];
+            int innerR = nr + dir[1];
+
+            int dq = innerQ - emitterQ;
+            int dr = innerR - emitterR;
+            int dist = (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+
+            // If this neighbor sits on the current ring (an inner parent of nq, nr),
+            // check if it survived in activeWavefront. If it's missing, it was blocked!
+            if (dist == currentRingDist) {
+                boolean parentIsActive = false;
+                for (int j = 0; j < activeWavefront.size; j += 2) {
+                    if (activeWavefront.get(j) == innerQ && activeWavefront.get(j + 1) == innerR) {
+                        parentIsActive = true;
+                        break;
+                    }
+                }
+                if (!parentIsActive) {
+                    return true; // One of its inner parents was blocked by a mountain/cleanser!
+                }
+            }
+        }
+        return false;
+    }
 
     @Override
     protected void processEntity(Entity toxicWave) {
-        try{
-            System.out.println("wave toxic system");
+        try {
             ToxicWave wave = Mappers.toxicWaveCMap.get(toxicWave);
             MultiTilePosition wavefront = Mappers.multiTilePositionCMap.get(toxicWave);
+            Position emitterPosition = Mappers.positionCMap.get(toxicWave);
+
+            int emitterQ = emitterPosition.q;
+            int emitterR = emitterPosition.r;
 
             if (wave.currentStep == 0 || wavefront.points.size == 0) {
-                int emitterQ = wavefront.points.get(0);
-                int emitterR = wavefront.points.get(1);
                 wavefront.points.clear();
                 wave.visitedHexes.clear();
                 wavefront.points.add(emitterQ);
@@ -59,6 +88,8 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
             }
 
             nextToxicWavefront.clear();
+            int currentRingDist = wave.currentStep;
+            int targetRingDist = wave.currentStep + 1;
 
             // Expand every hex currently on the leading edge of the wave
             for (int i = 0; i < wavefront.points.size; i += 2) {
@@ -69,49 +100,61 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
                     int nq = curQ + dir[0];
                     int nr = curR + dir[1];
 
+                    // 1. STRICT RING EXPANSION: Only step onto the next outer ring (currentStep + 1)
+                    int dq = nq - emitterQ;
+                    int dr = nr - emitterR;
+                    int dist = (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+                    if (dist != targetRingDist) continue;
+
                     int hexIndex = Map.instance().getIndex(nq, nr);
                     if (wave.visitedHexes.contains(hexIndex)) continue;
+
+                    // 2. ANTI-REFORMING SHADOW CHECK:
+                    // When expanding beyond Ring 1 (currentStep >= 1), check the inner parents of (nq, nr)
+                    // that sit on the current ring (dist == currentRingDist). 
+                    // If an inner parent on the current ring was BLOCKED (not in wavefront.points),
+                    // do not allow an adjacent wave tile to bleed diagonally behind that obstacle!
+                    if (currentRingDist >= 1 && isShadowedByBlockedInnerNeighbor(nq, nr, emitterQ, emitterR, currentRingDist, wavefront.points)) {
+                        continue;
+                    }
+
                     wave.visitedHexes.add(hexIndex);
 
                     Entity surface = Map.instance().getEntityAt(nq, nr, TilePosition.SURFACE);
                     if (surface == null) continue;
 
                     Region region = Mappers.regionCMap.get(surface);
-                    
-                    // 1. COLLISION CHECK: Mountains physically block the wave
+
+                    // 3. COLLISION CHECK: Mountains physically block the wave
                     if (region != null && region.regionType == RegionType.MOUNTAIN) {
                         continue; // Do not add to nextToxicWavefront!
                     }
 
-                    // 2. DEFENSE CHECK: Active Cleanser shields block the wave
+                    // 4. DEFENSE CHECK: Active Cleanser shields block the wave
                     // if (tryAbsorbWithCleanser(nq, nr)) {
-                    //     // Optional: spawn a floating text "-1M -1C" or shield ripple here!
-                    //     continue; // ToxicWave dies on the shield; do not add to nextToxicWavefront!
+                    //     continue;
                     // }
 
-                    // 3. UNBLOCKED: Apply toxic damage to greenery & surface
+                    // 5. UNBLOCKED: Apply toxic damage to greenery & surface
                     // applySludgeDamage(nq, nr, surface, region);
 
-                    // 4. Propagate wavefront forward from this tile on the next step
+                    // 6. Propagate wavefront forward from this tile on the next step
                     nextToxicWavefront.add(nq);
                     nextToxicWavefront.add(nr);
                 }
             }
 
-            // Swap nextToxicWavefront into currentToxicWavefront for the next tick
+            // Swap nextToxicWavefront into wavefront.points for the next tick
             wavefront.points.clear();
             wavefront.points.addAll(nextToxicWavefront);
 
             wave.currentStep++;
-            if (wave.currentStep >= wave.maxSteps) {
+            if (wave.currentStep >= wave.maxSteps || wavefront.points.size == 0) {
                 wavefront.points.clear();
                 EntityBuilder.instance().dead(toxicWave);
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("ToxicWaveError: " + e.getMessage());
-        }
-        finally{
         }
     }
 }

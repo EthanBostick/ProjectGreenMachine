@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Dead;
+import io.github.ethanBostick.ecs.components.Depth;
 import io.github.ethanBostick.ecs.components.FactoryEmitter;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Position;
@@ -26,6 +27,7 @@ public class ToxicEmitterSystem extends IntervalIteratingSystem {
         try{
             FactoryEmitter emitter = Mappers.factoryEmitterCMap.get(factory);
             Position factoryPos = Mappers.positionCMap.get(factory);
+            Depth depth = Mappers.depthCMap.get(factory);
             if(emitter.isNeutralized){
                 //unlock something based on neutralized factory
                 return;
@@ -33,9 +35,8 @@ public class ToxicEmitterSystem extends IntervalIteratingSystem {
 
             emitter.ticksUntilNextPulse = (emitter.ticksUntilNextPulse + 1) % emitter.pulseIntervalTicks;
             if(emitter.ticksUntilNextPulse == 0){
-                Entity wave = EntityBuilder.instance().createToxicWave(factoryPos.q, factoryPos.r, emitter.maxSpreadRadius);
+                Entity wave = EntityBuilder.instance().createToxicWave(factoryPos.q, factoryPos.r, emitter.maxSpreadRadius, depth.depth);
                 EntityBuilder.instance().addToEngine(wave);
-                System.out.println("wave launched");
             }
         }
         catch(Exception e){

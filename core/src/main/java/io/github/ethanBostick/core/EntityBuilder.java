@@ -294,22 +294,27 @@ public class EntityBuilder {
 		return factory;
 	}
 
-	public Entity createToxicWave(int emitterQ, int emitterR, int maxSteps){
+	public Entity createToxicWave(int emitterQ, int emitterR, int maxSteps, int displayDepth){
 		Entity e = this.engine.createEntity();
 		ToxicWave wave = this.engine.createComponent(ToxicWave.class); 
 		MultiTilePosition wavePosition = this.engine.createComponent(MultiTilePosition.class);
+		Position emitterPosition = this.engine.createComponent(Position.class);
 		MultiTileSprite waveSprite = this.engine.createComponent(MultiTileSprite.class);
+		Depth depth = this.engine.createComponent(Depth.class);
 
+		depth.depth = displayDepth;
 		waveSprite.textureHead = TextureUtils.pathToTexture("toxicWave.png");
 		wavePosition.points = new IntArray(false,64);
-		wavePosition.points.add(emitterQ);
-		wavePosition.points.add(emitterR);
+		emitterPosition.q = emitterQ;
+		emitterPosition.r = emitterR;
 		wavePosition.layer = 1;
 		wave.visitedHexes = new IntArray(false, 64);
 		wave.maxSteps = maxSteps;
 
+		e.add(depth);
 		e.add(wave);
 		e.add(wavePosition);
+		e.add(emitterPosition);
 		e.add(waveSprite);
 
 		return e;

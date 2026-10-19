@@ -72,7 +72,7 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new DegenerationSystem(tickRate,10));
 
 		this.engine.addSystem(new ToxicEmitterSystem(tickRate, 11));
-		this.engine.addSystem(new ToxicWaveSystem(tickRate, 12));
+		this.engine.addSystem(new ToxicWaveSystem(tickRate*2, 12));
 
 		//commits and final calculations
 		this.engine.addSystem(new BuildSystem(tickRate,13));
