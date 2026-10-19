@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 //libGDX stuff
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.ecs.components.ActiveTool;
 import io.github.ethanBostick.ecs.components.Build;
@@ -16,11 +17,13 @@ import io.github.ethanBostick.ecs.components.Density;
 import io.github.ethanBostick.ecs.components.Depth;
 import io.github.ethanBostick.ecs.components.Direction;
 import io.github.ethanBostick.ecs.components.Extraction;
+import io.github.ethanBostick.ecs.components.FactoryEmitter;
 import io.github.ethanBostick.ecs.components.FloatingText;
 import io.github.ethanBostick.ecs.components.Green;
 import io.github.ethanBostick.ecs.components.Health;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
+import io.github.ethanBostick.ecs.components.MultiTileSprite;
 import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
@@ -31,6 +34,7 @@ import io.github.ethanBostick.ecs.components.Reclaim;
 import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.Resource;
 import io.github.ethanBostick.ecs.components.Sprite;
+import io.github.ethanBostick.ecs.components.ToxicWave;
 import io.github.ethanBostick.ecs.components.VectorArrow;
 import io.github.ethanBostick.ecs.components.Vision;
 import io.github.ethanBostick.map.Map;
@@ -166,7 +170,7 @@ public class EntityBuilder {
     }
 
     public Entity createMyceliumCleanser(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
-        Entity e = createBaseMycelium(q, r, "cleanserMycelium.png", 4,
+        Entity e = createBaseMycelium(q, r, "cleanser.png", 4,
                 20, 20, 2,
                 initCarbon, initMineral, carbonReclaim, mineralReclaim);
 
@@ -200,6 +204,7 @@ public class EntityBuilder {
 		targetPosition.layer = 99; //so it renders on top
 		depth.depth = 1;
 
+		startAndEnd.points = new IntArray(false,4);
 		startAndEnd.points.add(startQ);
 		startAndEnd.points.add(startR);
 		startAndEnd.points.add(endQ);
@@ -276,6 +281,40 @@ public class EntityBuilder {
 		return green;
 	}
 
+	public Entity createWaveEmitter(int q, int r, int cleanseRequirement, int maxSpreadRadius, int pulseIntervalTicks){
+		//render below mountains (L2), on surface depth
+		Entity factory = this.createRenderable(q, r, 1, 0, TilePosition.GREEN, "factory.png");
+		FactoryEmitter emitter = this.engine.createComponent(FactoryEmitter.class);
+
+		emitter.cleanseRequirement = cleanseRequirement;
+		emitter.maxSpreadRadius = maxSpreadRadius;
+		emitter.pulseIntervalTicks = pulseIntervalTicks;
+
+		factory.add(emitter);
+		return factory;
+	}
+
+	public Entity createToxicWave(int emitterQ, int emitterR, int maxSteps){
+		Entity e = this.engine.createEntity();
+		ToxicWave wave = this.engine.createComponent(ToxicWave.class); 
+		MultiTilePosition wavePosition = this.engine.createComponent(MultiTilePosition.class);
+		MultiTileSprite waveSprite = this.engine.createComponent(MultiTileSprite.class);
+
+		waveSprite.textureHead = TextureUtils.pathToTexture("toxicWave.png");
+		wavePosition.points = new IntArray(false,64);
+		wavePosition.points.add(emitterQ);
+		wavePosition.points.add(emitterR);
+		wavePosition.layer = 1;
+		wave.visitedHexes = new IntArray(false, 64);
+		wave.maxSteps = maxSteps;
+
+		e.add(wave);
+		e.add(wavePosition);
+		e.add(waveSprite);
+
+		return e;
+	}
+
 	public Entity createFloatingText(int q, int r, int displayDepth, String text, Color color, boolean randomDeviate) {
 		Entity e = this.engine.createEntity();
 		
@@ -324,6 +363,8 @@ public class EntityBuilder {
 		VectorArrow vectorArrow = this.engine.createComponent(VectorArrow.class);
 
 		vectorArrow.arrowTexture = TextureUtils.pathToTexture("dragArrow.png");
+
+		mtp.points = new IntArray(false,12);
 
 		entity.add(vectorArrow);
 		entity.add(mousePosition);

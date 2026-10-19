@@ -7,6 +7,7 @@ import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.ecs.components.Sprite;
+import io.github.ethanBostick.ecs.components.ToxicWave;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
 
@@ -62,7 +63,8 @@ public class RenderSystem extends SortedIteratingSystem{
     }
 
     public RenderSystem(int priority) {
-        super(Family.all(Position.class, Sprite.class).exclude(Dead.class).get(), new LayerComparator(), priority);
+        super(Family.all(Position.class, Sprite.class)
+            .exclude(Dead.class).get(), new LayerComparator(), priority);
         this.batch = Registry.spriteBatch;
         this.camera = Registry.camera;
     }

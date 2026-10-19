@@ -21,6 +21,8 @@ import io.github.ethanBostick.ecs.systems.NetworkGrowthSystem;
 import io.github.ethanBostick.ecs.systems.PlayerStateSystem;
 import io.github.ethanBostick.ecs.systems.StateCommitSystem;
 import io.github.ethanBostick.ecs.systems.SystemUpdater;
+import io.github.ethanBostick.ecs.systems.ToxicEmitterSystem;
+import io.github.ethanBostick.ecs.systems.ToxicWaveSystem;
 import io.github.ethanBostick.ecs.systems.RenderSystem;
 import io.github.ethanBostick.ecs.systems.RevealSystem;
 import io.github.ethanBostick.ecs.systems.RunnerSystem;
@@ -68,10 +70,14 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new CleansingSystem(tickRate*2,8));
 		this.engine.addSystem(new CultivationSystem(tickRate*2, 9));
 		this.engine.addSystem(new DegenerationSystem(tickRate,10));
+
+		this.engine.addSystem(new ToxicEmitterSystem(tickRate, 11));
+		this.engine.addSystem(new ToxicWaveSystem(tickRate, 12));
+
 		//commits and final calculations
-		this.engine.addSystem(new BuildSystem(tickRate,11));
-		this.engine.addSystem(new ReclaimSystem(12));
-		this.engine.addSystem(new StateCommitSystem(tickRate, 13));
+		this.engine.addSystem(new BuildSystem(tickRate,13));
+		this.engine.addSystem(new ReclaimSystem(14));
+		this.engine.addSystem(new StateCommitSystem(tickRate, 15));
 
 		this.engine.addSystem(new RevealSystem(tickRate,95));
 		this.engine.addSystem(new RenderSystem(96));

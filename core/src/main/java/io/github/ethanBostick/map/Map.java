@@ -209,6 +209,9 @@ public class Map{
 					this.entityBuilder.addToEngine(initMycelium);
 					this.map[index][TilePosition.MYCELIUM.value()] = initMycelium;
 
+					Entity factory = this.entityBuilder.createWaveEmitter(q, r, 100, 10, 10);
+					this.entityBuilder.addToEngine(factory);
+					this.map[index][TilePosition.GREEN.value()] = factory;
 					//do not track, for visual only
 					// Entity center = entityBuilder.createRenderable(0,0, 3,0,null, "hexCenter.png");
 					// this.entityBuilder.addToEngine(center);

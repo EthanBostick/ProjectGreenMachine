@@ -8,7 +8,7 @@ public enum TilePosition {
     SURFACE(4),
     SURFACE_MYCELIUM(5),
     GREEN(6),
-    MAX_POSITIONS(6);
+    MAX_POSITIONS(7);
 
     private int position;
 

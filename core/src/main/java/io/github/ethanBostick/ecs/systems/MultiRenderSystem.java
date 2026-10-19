@@ -66,11 +66,16 @@ public class MultiRenderSystem extends SortedIteratingSystem{
 
                 // Only draw if the sprite's bounding box intersects the camera's view
                 if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
-                    if (i+2 >= mtp.points.size){
-                        batch.draw(mts.textureHead, pixelX, pixelY);
+                    if(mts.texture != null){
+                        if (i+2 >= mtp.points.size){
+                            batch.draw(mts.textureHead, pixelX, pixelY);
+                        }
+                        else{
+                            batch.draw(mts.texture.get(Math.floorDiv(i, 2)), pixelX, pixelY);
+                        }
                     }
-                    else{
-                        batch.draw(mts.texture.get(Math.floorDiv(i, 2)), pixelX, pixelY);
+                    else if (mts.textureHead != null){
+                        batch.draw(mts.textureHead, pixelX, pixelY);
                     }
                 }
             }
