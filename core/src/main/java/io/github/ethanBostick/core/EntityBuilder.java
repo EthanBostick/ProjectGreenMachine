@@ -281,7 +281,7 @@ public class EntityBuilder {
 		return green;
 	}
 
-	public Entity createWaveEmitter(int q, int r, int cleanseRequirement, int maxSpreadRadius, int pulseIntervalTicks){
+	public Entity createWaveEmitter(int q, int r, RegionType hazardType, int cleanseRequirement, int maxSpreadRadius, int pulseIntervalTicks){
 		//render below mountains (L2), on surface depth
 		Entity factory = this.createRenderable(q, r, 1, 0, TilePosition.GREEN, "factory.png");
 		FactoryEmitter emitter = this.engine.createComponent(FactoryEmitter.class);
@@ -289,12 +289,13 @@ public class EntityBuilder {
 		emitter.cleanseRequirement = cleanseRequirement;
 		emitter.maxSpreadRadius = maxSpreadRadius;
 		emitter.pulseIntervalTicks = pulseIntervalTicks;
+		emitter.hazardType = hazardType;
 
 		factory.add(emitter);
 		return factory;
 	}
 
-	public Entity createToxicWave(int emitterQ, int emitterR, int maxSteps, int displayDepth){
+	public Entity createToxicWave(int emitterQ, int emitterR, RegionType hazardType, int maxSteps, int displayDepth){
 		Entity e = this.engine.createEntity();
 		ToxicWave wave = this.engine.createComponent(ToxicWave.class); 
 		MultiTilePosition wavePosition = this.engine.createComponent(MultiTilePosition.class);
@@ -310,6 +311,7 @@ public class EntityBuilder {
 		wavePosition.layer = 1;
 		wave.visitedHexes = new IntArray(false, 64);
 		wave.maxSteps = maxSteps;
+		wave.hazardType = hazardType;
 
 		e.add(depth);
 		e.add(wave);

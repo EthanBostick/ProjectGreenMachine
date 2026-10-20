@@ -69,6 +69,20 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
         return false;
     }
 
+    private boolean applySludgeDamage(int q, int r, Entity surfaceTile, Region region, RegionType hazardType){
+
+        //harm env
+        if(region.regionType == RegionType.RESTORED){
+
+        }
+        //simply region conversion
+        else{
+            region.regionType = hazardType;
+        }
+
+        return true;
+    }
+
     @Override
     protected void processEntity(Entity toxicWave) {
         try {
@@ -100,7 +114,6 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
                     int nq = curQ + dir[0];
                     int nr = curR + dir[1];
 
-                    // 1. STRICT RING EXPANSION: Only step onto the next outer ring (currentStep + 1)
                     int dq = nq - emitterQ;
                     int dr = nr - emitterR;
                     int dist = (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
@@ -109,11 +122,6 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
                     int hexIndex = Map.instance().getIndex(nq, nr);
                     if (wave.visitedHexes.contains(hexIndex)) continue;
 
-                    // 2. ANTI-REFORMING SHADOW CHECK:
-                    // When expanding beyond Ring 1 (currentStep >= 1), check the inner parents of (nq, nr)
-                    // that sit on the current ring (dist == currentRingDist). 
-                    // If an inner parent on the current ring was BLOCKED (not in wavefront.points),
-                    // do not allow an adjacent wave tile to bleed diagonally behind that obstacle!
                     if (currentRingDist >= 1 && isShadowedByBlockedInnerNeighbor(nq, nr, emitterQ, emitterR, currentRingDist, wavefront.points)) {
                         continue;
                     }
@@ -125,7 +133,6 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
 
                     Region region = Mappers.regionCMap.get(surface);
 
-                    // 3. COLLISION CHECK: Mountains physically block the wave
                     if (region != null && region.regionType == RegionType.MOUNTAIN) {
                         continue; // Do not add to nextToxicWavefront!
                     }
@@ -138,7 +145,7 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
                     // 5. UNBLOCKED: Apply toxic damage to greenery & surface
                     // applySludgeDamage(nq, nr, surface, region);
 
-                    // 6. Propagate wavefront forward from this tile on the next step
+                    //propogate wave
                     nextToxicWavefront.add(nq);
                     nextToxicWavefront.add(nr);
                 }

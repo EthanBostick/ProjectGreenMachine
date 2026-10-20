@@ -209,7 +209,7 @@ public class Map{
 					this.entityBuilder.addToEngine(initMycelium);
 					this.map[index][TilePosition.MYCELIUM.value()] = initMycelium;
 
-					Entity factory = this.entityBuilder.createWaveEmitter(q, r, 100, 15, 10);
+					Entity factory = this.entityBuilder.createWaveEmitter(q, r,RegionType.BARREN, 100, 15, 10);
 					this.entityBuilder.addToEngine(factory);
 					this.map[index][TilePosition.GREEN.value()] = factory;
 					//do not track, for visual only

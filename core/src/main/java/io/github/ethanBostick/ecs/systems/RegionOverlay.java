@@ -10,6 +10,7 @@ import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.ecs.components.Sprite;
+import io.github.ethanBostick.ecs.components.ToxicWave;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
 
@@ -25,7 +26,7 @@ public class RegionOverlay extends IteratingSystem{
     private final OrthographicCamera camera;
 
     public RegionOverlay(int priority) {
-        super(Family.all(Position.class, Region.class).exclude(Dead.class).get(), priority);
+        super(Family.all(Position.class, Region.class).exclude(Dead.class, ToxicWave.class).get(), priority);
         this.batch = Registry.spriteBatch;
         this.camera = Registry.camera;
     }

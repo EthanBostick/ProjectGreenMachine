@@ -35,7 +35,7 @@ public class ToxicEmitterSystem extends IntervalIteratingSystem {
 
             emitter.ticksUntilNextPulse = (emitter.ticksUntilNextPulse + 1) % emitter.pulseIntervalTicks;
             if(emitter.ticksUntilNextPulse == 0){
-                Entity wave = EntityBuilder.instance().createToxicWave(factoryPos.q, factoryPos.r, emitter.maxSpreadRadius, depth.depth);
+                Entity wave = EntityBuilder.instance().createToxicWave(factoryPos.q, factoryPos.r, emitter.hazardType, emitter.maxSpreadRadius, depth.depth);
                 EntityBuilder.instance().addToEngine(wave);
             }
         }
