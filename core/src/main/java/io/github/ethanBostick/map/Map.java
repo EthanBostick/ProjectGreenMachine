@@ -7,6 +7,7 @@ import java.util.Random;
 import com.badlogic.ashley.core.Entity;
 
 import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Position;
 
 public class Map{
@@ -164,6 +165,9 @@ public class Map{
 				//Put the Entities together and update map
 				tileEntity = entityBuilder.createRenderable(q,r,renderLayer,0,TilePosition.SURFACE, tilePng, name);
 				entityBuilder.addRegion(bType, tileEntity);
+				if(bType == RegionType.RESTORED){
+					Mappers.regionCMap.get(tileEntity).condition = 100;
+				}
 				this.entityBuilder.addToEngine(tileEntity);
 				this.map[index][TilePosition.SURFACE.value()] = tileEntity;
 
@@ -211,7 +215,7 @@ public class Map{
 
 					Entity factory = this.entityBuilder.createWaveEmitter(q, r,RegionType.BARREN, 100, 15, 10);
 					this.entityBuilder.addToEngine(factory);
-					this.map[index][TilePosition.GREEN.value()] = factory;
+					this.map[index][TilePosition.SURFACE_ENTITY.value()] = factory;
 					//do not track, for visual only
 					// Entity center = entityBuilder.createRenderable(0,0, 3,0,null, "hexCenter.png");
 					// this.entityBuilder.addToEngine(center);

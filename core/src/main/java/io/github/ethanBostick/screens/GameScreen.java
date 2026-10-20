@@ -10,7 +10,7 @@ import io.github.ethanBostick.ecs.systems.BuildSystem;
 import io.github.ethanBostick.ecs.systems.EntityManagementSystem;
 import io.github.ethanBostick.ecs.systems.ExtractionSystem;
 import io.github.ethanBostick.ecs.systems.FloatingTextSystem;
-import io.github.ethanBostick.ecs.systems.CleansingSystem;
+import io.github.ethanBostick.ecs.systems.CleanserSystem;
 import io.github.ethanBostick.ecs.systems.CultivationSystem;
 import io.github.ethanBostick.ecs.systems.DegenerationSystem;
 import io.github.ethanBostick.ecs.systems.FlowGradientSystem;
@@ -67,7 +67,7 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new ExtractionSystem(tickRate*2,6));
 		this.engine.addSystem(new GreenSystem(tickRate*2, 7));
 		//consumers
-		this.engine.addSystem(new CleansingSystem(tickRate*2,8));
+		this.engine.addSystem(new CleanserSystem(tickRate*2,8));
 		this.engine.addSystem(new CultivationSystem(tickRate*2, 9));
 		this.engine.addSystem(new DegenerationSystem(tickRate,10));
 

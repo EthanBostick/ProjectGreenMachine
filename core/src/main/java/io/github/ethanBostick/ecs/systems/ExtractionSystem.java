@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 
+import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Extraction;
@@ -124,7 +125,7 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                     position.r, 
                     1,
                     "+" + totalCarbonGain + "C", 
-                    Color.GREEN,
+                    ColorSettings.CARBON_GAINS.color,
                     true
                 );
             }
@@ -135,7 +136,7 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                     position.r, 
                     1,
                     "+" + totalMineralGain + "M", 
-                    Color.CYAN,
+                    ColorSettings.MINERAL_GAINS.color,
                     true
                 );
             }

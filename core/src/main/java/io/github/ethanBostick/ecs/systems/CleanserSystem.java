@@ -6,11 +6,11 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 
+import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.EntityBuilder;
-import io.github.ethanBostick.ecs.components.Cleansing;
+import io.github.ethanBostick.ecs.components.Cleanser;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
-import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
@@ -23,27 +23,27 @@ import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
 
-public class CleansingSystem extends IntervalIteratingSystem {
+public class CleanserSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
     private IntArray processingArray = new IntArray(14);
     
-    public CleansingSystem(float interval, int priority) {
-        super(Family.all(Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Cleansing.class)
+    public CleanserSystem(float interval, int priority) {
+        super(Family.all(Nutrients.class, NutrientFlow.class, NutrientCapacity.class, Position.class, Cleanser.class)
             .exclude(Dead.class).get(), interval, priority);
         this.interval = interval;
     }
 
     @Override
-    protected void processEntity(Entity cleanser) {
+    protected void processEntity(Entity cleanserNode) {
         try{
-            Position position = Mappers.positionCMap.get(cleanser);
-            Nutrients nutrients = Mappers.nutrientsCMap.get(cleanser);
-            Cleansing cleansing = Mappers.cleansingCMap.get(cleanser);
-            NutrientFlow flow = Mappers.nutrientFlowCMap.get(cleanser);
+            Position position = Mappers.positionCMap.get(cleanserNode);
+            Nutrients nutrients = Mappers.nutrientsCMap.get(cleanserNode);
+            Cleanser cleanser = Mappers.cleanserCMap.get(cleanserNode);
+            NutrientFlow flow = Mappers.nutrientFlowCMap.get(cleanserNode);
             int uncleanTiles = 0;
 
             //get radius vector
-            int radius = cleansing.radius;
+            int radius = cleanser.radius;
             this.processingArray = HexUtils.getAreaAround(position, radius, processingArray);
 
             int totalMineralOutput = 0;
@@ -56,18 +56,18 @@ public class CleansingSystem extends IntervalIteratingSystem {
                     TilePosition.SURFACE);
                 if (surfaceNode == null) continue;
 
-                int carbonCost = cleansing.carbonCost;
-                int mineralCost = cleansing.mineralCost;
+                int carbonCost = cleanser.carbonCost;
+                int mineralCost = cleanser.mineralCost;
                 Region nodeRegion = Mappers.regionCMap.get(surfaceNode);
 
                 //already cleansed return
-                if (nodeRegion.regionType.cleansingScalar() <= 0) continue;
+                if (nodeRegion.regionType.cleanserScalar() <= 0) continue;
 
-                float cleansingRate = cleansing.rate * nodeRegion.regionType.cleansingScalar();
+                float cleanserRate = cleanser.rate * nodeRegion.regionType.cleanserScalar();
                 int usableMinerals = nutrients.minerals + Math.min(0, nutrients.mineralDelta);
                 int usableCarbons = nutrients.carbons + Math.min(0, nutrients.carbonDelta);
 
-                //node cleansing
+                //node cleanser
                 if (nodeRegion.condition < 100){
                     uncleanTiles ++;
                     if (carbonCost >= usableCarbons || mineralCost >= usableMinerals) continue;
@@ -76,41 +76,44 @@ public class CleansingSystem extends IntervalIteratingSystem {
                     nutrients.mineralDelta -= mineralCost; 
                     totalCarbonOutput += carbonCost;
                     totalMineralOutput += mineralCost;
-                    nodeRegion.condition += Math.min(cleansingRate,100-nodeRegion.condition);                    
+                    nodeRegion.condition += Math.min(cleanserRate,100-nodeRegion.condition);                    
                 }
 
                 //node cleansed
-                Name tileName = Mappers.nameCMap.get(surfaceNode);
                 if (nodeRegion.condition >= 100){
                     nodeRegion.condition = 100;
                     nodeRegion.regionType = RegionType.RESTORED;
                     Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture("restoredTile.png");
                 }
                 //tile sprite updates
-                else if(tileName == null){
-                    continue;
-                }
                 else if(nodeRegion.condition >= 75){
-                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(tileName.name+"R3.png");
+                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(nodeRegion.regionType.name+"TileR3.png");
                 }
                 else if(nodeRegion.condition >= 50){
-                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(tileName.name+"R2.png");
+                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(nodeRegion.regionType.name+"TileR2.png");
                 }
                 else if(nodeRegion.condition >= 25){
-                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(tileName.name+"R1.png");
+                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture(nodeRegion.regionType.name+"TileR1.png");
                 }
             }
 
-            if (totalMineralOutput > 0 || totalCarbonOutput > 0) {
-                String carbonText = (totalCarbonOutput >0)? "+"+totalCarbonOutput +"C " : "";
-                String mineralText = (totalMineralOutput >0)? "+"+totalMineralOutput +"C" : "";
-
+            if (totalMineralOutput > 0){
                 EntityBuilder.instance().createFloatingText(
                     position.q, 
                     position.r, 
                     1,
-                    carbonText + mineralText, 
-                    Color.RED,
+                    "-"+totalMineralOutput+"M", 
+                    ColorSettings.MINERAL_LOSSES.color,
+                    true
+                );
+            }
+            if(totalCarbonOutput > 0) {
+                EntityBuilder.instance().createFloatingText(
+                    position.q, 
+                    position.r, 
+                    1,
+                    "-"+totalCarbonOutput+"C", 
+                    ColorSettings.CARBON_LOSSES.color,
                     true
                 );
             }
@@ -122,7 +125,7 @@ public class CleansingSystem extends IntervalIteratingSystem {
             }
         }
         catch(Exception e){
-            System.out.println("CleansingError: " + e.getMessage());
+            System.out.println("CleanserError: " + e.getMessage());
         }
         finally{
             this.processingArray.clear();

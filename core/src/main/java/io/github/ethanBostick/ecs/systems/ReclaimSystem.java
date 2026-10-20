@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 
+import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
@@ -81,10 +82,10 @@ public class ReclaimSystem extends IteratingSystem {
                     nNutrients.carbonDelta += cDeposit;
                     nNutrients.mineralDelta += mDeposit;
                     if (cDeposit > 0) {
-                        EntityBuilder.instance().createFloatingText(targetQ, targetR, 1, "+" + cDeposit + "C", Color.GREEN, true);
+                        EntityBuilder.instance().createFloatingText(targetQ, targetR, 1, "+" + cDeposit + "C", ColorSettings.CARBON_GAINS.color, true);
                     }
                     if (mDeposit > 0) {
-                        EntityBuilder.instance().createFloatingText( targetQ, targetR, 1, "+" + mDeposit + "M", Color.CYAN, true);
+                        EntityBuilder.instance().createFloatingText( targetQ, targetR, 1, "+" + mDeposit + "M", ColorSettings.MINERAL_GAINS.color, true);
                     }
 
                     totalCarbonReclaim -= cDeposit;

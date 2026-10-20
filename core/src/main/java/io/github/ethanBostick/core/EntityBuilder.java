@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.IntArray;
 import io.github.ethanBostick.ecs.components.ActiveTool;
 import io.github.ethanBostick.ecs.components.Build;
 import io.github.ethanBostick.ecs.components.BuildType;
-import io.github.ethanBostick.ecs.components.Cleansing;
+import io.github.ethanBostick.ecs.components.Cleanser;
 import io.github.ethanBostick.ecs.components.Complete;
 import io.github.ethanBostick.ecs.components.Cultivator;
 import io.github.ethanBostick.ecs.components.Dead;
@@ -178,12 +178,12 @@ public class EntityBuilder {
 		flow.mineralRole = PriorityRole.UPKEEP;
 		flow.carbonRole = PriorityRole.UPKEEP;
 
-        Cleansing cleansing = this.engine.createComponent(Cleansing.class);
-        cleansing.carbonCost = 1;
-        cleansing.mineralCost = 1;
-        cleansing.rate = 10f;
-        cleansing.radius = 1;
-        e.add(cleansing);
+        Cleanser cleanser = this.engine.createComponent(Cleanser.class);
+        cleanser.carbonCost = 1;
+        cleanser.mineralCost = 1;
+        cleanser.rate = 10f;
+        cleanser.radius = 1;
+        e.add(cleanser);
 
         return e;
     }
@@ -261,7 +261,7 @@ public class EntityBuilder {
 
 	public Entity createGreen(int q, int r, int level){
 		//render lower than mountains
-		Entity green = this.createRenderable(q, r, 1, 0, TilePosition.GREEN, "greenS" + level +".png");
+		Entity green = this.createRenderable(q, r, 1, 0, TilePosition.SURFACE_ENTITY, "greenS" + level +".png");
 		NutrientCapacity nutrientCapacity = this.engine.createComponent(NutrientCapacity.class);
 		Nutrients nutrients = this.engine.createComponent(Nutrients.class);
 		Health health = this.engine.createComponent(Health.class);
@@ -283,7 +283,7 @@ public class EntityBuilder {
 
 	public Entity createWaveEmitter(int q, int r, RegionType hazardType, int cleanseRequirement, int maxSpreadRadius, int pulseIntervalTicks){
 		//render below mountains (L2), on surface depth
-		Entity factory = this.createRenderable(q, r, 1, 0, TilePosition.GREEN, "factory.png");
+		Entity factory = this.createRenderable(q, r, 1, 0, TilePosition.SURFACE_ENTITY, "factory.png");
 		FactoryEmitter emitter = this.engine.createComponent(FactoryEmitter.class);
 
 		emitter.cleanseRequirement = cleanseRequirement;

@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 
+import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Cultivator;
@@ -59,22 +60,22 @@ public class CultivationSystem extends IntervalIteratingSystem {
                     if (Mappers.regionCMap.get(surfaceNode).regionType != RegionType.RESTORED) continue;
 
                     //check for surface greenery
-                    Entity greenNode = Map.instance().getEntityAt(
+                    Entity terrainNode = Map.instance().getEntityAt(
                         q,
                         r,
-                        TilePosition.GREEN);
+                        TilePosition.SURFACE_ENTITY);
                     //if none, make one
-                    if (greenNode == null){
+                    if (terrainNode == null){
                         nutrients.mineralDelta -= (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
                         totalMineralOutput -= (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
                         Entity newGreenNode = EntityBuilder.instance().createGreen(q, r, 1);
 
-                        Map.instance().setEntityAt(q, r, newGreenNode, TilePosition.GREEN);
+                        Map.instance().setEntityAt(q, r, newGreenNode, TilePosition.SURFACE_ENTITY);
                         EntityBuilder.instance().addToEngine(newGreenNode);
                     }
-                    else{
-                        Nutrients greenNutrients = Mappers.nutrientsCMap.get(greenNode);
-                        NutrientCapacity greenNutrientCapacity = Mappers.nutrientCapacityCMap.get(greenNode);
+                    else if(Mappers.greenCMap.get(terrainNode)!=null){
+                        Nutrients greenNutrients = Mappers.nutrientsCMap.get(terrainNode);
+                        NutrientCapacity greenNutrientCapacity = Mappers.nutrientCapacityCMap.get(terrainNode);
                         int trueMineralAmount = greenNutrients.mineralDelta + greenNutrients.minerals;
                         int mineralRoom = Math.max(0, greenNutrientCapacity.mineralCapacity - trueMineralAmount);
 
@@ -90,14 +91,14 @@ public class CultivationSystem extends IntervalIteratingSystem {
                         position.r, 
                         1,
                         "-" + totalMineralOutput + "M", 
-                        Color.RED,
+                        ColorSettings.MINERAL_LOSSES.color,
                         true
                     );
                 }
             }
         }
         catch(Exception e){
-            System.out.println("CleansingError: " + e.getMessage());
+            System.out.println("CleanserError: " + e.getMessage());
         }
         finally{
             this.processingArray.clear();

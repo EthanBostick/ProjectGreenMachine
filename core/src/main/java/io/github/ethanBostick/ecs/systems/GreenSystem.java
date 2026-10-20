@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 
+import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Cultivator;
@@ -73,7 +74,7 @@ public class GreenSystem extends IntervalIteratingSystem {
             usableMinerals = nutrients.minerals + Math.min(0, nutrients.mineralDelta);
 
             //downgrade & reset
-            if (health.health <= 0 && withering){
+            if (health.health <= 0){
                 levelThreshold.mineralCapacity = Math.max(0,levelThreshold.mineralCapacity - this.getLevelThresh(level.density));
                 level.density --;
                 if(level.density == 0){
@@ -129,7 +130,7 @@ public class GreenSystem extends IntervalIteratingSystem {
                             position.r, 
                             1,
                             "+" + finalOutput + "C", 
-                            Color.GREEN,
+                            ColorSettings.CARBON_GAINS.color,
                             true
                         );
                     }
@@ -137,7 +138,7 @@ public class GreenSystem extends IntervalIteratingSystem {
             }
         }
         catch(Exception e){
-            System.out.println("CleansingError: " + e.getMessage());
+            System.out.println("CleanserError: " + e.getMessage());
         }
         finally{
             this.processingArray.clear();

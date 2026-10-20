@@ -3,13 +3,13 @@ package io.github.ethanBostick.ecs.components;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.ashley.core.Component;
 
-public class Cleansing implements Component, Poolable{
+public class Cleanser implements Component, Poolable{
     public int radius = 0;
     public int mineralCost = 1;
     public int carbonCost = 1; //per tick
     public float rate = 1f; //cleanse progress per tick
 
-    public Cleansing(){}
+    public Cleanser(){}
     
 	@Override
 	public void reset(){

@@ -5,10 +5,14 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.utils.IntArray;
 
+import io.github.ethanBostick.core.ColorSettings;
+import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Dead;
+import io.github.ethanBostick.ecs.components.Health;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
+import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.ToxicWave;
@@ -16,6 +20,7 @@ import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.HexUtils;
+import io.github.ethanBostick.utils.TextureUtils;
 
 public class ToxicWaveSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
@@ -35,7 +40,7 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
             int targetR = r + dir[1];
             Entity neighbor = Map.instance().getEntityAt(targetQ, targetR, TilePosition.MYCELIUM);
             if(neighbor == null) continue;
-            if(Mappers.cleansingCMap.get(neighbor) == null) continue;
+            if(Mappers.cleanserCMap.get(neighbor) == null) continue;
             else return true;
         } 
         return false;
@@ -69,15 +74,69 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
         return false;
     }
 
+    private void updateRegionConditionSprite(Entity surfaceTile, Region region){
+        if (region.condition >= 100){
+            region.condition = 100;
+            region.regionType = RegionType.RESTORED;
+            Mappers.spriteCMap.get(surfaceTile).texture = TextureUtils.pathToTexture("restoredTile.png");
+        }
+        //tile sprite updates
+        else if(region.condition >= 75){
+            Mappers.spriteCMap.get(surfaceTile).texture = TextureUtils.pathToTexture(region.regionType.name+"TileR3.png");
+        }
+        else if(region.condition >= 50){
+            Mappers.spriteCMap.get(surfaceTile).texture = TextureUtils.pathToTexture(region.regionType.name+"TileR2.png");
+        }
+        else if(region.condition >= 25){
+            Mappers.spriteCMap.get(surfaceTile).texture = TextureUtils.pathToTexture(region.regionType.name+"TileR1.png");
+        }
+        else{
+            Mappers.spriteCMap.get(surfaceTile).texture = TextureUtils.pathToTexture(region.regionType.name+"Tile.png");
+        }
+    }
+
     private boolean applySludgeDamage(int q, int r, Entity surfaceTile, Region region, RegionType hazardType){
 
         //harm env
         if(region.regionType == RegionType.RESTORED){
+            Entity surfaceEntity = Map.instance().getEntityAt(q, r, TilePosition.SURFACE_ENTITY);
 
+            if(surfaceEntity != null && Mappers.greenCMap.get(surfaceEntity) != null){
+                Health greenHealth = Mappers.healthCMap.get(surfaceEntity);
+                Nutrients greenNutrients = Mappers.nutrientsCMap.get(surfaceEntity);
+                int availableHealthLoss = Math.max(0, greenHealth.health-(int)CommonValues.TOXIC_WAVE_DMG.value);
+
+                int availableMinerals = Math.max(0, greenNutrients.minerals + greenNutrients.mineralDelta); //gets the true headroom of minerals including positive or negative deltas
+                int mineralLeach = Math.min(availableMinerals, (int)CommonValues.TOXIC_WAVE_NUTRIENT_LEACH.value);
+
+                int availableCarbons = Math.max(0, greenNutrients.carbons + greenNutrients.carbonDelta);
+                int carbonLeach = Math.min(availableCarbons, (int)CommonValues.TOXIC_WAVE_NUTRIENT_LEACH.value);
+
+                greenHealth.health -= availableHealthLoss;
+                greenNutrients.mineralDelta -= mineralLeach;
+                greenNutrients.carbonDelta -= carbonLeach;
+
+                //display values
+                if (availableHealthLoss > 0) {
+                    EntityBuilder.instance().createFloatingText(q, r, 0, "-" + availableHealthLoss + "H", ColorSettings.HEALTH_LOSSES.color, true);
+                }
+                if (carbonLeach > 0) {
+                    EntityBuilder.instance().createFloatingText(q, r, 0, "-" + carbonLeach + "C", ColorSettings.CARBON_LOSSES.color, true);
+                }
+                if (mineralLeach > 0) {
+                    EntityBuilder.instance().createFloatingText( q, r, 0, "-" + mineralLeach + "M", ColorSettings.MINERAL_LOSSES.color, true);
+                }
+            }
+            else{
+                region.regionType = hazardType;
+                region.condition = Math.max(0, region.condition-25);
+                this.updateRegionConditionSprite(surfaceTile, region);
+            }
         }
-        //simply region conversion
+        //region is already corrupt 
         else{
-            region.regionType = hazardType;
+            region.condition = Math.max(0, region.condition-25);
+            this.updateRegionConditionSprite(surfaceTile, region);
         }
 
         return true;
@@ -142,8 +201,8 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
                     //     continue;
                     // }
 
-                    // 5. UNBLOCKED: Apply toxic damage to greenery & surface
-                    // applySludgeDamage(nq, nr, surface, region);
+                    //unblocked
+                    applySludgeDamage(nq, nr, surface, region, wave.hazardType);
 
                     //propogate wave
                     nextToxicWavefront.add(nq);
