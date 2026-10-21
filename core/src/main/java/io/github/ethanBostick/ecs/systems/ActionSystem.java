@@ -69,6 +69,9 @@ public class ActionSystem extends IteratingSystem{
 
         // deploy Runners
 
+        //only allow on underground depth
+        int playerDepth = Mappers.depthCMap.get(Registry.player).depth;
+        if(playerDepth == 0) return;
         if (mouseDragPosition.points.size < 4) return;
         int startQ = mouseDragPosition.points.get(0);
         int startR = mouseDragPosition.points.get(1);
@@ -108,6 +111,11 @@ public class ActionSystem extends IteratingSystem{
         BuildType targetBuild = activeTool.buildTarget;
 
         if (targetBuild == null) return;
+
+        //only build on active depth
+        int playerDepth = Mappers.depthCMap.get(Registry.player).depth;
+        if(playerDepth == 0 && targetBuild.surfaceSpritePath == null) return;
+
 
         int carbonCost = targetBuild.carbonCost;
         int mineralCost = targetBuild.mineralCost;
