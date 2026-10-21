@@ -149,7 +149,7 @@ public class Map{
 				} else if (duelGrid[0][index] == RegionType.MOUNTAIN.tempValue()){
 					tilePng = "mountainTile.png";
 					name = "mountainTile";
-					renderLayer = 2;
+					renderLayer = 3;
 					bType = RegionType.MOUNTAIN;						
 				} else if (duelGrid[0][index] == RegionType.RESTORED.tempValue()){
 					tilePng = "restoredTile.png";
@@ -158,7 +158,7 @@ public class Map{
 				} else{
 					tilePng = "mountainTile.png";
 					name = "mountainTile";
-					renderLayer = 2;
+					renderLayer = 3;
 					bType = RegionType.MOUNTAIN;						
 				}
 

@@ -2,10 +2,12 @@ package io.github.ethanBostick.ecs.systems;
 
 import com.badlogic.ashley.systems.IteratingSystem;
 
+import io.github.ethanBostick.ecs.components.Child;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.map.Map;
+import io.github.ethanBostick.map.TilePosition;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;

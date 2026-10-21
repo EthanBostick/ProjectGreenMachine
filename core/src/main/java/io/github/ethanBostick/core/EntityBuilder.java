@@ -28,6 +28,7 @@ import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.Nutrients;
+import io.github.ethanBostick.ecs.components.Child;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.PriorityRole;
 import io.github.ethanBostick.ecs.components.Reclaim;
@@ -159,11 +160,15 @@ public class EntityBuilder {
 
         NutrientFlow flow = e.getComponent(NutrientFlow.class);
 		Cultivator cultivatorComp = this.engine.createComponent(Cultivator.class);
+		Child child = this.engine.createComponent(Child.class);
+		Entity surfaceNode = createRenderable(q, r, 2, 0, TilePosition.SURFACE_MYCELIUM, "cleanserSurface.png");
 
 		flow.mineralRole = PriorityRole.UPKEEP;
 		flow.carbonRole = PriorityRole.UPKEEP;
 		cultivatorComp.radius = 1;
+		child.child = surfaceNode;
 
+		e.add(child);
 		e.add(cultivatorComp);
 
         return e;
@@ -183,6 +188,12 @@ public class EntityBuilder {
         cleanser.mineralCost = 1;
         cleanser.rate = 10f;
         cleanser.radius = 1;
+
+		Child child = this.engine.createComponent(Child.class);
+		Entity surfaceNode = createRenderable(q, r, 2, 0, TilePosition.SURFACE_MYCELIUM, "cleanserSurface.png");
+		child.child = surfaceNode;
+
+		e.add(child);
         e.add(cleanser);
 
         return e;
@@ -220,6 +231,11 @@ public class EntityBuilder {
 		return runner;
 	}
 
+	public Entity createVisableSurfaceNode(int q, int r, String texturePath){
+		Entity node = this.createRenderable(q, r, 1, 0, TilePosition.SURFACE_MYCELIUM, texturePath);
+		return node;
+	}
+
 	public Entity createBuild(BuildType buildType, int q, int r, int carbonCost, int mineralCost){
 		Entity build = this.engine.createEntity();
 		Position position = this.engine.createComponent(Position.class);
@@ -247,6 +263,14 @@ public class EntityBuilder {
 
 		buildTarget.buildType = buildType;
 		sprite.texture = TextureUtils.pathToTexture(buildType.spritePath);
+
+		//has surface connection
+		if(buildType.surfaceSpritePath != null){
+			Child child = this.engine.createComponent(Child.class);
+			Entity surfaceNode = createRenderable(q, r, 2, 0, TilePosition.SURFACE_MYCELIUM, buildType.surfaceSpritePath);
+			child.child = surfaceNode;
+			build.add(child);
+		}
 		
 		build.add(depth);
 		build.add(nutrients);

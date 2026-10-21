@@ -9,6 +9,7 @@ import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
+import io.github.ethanBostick.ecs.components.Child;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
@@ -25,24 +26,41 @@ public class BuildSystem extends IntervalIteratingSystem{
         this.interval = interval;
     }
 
-    private Entity createTargetBuild(BuildType target, Position p){
+    private void createTargetBuild(BuildType target, Position p){
+        Entity creation = null;
+
         switch (target){
             case MYCELIUM_D1:
-                return EntityBuilder.instance().createMycelium(p.q, p.r, 1, 0, 0,target.carbonCost/2,target.mineralCost/2);
+                creation = EntityBuilder.instance().createMycelium(p.q, p.r, 1, 0, 0,target.carbonCost/2,target.mineralCost/2);
+                break;
             case MYCELIUM_D2:
-                return EntityBuilder.instance().createMycelium(p.q, p.r, 2, 0, 0,target.carbonCost,target.mineralCost);
+                creation = EntityBuilder.instance().createMycelium(p.q, p.r, 2, 0, 0,target.carbonCost,target.mineralCost);
+                break;
             case MYCELIUM_D3:
-                return EntityBuilder.instance().createMycelium(p.q, p.r, 3, 0, 0,(target.carbonCost*3)/2,(target.mineralCost*3)/2);
+                creation = EntityBuilder.instance().createMycelium(p.q, p.r, 3, 0, 0,(target.carbonCost*3)/2,(target.mineralCost*3)/2);
+                break;
             case EXTRACTOR:
-                return EntityBuilder.instance().createMyceliumExtractor(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
+                creation = EntityBuilder.instance().createMyceliumExtractor(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
+                break;
             case CLEANSER:
-                return EntityBuilder.instance().createMyceliumCleanser(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
+                creation = EntityBuilder.instance().createMyceliumCleanser(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
+                break;
             case CULTIVATOR:
-                return EntityBuilder.instance().createMyceliumCultivator(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
+                creation = EntityBuilder.instance().createMyceliumCultivator(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
+                break;
             case STORAGE:
-                return EntityBuilder.instance().createMyceliumStorage(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
+                creation = EntityBuilder.instance().createMyceliumStorage(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
+                break;
         }
-        return null;
+
+        Map.instance().setEntityAt(p.q, p.r, creation, TilePosition.MYCELIUM);
+        EntityBuilder.instance().addToEngine(creation);
+
+        Child child = Mappers.childCMap.get(creation);
+        if(child != null){
+            Map.instance().setEntityAt(p.q, p.r, child.child, TilePosition.SURFACE_MYCELIUM);
+            EntityBuilder.instance().addToEngine(child.child);
+        }
     }
 
     @Override
@@ -56,9 +74,7 @@ public class BuildSystem extends IntervalIteratingSystem{
 
         if(currentProgress.carbons == nutrientsNeeded.carbonCapacity &&
         currentProgress.minerals == nutrientsNeeded.mineralCapacity){
-            Entity creation = this.createTargetBuild(targetBuild.buildType, position);
-            Map.instance().setEntityAt(position.q, position.r, creation, TilePosition.MYCELIUM);
-            EntityBuilder.instance().addToEngine(creation);
+            this.createTargetBuild(targetBuild.buildType, position);
             currentProgress.carbons -= nutrientsNeeded.carbonCapacity;
             currentProgress.minerals -= nutrientsNeeded.mineralCapacity;
             //schedule for reclaim

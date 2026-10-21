@@ -3,7 +3,6 @@ package io.github.ethanBostick.ecs.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.graphics.Color;
 
 import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.EntityBuilder;
@@ -11,6 +10,7 @@ import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
+import io.github.ethanBostick.ecs.components.Child;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Reclaim;
 import io.github.ethanBostick.map.Map;
@@ -103,6 +103,10 @@ public class ReclaimSystem extends IteratingSystem {
             System.out.println("ReclaimError: " + e.getMessage());
         }
         finally{
+            Child child = Mappers.childCMap.get(entity);
+            if(child != null){
+                EntityBuilder.instance().dead(child.child);
+            }
             EntityBuilder.instance().dead(entity);
         }
     }

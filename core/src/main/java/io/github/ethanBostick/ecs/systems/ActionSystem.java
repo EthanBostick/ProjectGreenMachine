@@ -10,6 +10,7 @@ import io.github.ethanBostick.ecs.components.BuildType;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
+import io.github.ethanBostick.ecs.components.Child;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.ecs.components.Sprite;
@@ -119,20 +120,32 @@ public class ActionSystem extends IteratingSystem{
                 return;
             }
 
+            //check for atleast one mycelium neighbor
             if(selectedTile != null && neighboringMycelium(mousePosition)){
                 Entity newBuild = EntityBuilder.instance().createBuild(targetBuild,mousePosition.q,mousePosition.r,carbonCost,mineralCost);
                 EntityBuilder.instance().addToEngine(newBuild);
                 Map.instance().setEntityAt(mousePosition.q, mousePosition.r, newBuild, TilePosition.MYCELIUM);       
 
+                //add surface connection if it exists
+                Child child = Mappers.childCMap.get(newBuild);
+                if(child != null){
+                    Map.instance().setEntityAt(mousePosition.q, mousePosition.r, child.child, TilePosition.SURFACE_MYCELIUM);
+                    EntityBuilder.instance().addToEngine(child.child);
+                }
                 //clear old mycelium
                 EntityBuilder.instance().reclaim(selectedTile);
             }
-            //check for atleast one mycelium neighbor
             else if (neighboringMycelium(mousePosition)){
                 Entity newBuild = EntityBuilder.instance().createBuild(targetBuild,mousePosition.q,mousePosition.r,carbonCost,mineralCost);
                 EntityBuilder.instance().addToEngine(newBuild);
-                //add to map so none may build there
                 Map.instance().setEntityAt(mousePosition.q, mousePosition.r, newBuild, TilePosition.MYCELIUM);       
+
+                //add surface connection if it exists
+                Child child = Mappers.childCMap.get(newBuild);
+                if(child != null){
+                    Map.instance().setEntityAt(mousePosition.q, mousePosition.r, child.child, TilePosition.SURFACE_MYCELIUM);
+                    EntityBuilder.instance().addToEngine(child.child);
+                }
             }
         }
     }
