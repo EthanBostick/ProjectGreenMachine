@@ -203,7 +203,7 @@ public class Map{
 					if(factoryRoll < 0.005){ //about 0.5% chance a tile thats not a mountain has a factory on it
 						//hazard type is inherited from tile region type
 						float pulseDeviation = (float)(10 * Map.instance().random.nextGaussian());
-						int pulseRate = 20 + (int)pulseDeviation;
+						int pulseRate = 30 + (int)pulseDeviation;
 
 						Entity factory = this.entityBuilder.createWaveEmitter(q, r,bType, 100, 7, pulseRate);
 						this.entityBuilder.addToEngine(factory);

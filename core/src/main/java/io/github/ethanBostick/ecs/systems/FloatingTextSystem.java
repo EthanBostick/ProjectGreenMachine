@@ -36,8 +36,9 @@ public class FloatingTextSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         Depth depth = Mappers.depthCMap.get(entity);
-        if(depth != null && depth.depth != Mappers.depthCMap.get(Registry.player).depth){
-            return;
+        int displayDepth = -1;
+        if(depth != null){
+            displayDepth = depth.depth;
         }
 
         FloatingText ft = Mappers.floatingTextCMap.get(entity);
@@ -48,14 +49,16 @@ public class FloatingTextSystem extends IteratingSystem {
             return;
         }
 
-        // 1. Float upward smoothly at 60 FPS
+        //Float upward smoothly at 60 FPS
         ft.worldY += ft.velocityY * deltaTime;
 
-        // 2. Fade alpha out over the second half of its life
+        //Fade alpha out over the second half of its life
         float progress = ft.elapsed / ft.duration;
         float alpha = (progress > 0.5f) ? 1f - ((progress - 0.5f) * 2f) : 1f;
 
-        font.setColor(ft.color.r, ft.color.g, ft.color.b, alpha);
-        font.draw(batch, ft.text, ft.worldX, ft.worldY);
+        if((displayDepth == Mappers.depthCMap.get(Registry.player).depth) || displayDepth == -1){
+            font.setColor(ft.color.r, ft.color.g, ft.color.b, alpha);
+            font.draw(batch, ft.text, ft.worldX, ft.worldY);
+        }
     }
 }

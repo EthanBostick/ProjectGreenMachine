@@ -5,6 +5,7 @@ public enum CommonValues {
     TICK_SPEED(0.25f),
     //DELTA_WINDOW_SIZE(30f), //unused, prev for calculating mineral and carbon gains over window size
     SIGHT_RADIUS(3f),
+    FACTORY_CLEANSE_MINERAL_THROUGHPUT_PER_TICK(1f),
     DEGENERATION_CARBON_PER_TICK(0.025f),
     DEGENERATION_HEALTH_PER_TICK(5f),
     DEGENERATION_MINERAL_PER_TICK(0f),

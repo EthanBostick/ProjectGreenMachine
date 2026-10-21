@@ -115,6 +115,7 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
         if(region.regionType == RegionType.RESTORED){
             Entity surfaceEntity = Map.instance().getEntityAt(q, r, TilePosition.SURFACE_ENTITY);
 
+            //plant and region check
             if(surfaceEntity != null && Mappers.greenCMap.get(surfaceEntity) != null){
                 Health greenHealth = Mappers.healthCMap.get(surfaceEntity);
                 Nutrients greenNutrients = Mappers.nutrientsCMap.get(surfaceEntity);
@@ -146,11 +147,41 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
                 region.condition = Math.max(0, region.condition-25);
                 this.updateRegionConditionSprite(surfaceTile, region);
             }
+
         }
-        //region is already corrupt 
         else{
             region.condition = Math.max(0, region.condition-25);
             this.updateRegionConditionSprite(surfaceTile, region);
+        }
+
+        //surface mycelium check
+        Entity surfaceMycelium = Map.instance().getEntityAt(q, r, TilePosition.SURFACE_MYCELIUM);
+        Entity underMycelium = Map.instance().getEntityAt(q, r, TilePosition.MYCELIUM);
+        if(surfaceMycelium != null && underMycelium != null){
+            Health myceliumHealth = Mappers.healthCMap.get(underMycelium);
+            Nutrients myceliumNutrients = Mappers.nutrientsCMap.get(underMycelium);
+            int availableHealthLoss = Math.max(0, myceliumHealth.health-(int)CommonValues.TOXIC_WAVE_DMG.value);
+
+            int availableMinerals = myceliumNutrients.minerals + Math.min(0, myceliumNutrients.mineralDelta);                 
+            int mineralLeach = Math.min(availableMinerals, (int)CommonValues.TOXIC_WAVE_NUTRIENT_LEACH.value);
+
+            int availableCarbons = myceliumNutrients.carbons + Math.min(0, myceliumNutrients.carbonDelta);
+            int carbonLeach = Math.min(availableCarbons, (int)CommonValues.TOXIC_WAVE_NUTRIENT_LEACH.value);
+
+            myceliumHealth.health -= availableHealthLoss;
+            myceliumNutrients.mineralDelta -= mineralLeach;
+            myceliumNutrients.carbonDelta -= carbonLeach;
+
+            //display values
+            if (availableHealthLoss > 0) {
+                EntityBuilder.instance().createFloatingText(q, r, -1, "-" + availableHealthLoss + "H", ColorSettings.HEALTH_LOSSES.color, true);
+            }
+            if (carbonLeach > 0) {
+                EntityBuilder.instance().createFloatingText(q, r, -1, "-" + carbonLeach + "C", ColorSettings.CARBON_LOSSES.color, true);
+            }
+            if (mineralLeach > 0) {
+                EntityBuilder.instance().createFloatingText( q, r, -1, "-" + mineralLeach + "M", ColorSettings.MINERAL_LOSSES.color, true);
+            }
         }
 
         return true;

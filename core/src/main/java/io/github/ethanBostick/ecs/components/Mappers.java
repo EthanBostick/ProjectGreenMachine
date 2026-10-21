@@ -32,4 +32,5 @@ public class Mappers {
     public static final ComponentMapper<FactoryEmitter> factoryEmitterCMap = ComponentMapper.getFor(FactoryEmitter.class);
     public static final ComponentMapper<ToxicWave> toxicWaveCMap = ComponentMapper.getFor(ToxicWave.class);
     public static final ComponentMapper<Child> childCMap = ComponentMapper.getFor(Child.class);
+    public static final ComponentMapper<MutagenMass> mutagenMassCMap = ComponentMapper.getFor(MutagenMass.class);
 }

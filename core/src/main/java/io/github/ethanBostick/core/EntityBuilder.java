@@ -24,6 +24,7 @@ import io.github.ethanBostick.ecs.components.Health;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
 import io.github.ethanBostick.ecs.components.MultiTileSprite;
+import io.github.ethanBostick.ecs.components.MutagenMass;
 import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
@@ -309,13 +310,17 @@ public class EntityBuilder {
 		//render below mountains (L2), on surface depth
 		Entity factory = this.createRenderable(q, r, 1, 0, TilePosition.SURFACE_ENTITY, "factory.png");
 		FactoryEmitter emitter = this.engine.createComponent(FactoryEmitter.class);
+		MutagenMass mMass = this.engine.createComponent(MutagenMass.class);
 
+		mMass.amount = 100;
 		emitter.cleanseRequirement = cleanseRequirement;
 		emitter.maxSpreadRadius = maxSpreadRadius;
 		emitter.pulseIntervalTicks = pulseIntervalTicks;
 		emitter.hazardType = hazardType;
 
+		factory.add(mMass);
 		factory.add(emitter);
+
 		return factory;
 	}
 
@@ -412,8 +417,10 @@ public class EntityBuilder {
 		ActiveTool tool = this.engine.createComponent(ActiveTool.class);
 		Nutrients nutrients = this.engine.createComponent(Nutrients.class);
 		NutrientCapacity maxNutrients = this.engine.createComponent(NutrientCapacity.class);
+		MutagenMass mMass = this.engine.createComponent(MutagenMass.class);
 		Entity entity = this.engine.createEntity();
 
+		entity.add(mMass);
 		entity.add(maxNutrients);
 		entity.add(nutrients);
 		entity.add(tool);

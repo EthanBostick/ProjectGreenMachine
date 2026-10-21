@@ -19,6 +19,7 @@ import io.github.ethanBostick.core.OverlayMap;
 import io.github.ethanBostick.ecs.components.BuildType;
 import io.github.ethanBostick.ecs.components.Direction;
 import io.github.ethanBostick.ecs.components.Mappers;
+import io.github.ethanBostick.ecs.components.MutagenMass;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.Position;
@@ -42,12 +43,14 @@ public class GameHUD implements Observer {
     // Player / Network References
     private final Nutrients networkNutrients;
     private final NutrientCapacity networkCap;
+    private final MutagenMass networkMutagens;
 
     // Panels
     private Table networkPanel;
     private Table infoPanel;
 
     // Network Labels
+    private Label networkMutagensLabel;
     private Label networkCarbonLabel;
     private Label networkMineralLabel;
 
@@ -68,6 +71,7 @@ public class GameHUD implements Observer {
 
         this.networkNutrients = Mappers.nutrientsCMap.get(Registry.player);
         this.networkCap = Mappers.nutrientCapacityCMap.get(Registry.player);
+        this.networkMutagens = Mappers.mutagenMassCMap.get(Registry.player);
 
         buildUI();
     }
@@ -109,6 +113,7 @@ public class GameHUD implements Observer {
         Table panel = createStyledPanel();
         networkCarbonLabel = addLabelRow(panel, "Network Carbon: 0/0");
         networkMineralLabel = addLabelRow(panel, "Network Mineral: 0/0");
+        networkMutagensLabel = addLabelRow(panel, "Mutagen Mass: 0");
         return panel;
     }
 
@@ -248,6 +253,10 @@ public class GameHUD implements Observer {
     }
 
     private void updateNetworkPanel() {
+        if (networkMutagensLabel != null){
+            networkMutagensLabel.setText("Mutagen Mass: " + networkMutagens.amount);
+        }
+
         if (networkNutrients == null) return;
 
         if (networkCap != null) {
