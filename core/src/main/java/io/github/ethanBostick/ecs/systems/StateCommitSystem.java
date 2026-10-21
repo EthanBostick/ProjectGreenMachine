@@ -61,8 +61,8 @@ public class StateCommitSystem extends IntervalIteratingSystem {
                 );
             }
             else{
-                nutrients.carbons += nutrients.carbonDelta;
-                nutrients.minerals += nutrients.mineralDelta;
+                nutrients.carbons = Math.max(0,nutrients.carbons+nutrients.carbonDelta);
+                nutrients.minerals = Math.max(0,nutrients.minerals+nutrients.mineralDelta);
             }
 
             //check if its part of the network and update player metrics

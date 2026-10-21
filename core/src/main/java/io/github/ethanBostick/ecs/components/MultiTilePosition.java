@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.ashley.core.Component;
 
 public class MultiTilePosition implements Component, Poolable{
-    public IntArray points = new IntArray();
+    public IntArray points;
     public int layer = 0;
 
     public MultiTilePosition(){}

@@ -1,9 +1,12 @@
 package io.github.ethanBostick.ecs.systems;
 
+import io.github.ethanBostick.ecs.components.Dead;
+import io.github.ethanBostick.ecs.components.Depth;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
 import io.github.ethanBostick.ecs.components.MultiTileSprite;
 import io.github.ethanBostick.ecs.components.Registry;
+import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.utils.HexUtils;
 
 import java.util.Comparator;
@@ -23,15 +26,16 @@ public class MultiRenderSystem extends SortedIteratingSystem{
         @Override
         public int compare(Entity e1, Entity e2) {
             //invert the layer values so lowest renders first
-            int layer1 = -Mappers.positionCMap.get(e1).layer;
-            int layer2 = -Mappers.positionCMap.get(e2).layer;
+            int layer1 = -Mappers.multiTilePositionCMap.get(e1).layer;
+            int layer2 = -Mappers.multiTilePositionCMap.get(e2).layer;
             
             return Integer.compare(layer2, layer1);
         }
     }
 
     public MultiRenderSystem(int priority) {
-        super(Family.all(MultiTileSprite.class,MultiTilePosition.class).get(), new LayerComparator(),priority);
+        super(Family.all(MultiTileSprite.class, MultiTilePosition.class)
+            .exclude(Dead.class).get(), new LayerComparator(),priority);
         this.batch = Registry.spriteBatch;
         this.camera = Registry.camera;
     }
@@ -58,20 +62,33 @@ public class MultiRenderSystem extends SortedIteratingSystem{
         MultiTileSprite mts = Mappers.multiTileSpriteCMap.get(entity);
         MultiTilePosition mtp = Mappers.multiTilePositionCMap.get(entity);
 
-        if (mts.texture != null){
-            for (int i = 0 ; i < mtp.points.size; i += 2){
+        Depth depth = Mappers.depthCMap.get(entity);
+        if(depth != null && depth.depth != Mappers.depthCMap.get(Registry.player).depth){
+            return;
+        }
 
-                float pixelX = HexUtils.getPixelX(mtp.points.get(i));
-                float pixelY = HexUtils.getPixelY(mtp.points.get(i),mtp.points.get(i+1));
+        for (int i = 0 ; i < mtp.points.size; i += 2){
 
-                // Only draw if the sprite's bounding box intersects the camera's view
-                if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
+            float pixelX = HexUtils.getPixelX(mtp.points.get(i));
+            float pixelY = HexUtils.getPixelY(mtp.points.get(i),mtp.points.get(i+1));
+
+            //map reveal state check
+            if (Map.instance().getRevealState(mtp.points.get(i), mtp.points.get(i+1)) == 0){
+                continue;
+            }
+
+            // Only draw if the sprite's bounding box intersects the camera's view
+            if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
+                if(mts.texture != null){
                     if (i+2 >= mtp.points.size){
                         batch.draw(mts.textureHead, pixelX, pixelY);
                     }
                     else{
                         batch.draw(mts.texture.get(Math.floorDiv(i, 2)), pixelX, pixelY);
                     }
+                }
+                else if (mts.textureHead != null){
+                    batch.draw(mts.textureHead, pixelX, pixelY);
                 }
             }
         }

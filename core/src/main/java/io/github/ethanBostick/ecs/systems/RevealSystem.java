@@ -23,9 +23,9 @@ public class RevealSystem extends IntervalIteratingSystem {
     }
 
     @Override
-    protected void processEntity(Entity cleanser) {
+    protected void processEntity(Entity entity) {
         try{
-            Position position = Mappers.positionCMap.get(cleanser);
+            Position position = Mappers.positionCMap.get(entity);
 
             if(position == null) return;
 

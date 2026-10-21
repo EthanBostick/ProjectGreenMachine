@@ -7,6 +7,7 @@ import java.util.Random;
 import com.badlogic.ashley.core.Entity;
 
 import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Position;
 
 public class Map{
@@ -123,12 +124,10 @@ public class Map{
 			for (int r = Math.max(-this.size, -q - this.size); r <= Math.min(this.size, -q + this.size); r ++){
 				
 				int index = this.getIndex(q, r);
-				double rDouble = this.random.nextDouble();
 
 				Entity tileEntity = null;
 				String tilePng = "hex_template.png";
 				String name = "";
-				String extraPng = null;
 				int renderLayer = 0;
 				RegionType bType = RegionType.BLANK;
 
@@ -148,7 +147,7 @@ public class Map{
 				} else if (duelGrid[0][index] == RegionType.MOUNTAIN.tempValue()){
 					tilePng = "mountainTile.png";
 					name = "mountainTile";
-					renderLayer = 2;
+					renderLayer = 3;
 					bType = RegionType.MOUNTAIN;						
 				} else if (duelGrid[0][index] == RegionType.RESTORED.tempValue()){
 					tilePng = "restoredTile.png";
@@ -157,19 +156,22 @@ public class Map{
 				} else{
 					tilePng = "mountainTile.png";
 					name = "mountainTile";
-					renderLayer = 2;
+					renderLayer = 3;
 					bType = RegionType.MOUNTAIN;						
 				}
 
 				//Put the Entities together and update map
 				tileEntity = entityBuilder.createRenderable(q,r,renderLayer,0,TilePosition.SURFACE, tilePng, name);
 				entityBuilder.addRegion(bType, tileEntity);
+				if(bType == RegionType.RESTORED){
+					Mappers.regionCMap.get(tileEntity).condition = 100;
+				}
 				this.entityBuilder.addToEngine(tileEntity);
 				this.map[index][TilePosition.SURFACE.value()] = tileEntity;
 
 				//underground gen
 				Entity underGroundTileEntity = entityBuilder.createRenderable(q,r,0,1,TilePosition.UNDERGROUND, "dirtTile.png");
-				entityBuilder.addRegion(bType, underGroundTileEntity);
+				//Dont give region to underground tile
 				this.entityBuilder.addToEngine(underGroundTileEntity);
 				this.map[index][TilePosition.UNDERGROUND.value()] = underGroundTileEntity;
 
@@ -192,6 +194,21 @@ public class Map{
 					//commit it to engine and map
 					this.entityBuilder.addToEngine(resourceNode);
 					this.map[index][TilePosition.RESOURCE_NODE.value()] = resourceNode;
+				}
+
+				//factory gen
+				if(bType != RegionType.MOUNTAIN && bType != RegionType.RESTORED){
+					double factoryRoll = this.random.nextDouble();
+
+					if(factoryRoll < 0.005){ //about 0.5% chance a tile thats not a mountain has a factory on it
+						//hazard type is inherited from tile region type
+						float pulseDeviation = (float)(10 * Map.instance().random.nextGaussian());
+						int pulseRate = 30 + (int)pulseDeviation;
+
+						Entity factory = this.entityBuilder.createWaveEmitter(q, r,bType, 100, 7, pulseRate);
+						this.entityBuilder.addToEngine(factory);
+						this.map[index][TilePosition.SURFACE_ENTITY.value()] = factory;
+					}
 				}
 
 				double rockRoll = this.random.nextDouble();

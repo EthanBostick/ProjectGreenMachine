@@ -4,11 +4,13 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
+import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
+import io.github.ethanBostick.ecs.components.Child;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Reclaim;
 import io.github.ethanBostick.map.Map;
@@ -60,7 +62,9 @@ public class ReclaimSystem extends IteratingSystem {
                 for (int[] dir : hexDirections) {
                     if (totalCarbonReclaim <= 0 && totalMineralReclaim <= 0) break;
 
-                    Entity neighbor = Map.instance().getEntityAt(lastPosition.q + dir[0], lastPosition.r + dir[1], TilePosition.MYCELIUM);
+                    int targetQ = lastPosition.q + dir[0];
+                    int targetR = lastPosition.r + dir[1];
+                    Entity neighbor = Map.instance().getEntityAt(targetQ, targetR, TilePosition.MYCELIUM);
                     if (neighbor == null || neighbor == entity) continue;
 
                     Nutrients nNutrients = Mappers.nutrientsCMap.get(neighbor);
@@ -77,6 +81,12 @@ public class ReclaimSystem extends IteratingSystem {
 
                     nNutrients.carbonDelta += cDeposit;
                     nNutrients.mineralDelta += mDeposit;
+                    if (cDeposit > 0) {
+                        EntityBuilder.instance().createFloatingText(targetQ, targetR, 1, "+" + cDeposit + "C", ColorSettings.CARBON_GAINS.color, true);
+                    }
+                    if (mDeposit > 0) {
+                        EntityBuilder.instance().createFloatingText( targetQ, targetR, 1, "+" + mDeposit + "M", ColorSettings.MINERAL_GAINS.color, true);
+                    }
 
                     totalCarbonReclaim -= cDeposit;
                     totalMineralReclaim -= mDeposit;
@@ -93,6 +103,10 @@ public class ReclaimSystem extends IteratingSystem {
             System.out.println("ReclaimError: " + e.getMessage());
         }
         finally{
+            Child child = Mappers.childCMap.get(entity);
+            if(child != null){
+                EntityBuilder.instance().dead(child.child);
+            }
             EntityBuilder.instance().dead(entity);
         }
     }

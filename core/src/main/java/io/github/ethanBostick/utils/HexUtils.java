@@ -90,6 +90,37 @@ public final class HexUtils {
         return output;
     }
 
+    public static IntArray getRing(int centerQ, int centerR, int radius, IntArray output) {
+        output.clear();
+
+        if (radius <= 0) {
+            output.add(centerQ);
+            output.add(centerR);
+            return output;
+        }
+
+        // 1. Start at the Top-Left corner (Direction Index 4 scaled by radius)
+        int q = centerQ + (hexDirections[4][0] * radius);
+        int r = centerR + (hexDirections[4][1] * radius);
+
+        // 2. Walk all 6 sides of the hex ring
+        for (int side = 0; side < 6; side++) {
+            int dirQ = hexDirections[side][0];
+            int dirR = hexDirections[side][1];
+
+            // Each side has exactly 'radius' steps
+            for (int step = 0; step < radius; step++) {
+                output.add(q);
+                output.add(r);
+
+                q += dirQ;
+                r += dirR;
+            }
+        }
+
+        return output;
+    }
+
     public static IntArray getNeighborsPositions(Position p, IntArray output) {
         int q = p.q;
         int r = p.r;

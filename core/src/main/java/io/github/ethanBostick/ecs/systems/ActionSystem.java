@@ -1,6 +1,7 @@
 package io.github.ethanBostick.ecs.systems;
 
 import io.github.ethanBostick.map.Map;
+import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
@@ -10,6 +11,7 @@ import io.github.ethanBostick.ecs.components.BuildType;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
+import io.github.ethanBostick.ecs.components.Child;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.ecs.components.Sprite;
@@ -67,6 +69,9 @@ public class ActionSystem extends IteratingSystem{
 
         // deploy Runners
 
+        //only allow on underground depth
+        int playerDepth = Mappers.depthCMap.get(Registry.player).depth;
+        if(playerDepth == 0) return;
         if (mouseDragPosition.points.size < 4) return;
         int startQ = mouseDragPosition.points.get(0);
         int startR = mouseDragPosition.points.get(1);
@@ -107,6 +112,11 @@ public class ActionSystem extends IteratingSystem{
 
         if (targetBuild == null) return;
 
+        //only build on active depth
+        int playerDepth = Mappers.depthCMap.get(Registry.player).depth;
+        if(playerDepth == 0 && targetBuild.surfaceSpritePath == null) return;
+
+
         int carbonCost = targetBuild.carbonCost;
         int mineralCost = targetBuild.mineralCost;
 
@@ -114,25 +124,42 @@ public class ActionSystem extends IteratingSystem{
 
             Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
             Entity obstacle = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.UNDERGROUND_TERRAIN);
+            Entity surfaceTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.SURFACE);
             //cant build on obstacle
             if(obstacle != null){
                 return;
             }
+            //cannot build on mountain if surface mycelium (for now)
+            if(surfaceTile != null && Mappers.regionCMap.get(surfaceTile).regionType == RegionType.MOUNTAIN && targetBuild.surfaceSpritePath != null){
+                return;
+            }
 
+            //check for atleast one mycelium neighbor
             if(selectedTile != null && neighboringMycelium(mousePosition)){
                 Entity newBuild = EntityBuilder.instance().createBuild(targetBuild,mousePosition.q,mousePosition.r,carbonCost,mineralCost);
                 EntityBuilder.instance().addToEngine(newBuild);
                 Map.instance().setEntityAt(mousePosition.q, mousePosition.r, newBuild, TilePosition.MYCELIUM);       
 
+                //add surface connection if it exists
+                Child child = Mappers.childCMap.get(newBuild);
+                if(child != null){
+                    Map.instance().setEntityAt(mousePosition.q, mousePosition.r, child.child, TilePosition.SURFACE_MYCELIUM);
+                    EntityBuilder.instance().addToEngine(child.child);
+                }
                 //clear old mycelium
                 EntityBuilder.instance().reclaim(selectedTile);
             }
-            //check for atleast one mycelium neighbor
             else if (neighboringMycelium(mousePosition)){
                 Entity newBuild = EntityBuilder.instance().createBuild(targetBuild,mousePosition.q,mousePosition.r,carbonCost,mineralCost);
                 EntityBuilder.instance().addToEngine(newBuild);
-                //add to map so none may build there
                 Map.instance().setEntityAt(mousePosition.q, mousePosition.r, newBuild, TilePosition.MYCELIUM);       
+
+                //add surface connection if it exists
+                Child child = Mappers.childCMap.get(newBuild);
+                if(child != null){
+                    Map.instance().setEntityAt(mousePosition.q, mousePosition.r, child.child, TilePosition.SURFACE_MYCELIUM);
+                    EntityBuilder.instance().addToEngine(child.child);
+                }
             }
         }
     }
@@ -143,11 +170,21 @@ public class ActionSystem extends IteratingSystem{
 
         if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
 
-            Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
-            if(selectedTile != null){
+            int playerDepth = Mappers.depthCMap.get(Registry.player).depth;
+            TilePosition selectPosition = (playerDepth==0)? TilePosition.SURFACE_MYCELIUM : TilePosition.MYCELIUM;
+            Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, selectPosition);
+
+            if(selectedTile != null && selectPosition == TilePosition.MYCELIUM){
                 Map.instance().setEntityAt(mousePosition.q, mousePosition.r, null, TilePosition.MYCELIUM);       
+                Map.instance().setEntityAt(mousePosition.q, mousePosition.r, null, TilePosition.SURFACE_MYCELIUM);       
                 //queue for reclaim nutrients
-                EntityBuilder.instance().reclaim(selectedTile);
+                EntityBuilder.instance().reclaim(selectedTile); //automatically cleans up children
+            }
+            else if(selectedTile != null && selectPosition == TilePosition.SURFACE_MYCELIUM){
+                Entity underTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
+                Map.instance().setEntityAt(mousePosition.q, mousePosition.r, null, TilePosition.MYCELIUM);       
+                Map.instance().setEntityAt(mousePosition.q, mousePosition.r, null, TilePosition.SURFACE_MYCELIUM);       
+                EntityBuilder.instance().reclaim(underTile);
             }
         }
     }

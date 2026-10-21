@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.utils.IntArray;
 
+import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Cultivator;
@@ -44,6 +45,7 @@ public class CultivationSystem extends IntervalIteratingSystem {
 
             //only process if enough minerals to do whole area
             if(usableMinerals >= (int)((this.processingArray.size/2)*CommonValues.CULTIVATE_MINERAL_PER_TILE.value)){
+                int totalMineralOutput = 0;
                 for (int i = 0; i < this.processingArray.size; i += 2) {
                     int q = this.processingArray.get(i);
                     int r = this.processingArray.get(i+1);
@@ -57,33 +59,45 @@ public class CultivationSystem extends IntervalIteratingSystem {
                     if (Mappers.regionCMap.get(surfaceNode).regionType != RegionType.RESTORED) continue;
 
                     //check for surface greenery
-                    Entity greenNode = Map.instance().getEntityAt(
+                    Entity terrainNode = Map.instance().getEntityAt(
                         q,
                         r,
-                        TilePosition.GREEN);
+                        TilePosition.SURFACE_ENTITY);
                     //if none, make one
-                    if (greenNode == null){
+                    if (terrainNode == null){
                         nutrients.mineralDelta -= (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
+                        totalMineralOutput -= (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
                         Entity newGreenNode = EntityBuilder.instance().createGreen(q, r, 1);
 
-                        Map.instance().setEntityAt(q, r, newGreenNode, TilePosition.GREEN);
+                        Map.instance().setEntityAt(q, r, newGreenNode, TilePosition.SURFACE_ENTITY);
                         EntityBuilder.instance().addToEngine(newGreenNode);
                     }
-                    else{
-                        Nutrients greenNutrients = Mappers.nutrientsCMap.get(greenNode);
-                        NutrientCapacity greenNutrientCapacity = Mappers.nutrientCapacityCMap.get(greenNode);
+                    else if(Mappers.greenCMap.get(terrainNode)!=null){
+                        Nutrients greenNutrients = Mappers.nutrientsCMap.get(terrainNode);
+                        NutrientCapacity greenNutrientCapacity = Mappers.nutrientCapacityCMap.get(terrainNode);
                         int trueMineralAmount = greenNutrients.mineralDelta + greenNutrients.minerals;
                         int mineralRoom = Math.max(0, greenNutrientCapacity.mineralCapacity - trueMineralAmount);
 
                         int finalOutput = Math.min((int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value, mineralRoom);
                         nutrients.mineralDelta -= finalOutput;
                         greenNutrients.mineralDelta += finalOutput;
+                        totalMineralOutput += (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
                     }
+                }
+                if (totalMineralOutput > 0) {
+                    EntityBuilder.instance().createFloatingText(
+                        position.q, 
+                        position.r, 
+                        1,
+                        "-" + totalMineralOutput + "M", 
+                        ColorSettings.MINERAL_LOSSES.color,
+                        true
+                    );
                 }
             }
         }
         catch(Exception e){
-            System.out.println("CleansingError: " + e.getMessage());
+            System.out.println("CleanserError: " + e.getMessage());
         }
         finally{
             this.processingArray.clear();

@@ -5,9 +5,9 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.utils.IntArray;
 
+import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
-import io.github.ethanBostick.ecs.components.Cultivator;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Density;
 import io.github.ethanBostick.ecs.components.Green;
@@ -18,7 +18,6 @@ import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.map.Map;
-import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
@@ -59,7 +58,7 @@ public class GreenSystem extends IntervalIteratingSystem {
 
             //if not enough nutrients, degrade
             if(usableMinerals < mineralRate){
-                health.health -= 1*(this.interval/CommonValues.TICK_SPEED.value);
+                health.health -= CommonValues.GREEN_DECAY_HEALTH_PER_TICK.value*(this.interval/CommonValues.TICK_SPEED.value);
                 withering = true;
                 //DD-1
                 //update sprite to withering 
@@ -72,7 +71,7 @@ public class GreenSystem extends IntervalIteratingSystem {
             usableMinerals = nutrients.minerals + Math.min(0, nutrients.mineralDelta);
 
             //downgrade & reset
-            if (health.health <= 0 && withering){
+            if (health.health <= 0){
                 levelThreshold.mineralCapacity = Math.max(0,levelThreshold.mineralCapacity - this.getLevelThresh(level.density));
                 level.density --;
                 if(level.density == 0){
@@ -83,7 +82,7 @@ public class GreenSystem extends IntervalIteratingSystem {
                 }
                 green.carbonOutput = (int)(CommonValues.GREEN_BASE_CARBON_OUTPUT_PER_HEX_PER_TICK.value * level.density);
                 sprite.texture = TextureUtils.pathToTexture("greenS"+level.density+".png");
-                health.health = 50;
+                health.health = 100;
             }
 
         //check for green upgrade & then reset
@@ -92,7 +91,7 @@ public class GreenSystem extends IntervalIteratingSystem {
                 green.carbonOutput = (int)(CommonValues.GREEN_BASE_CARBON_OUTPUT_PER_HEX_PER_TICK.value * level.density);
                 sprite.texture = TextureUtils.pathToTexture("greenS"+level.density+".png");
                 levelThreshold.mineralCapacity += this.getLevelThresh(level.density);
-                health.health = 50;
+                health.health = 100;
             }
         
         //carbon out step
@@ -121,11 +120,22 @@ public class GreenSystem extends IntervalIteratingSystem {
 
                     int finalOutput = Math.min(carbonOutput, carbonRoom);
                     myceliumNutrients.carbonDelta += finalOutput;
+
+                    if (finalOutput > 0) {
+                        EntityBuilder.instance().createFloatingText(
+                            position.q, 
+                            position.r, 
+                            1,
+                            "+" + finalOutput + "C", 
+                            ColorSettings.CARBON_GAINS.color,
+                            true
+                        );
+                    }
                 }
             }
         }
         catch(Exception e){
-            System.out.println("CleansingError: " + e.getMessage());
+            System.out.println("CleanserError: " + e.getMessage());
         }
         finally{
             this.processingArray.clear();

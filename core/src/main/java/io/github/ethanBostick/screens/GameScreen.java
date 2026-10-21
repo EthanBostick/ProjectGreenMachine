@@ -9,7 +9,8 @@ import io.github.ethanBostick.ecs.systems.ActionSystem;
 import io.github.ethanBostick.ecs.systems.BuildSystem;
 import io.github.ethanBostick.ecs.systems.EntityManagementSystem;
 import io.github.ethanBostick.ecs.systems.ExtractionSystem;
-import io.github.ethanBostick.ecs.systems.CleansingSystem;
+import io.github.ethanBostick.ecs.systems.FloatingTextSystem;
+import io.github.ethanBostick.ecs.systems.CleanserSystem;
 import io.github.ethanBostick.ecs.systems.CultivationSystem;
 import io.github.ethanBostick.ecs.systems.DegenerationSystem;
 import io.github.ethanBostick.ecs.systems.FlowGradientSystem;
@@ -19,11 +20,15 @@ import io.github.ethanBostick.ecs.systems.NetworkFlowSystem;
 import io.github.ethanBostick.ecs.systems.NetworkGrowthSystem;
 import io.github.ethanBostick.ecs.systems.PlayerStateSystem;
 import io.github.ethanBostick.ecs.systems.StateCommitSystem;
+import io.github.ethanBostick.ecs.systems.SystemUpdater;
+import io.github.ethanBostick.ecs.systems.ToxicEmitterSystem;
+import io.github.ethanBostick.ecs.systems.ToxicWaveSystem;
 import io.github.ethanBostick.ecs.systems.RenderSystem;
 import io.github.ethanBostick.ecs.systems.RevealSystem;
 import io.github.ethanBostick.ecs.systems.RunnerSystem;
 import io.github.ethanBostick.ecs.systems.VectorRenderSystem;
 import io.github.ethanBostick.ecs.systems.ReclaimSystem;
+import io.github.ethanBostick.ecs.systems.RegionOverlay;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
@@ -55,22 +60,35 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new RunnerSystem(tickRate, 2));
 		this.engine.addSystem(new NetworkGrowthSystem(tickRate*2, 3));
 
-		this.engine.addSystem(new ExtractionSystem(tickRate*2,4));
-		this.engine.addSystem(new CleansingSystem(tickRate*2,5));
-		this.engine.addSystem(new CultivationSystem(tickRate*2, 6));
-		this.engine.addSystem(new DegenerationSystem(tickRate,7));
-		this.engine.addSystem(new GreenSystem(tickRate*2, 8));
-		this.engine.addSystem(new FlowGradientSystem(tickRate,9));
-		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 10));
-		this.engine.addSystem(new StateCommitSystem(tickRate, 11));
-		this.engine.addSystem(new BuildSystem(tickRate,12));
-		this.engine.addSystem(new ReclaimSystem(13));
+		//gradient and routing
+		this.engine.addSystem(new FlowGradientSystem(tickRate,4));
+		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 5));
+		//producers
+		this.engine.addSystem(new ExtractionSystem(tickRate*2,6));
+		this.engine.addSystem(new GreenSystem(tickRate*2, 7));
+		//consumers
+		this.engine.addSystem(new CleanserSystem(tickRate*2,8));
+		this.engine.addSystem(new CultivationSystem(tickRate*2, 9));
+		this.engine.addSystem(new DegenerationSystem(tickRate,10));
 
-		this.engine.addSystem(new RevealSystem(tickRate,96));
-		this.engine.addSystem(new RenderSystem(97));
-		this.engine.addSystem(new MultiRenderSystem(98));
-		this.engine.addSystem(new VectorRenderSystem(99)); //99 so it renders on top
-		this.engine.addSystem(new EntityManagementSystem(engine, 100));
+		this.engine.addSystem(new ToxicEmitterSystem(tickRate, 11));
+		this.engine.addSystem(new ToxicWaveSystem(tickRate*2, 12));
+
+		//commits and final calculations
+		this.engine.addSystem(new BuildSystem(tickRate,13));
+		this.engine.addSystem(new ReclaimSystem(14));
+		this.engine.addSystem(new StateCommitSystem(tickRate, 15));
+
+		this.engine.addSystem(new RevealSystem(tickRate,95));
+		this.engine.addSystem(new RenderSystem(96));
+		this.engine.addSystem(new MultiRenderSystem(97));
+		this.engine.addSystem(new RegionOverlay(98));
+		this.engine.addSystem(new FloatingTextSystem(99));
+		this.engine.addSystem(new VectorRenderSystem(100)); //99 so it renders on top
+		this.engine.addSystem(new EntityManagementSystem(101));
+
+		this.engine.addSystem(new SystemUpdater(0)); //must be added after Overlays
+
 
 		Map map = Map.instance();
 		double[] concentrations = new double[] {

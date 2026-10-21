@@ -33,6 +33,16 @@ public class EventBus{
 		listeners.add(observer);
 	}
 
+	public void unsubscribe(EventType type, Observer observer){
+		Array<Observer> listeners = this.observers.get(type); 
+
+		if (listeners == null){
+			return;
+		}
+
+		listeners.removeValue(observer,true);
+	}
+
 	public void publish(Event event){
 		Array<Observer> listeners = this.observers.get(event.getType()); 
 
@@ -53,6 +63,9 @@ public class EventBus{
 		}
 		else if (event instanceof TileSelectEvent){
 			EventFactory.instance().tileSelectEventPool.free((TileSelectEvent)event);
+		}
+		else if (event instanceof OverlayChangeEvent){
+			EventFactory.instance().overlayChangeEventPool.free((OverlayChangeEvent)event);
 		}
 	}
 }

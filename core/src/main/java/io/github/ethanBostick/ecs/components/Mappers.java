@@ -16,7 +16,7 @@ public class Mappers {
     public static final ComponentMapper<NutrientCapacity> nutrientCapacityCMap = ComponentMapper.getFor(NutrientCapacity.class);
     public static final ComponentMapper<NutrientFlow> nutrientFlowCMap = ComponentMapper.getFor(NutrientFlow.class);
     public static final ComponentMapper<Extraction> extractionCMap = ComponentMapper.getFor(Extraction.class);
-    public static final ComponentMapper<Cleansing> cleansingCMap = ComponentMapper.getFor(Cleansing.class);
+    public static final ComponentMapper<Cleanser> cleanserCMap = ComponentMapper.getFor(Cleanser.class);
     public static final ComponentMapper<Cultivator> cultivatorCMap = ComponentMapper.getFor(Cultivator.class);
     public static final ComponentMapper<Direction> directionCMap = ComponentMapper.getFor(Direction.class);
     public static final ComponentMapper<VectorArrow> VectorArrowCMap = ComponentMapper.getFor(VectorArrow.class);
@@ -28,4 +28,9 @@ public class Mappers {
     public static final ComponentMapper<Name> nameCMap = ComponentMapper.getFor(Name.class);
     public static final ComponentMapper<Resource> resourceCMap = ComponentMapper.getFor(Resource.class);
     public static final ComponentMapper<Green> greenCMap = ComponentMapper.getFor(Green.class);
+    public static final ComponentMapper<FloatingText> floatingTextCMap = ComponentMapper.getFor(FloatingText.class);
+    public static final ComponentMapper<FactoryEmitter> factoryEmitterCMap = ComponentMapper.getFor(FactoryEmitter.class);
+    public static final ComponentMapper<ToxicWave> toxicWaveCMap = ComponentMapper.getFor(ToxicWave.class);
+    public static final ComponentMapper<Child> childCMap = ComponentMapper.getFor(Child.class);
+    public static final ComponentMapper<MutagenMass> mutagenMassCMap = ComponentMapper.getFor(MutagenMass.class);
 }
