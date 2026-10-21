@@ -1,12 +1,16 @@
 package io.github.ethanBostick.ui;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -35,10 +39,14 @@ import io.github.ethanBostick.events.TileSelectEvent;
 import io.github.ethanBostick.events.ToolChangeEvent;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.TilePosition;
+import io.github.ethanBostick.utils.TextureUtils;
 
 public class GameHUD implements Observer {
     public final Stage stage;
     private final Skin uiSkin;
+
+    //overlays
+    private Table adaptationTreeOverlay;
 
     // Player / Network References
     private final Nutrients networkNutrients;
@@ -90,6 +98,7 @@ public class GameHUD implements Observer {
         this.infoPanel = buildInfoPanel();
         Table buildOptions = buildToolBar();
         Table bottomButtons = buildBottomBar();
+        Table menuButtons = buildMenusBar();
 
         // Group top-right telemetry panels into a vertical stack so they align cleanly
         Table rightSidebar = new Table();
@@ -99,7 +108,8 @@ public class GameHUD implements Observer {
 
         // Row 1: Top Left (Overlays) & Top Right (Telemetry Sidebar)
         rootTable.add(overlayOptions).top().left().pad(10);
-        rootTable.add(rightSidebar).expandX().top().right().pad(10);
+        rootTable.add(menuButtons).expandX().top().right().pad(10);
+        rootTable.add(rightSidebar).top().right().pad(10);
         rootTable.row();
 
         // Row 2: Bottom Left (Build Tools) & Bottom Right (Depth Control)
@@ -107,6 +117,10 @@ public class GameHUD implements Observer {
         rootTable.add(bottomButtons).bottom().right().pad(10);
 
         stage.addActor(rootTable);
+
+        //overlays
+        this.adaptationTreeOverlay = buildAdaptationTreeModal();
+        stage.addActor(adaptationTreeOverlay);
     }
 
     private Table buildNetworkPanel() {
@@ -115,6 +129,17 @@ public class GameHUD implements Observer {
         networkMineralLabel = addLabelRow(panel, "Network Mineral: 0/0");
         networkMutagensLabel = addLabelRow(panel, "Mutagen Mass: 0");
         return panel;
+    }
+
+    private Table buildMenusBar() {
+        Table table = new Table();
+        table.defaults().padRight(5); // Automatic spacing
+
+        addActionButton(table, "Adaptations", () -> {
+            this.adaptationTreeOverlay.setVisible(true);
+        });
+
+        return table;
     }
 
     private Table buildInfoPanel() {
@@ -171,6 +196,64 @@ public class GameHUD implements Observer {
         });
 
         return table;
+    }
+
+    private Table buildAdaptationTreeModal() {
+        Table modalOverlay = new Table(uiSkin);
+        modalOverlay.setFillParent(true);
+        modalOverlay.setBackground("default-pane"); // Or a semi-transparent dark tint
+        modalOverlay.setVisible(false); // Hidden by default!
+
+        // Swallow all clicks & scrolls on the backdrop so MapController never sees them
+        modalOverlay.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.enabled);
+        modalOverlay.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true; // Consumes click!
+            }
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
+                return true; 
+            }
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.ESCAPE) {
+                    toggleSkillTree(false);                 
+                }
+                return true;             
+            }
+            @Override
+            public boolean keyUp(InputEvent event, int keycode) {
+                return true;
+            }
+            @Override
+            public boolean keyTyped(InputEvent event, char character) {
+                return true;
+            }
+        });
+
+        // Create the canvas and wrap it in a ScrollPane for click-and-drag panning
+        Texture lineTex = TextureUtils.pathToTexture("dragArrow.png"); // Any 1x1 white PNG or your arrow texture
+        AdaptationTreeCanvas canvas = new AdaptationTreeCanvas(uiSkin, lineTex);
+        ScrollPane scrollPane = new ScrollPane(canvas);
+        scrollPane.setScrollingDisabled(false, false); // Allow X and Y panning
+        scrollPane.setOverscroll(false, false);
+
+        // Header Bar with a Close Button
+        Table header = new Table();
+        header.add(new Label("Mycelium Adaptations", uiSkin)).expandX().left();
+        addActionButton(header, "Close [X]", () -> modalOverlay.setVisible(false));
+
+        // Pack the Header and the ScrollPane into the modal window
+        modalOverlay.add(header).fillX().pad(20).row();
+        modalOverlay.add(scrollPane).expand().fill().pad(20);
+
+        // Center the ScrollPane camera on the root node (1000, 1000) after layout
+        scrollPane.layout();
+        scrollPane.setScrollPercentX(0.5f);
+        scrollPane.setScrollPercentY(0.5f);
+
+        return modalOverlay;
     }
 
     // =========================================================================
@@ -301,6 +384,17 @@ public class GameHUD implements Observer {
             carbonTarget.setText("Carbons: N/A");
             mineralTarget.setText("Minerals: N/A");
         }
+    }
+
+    private void toggleSkillTree(boolean open) {
+        adaptationTreeOverlay.setVisible(open);
+        // if (open) {
+        //     stage.setKeyboardFocus(adaptationTreeOverlay); // Routes key events to modalOverlay!
+        //     //stage.setScrollFocus(adaptationTreeScrollPane); // Routes mouse wheel to ScrollPane!
+        // } else {
+        //     stage.setKeyboardFocus(null);
+        //     //stage.setScrollFocus(null);
+        // }
     }
 
     @Override
