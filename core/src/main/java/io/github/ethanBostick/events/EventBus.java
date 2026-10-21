@@ -33,6 +33,16 @@ public class EventBus{
 		listeners.add(observer);
 	}
 
+	public void unsubscribe(EventType type, Observer observer){
+		Array<Observer> listeners = this.observers.get(type); 
+
+		if (listeners == null){
+			return;
+		}
+
+		listeners.removeValue(observer,true);
+	}
+
 	public void publish(Event event){
 		Array<Observer> listeners = this.observers.get(event.getType()); 
 

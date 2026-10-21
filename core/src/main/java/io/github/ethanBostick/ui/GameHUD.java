@@ -1,28 +1,19 @@
 package io.github.ethanBostick.ui;
 
-
-import com.badlogic.gdx.Gdx;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
-
-import com.badlogic.ashley.core.Entity;
-
-import io.github.ethanBostick.map.Map;
-import io.github.ethanBostick.map.TilePosition;
-import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.Observer;
 import io.github.ethanBostick.core.OverlayMap;
 import io.github.ethanBostick.ecs.components.BuildType;
@@ -31,8 +22,8 @@ import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.Position;
-import io.github.ethanBostick.ecs.components.ToolType;
 import io.github.ethanBostick.ecs.components.Registry;
+import io.github.ethanBostick.ecs.components.ToolType;
 import io.github.ethanBostick.events.DepthChangeEvent;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventBus;
@@ -41,303 +32,287 @@ import io.github.ethanBostick.events.EventType;
 import io.github.ethanBostick.events.OverlayChangeEvent;
 import io.github.ethanBostick.events.TileSelectEvent;
 import io.github.ethanBostick.events.ToolChangeEvent;
-
+import io.github.ethanBostick.map.Map;
+import io.github.ethanBostick.map.TilePosition;
 
 public class GameHUD implements Observer {
-    // private IntArray carbonRateWindow;
-    // private IntArray mineralRateWindow;
+    public final Stage stage;
+    private final Skin uiSkin;
 
-    public Stage stage; 
-    private Skin uiSkin;
-    
-    private final Nutrients networkNutrients; 
-    private final NutrientCapacity networkCap; 
+    // Player / Network References
+    private final Nutrients networkNutrients;
+    private final NutrientCapacity networkCap;
+
+    // Panels
     private Table networkPanel;
+    private Table infoPanel;
 
-    private Label networkMineralLabel;
+    // Network Labels
     private Label networkCarbonLabel;
+    private Label networkMineralLabel;
+
+    // Selected Tile Labels
     private Position selectedTilePosition;
     private Label positionLabel;
-    private Label carbonLabel;
-    private Label mineralLabel;
+    private Label myceliumCarbonLabel;
+    private Label myceliumMineralLabel;
     private Label directionLabel;
-    private Label carbonLabel2;
-    private Label mineralLabel2;
-    private Table infoPanel;
+    private Label nodeCarbonLabel;
+    private Label nodeMineralLabel;
 
     public GameHUD() {
         EventBus.instance().subscribe(EventType.TILE_SELECTED, this);
 
-        // carbonRateWindow = new IntArray(false,(int)CommonValues.DELTA_WINDOW_SIZE.value);
-        // mineralRateWindow = new IntArray(false,(int)CommonValues.DELTA_WINDOW_SIZE.value);
+        this.stage = new Stage(new ExtendViewport(1920, 1080));
+        this.uiSkin = Registry.uiSkin;
 
-        stage = new Stage(new ExtendViewport(1920, 1080));
-        uiSkin = Registry.uiSkin;
-
-        //get network/player permanent refs
         this.networkNutrients = Mappers.nutrientsCMap.get(Registry.player);
         this.networkCap = Mappers.nutrientCapacityCMap.get(Registry.player);
 
-        networkPanel = new Table(uiSkin);
-        networkPanel.setBackground("default-pane"); // Assuming your skin has a background drawable
-        networkPanel.pad(10);
-        networkPanel.setVisible(true);
+        buildUI();
+    }
 
-        networkCarbonLabel = new Label("Network Carbon: 0/0", uiSkin);
-        networkMineralLabel = new Label("Network Mineral 0/0", uiSkin);
+    // =========================================================================
+    // UI Layout Assembly
+    // =========================================================================
 
-        networkPanel.add(networkCarbonLabel).left().row();
-        networkPanel.add(networkMineralLabel).left().row();
-
-
-        // 2. Build the permanent Info Panel
-        infoPanel = new Table(uiSkin);
-        infoPanel.setBackground("default-pane"); // Assuming your skin has a background drawable
-        infoPanel.pad(10);
-        infoPanel.setVisible(true);
-
-        // 3. Initialize the dynamic labels
-        positionLabel = new Label("q = 0, r = 0", uiSkin);
-        carbonLabel = new Label("Carbons: 0", uiSkin);
-        mineralLabel = new Label("Minerals: 0", uiSkin);
-        directionLabel = new Label("Direction: 0,0", uiSkin );
-        carbonLabel2 = new Label("Carbons: 0", uiSkin);
-        mineralLabel2 = new Label("Minerals: 0", uiSkin);
-        
-        infoPanel.add(positionLabel).left().row();
-        infoPanel.add(new Label("-- Mycelium --", uiSkin)).row();
-        infoPanel.add(carbonLabel).left().row();
-        infoPanel.add(mineralLabel).left().row();
-        infoPanel.add(directionLabel).left().row();
-        infoPanel.add(new Label("-- Resource Node --", uiSkin)).row();
-        infoPanel.add(carbonLabel2).left().row();
-        infoPanel.add(mineralLabel2).left().row();
-
+    private void buildUI() {
         Table rootTable = new Table();
         rootTable.setFillParent(true);
-        //goes to the top right, expand claims all available vertical and horizontal space for this cell
-        //rootTable.setDebug(true); //shows grid lines
+        // rootTable.setDebug(true);
 
-        //overlays
-        Table overlayOptions = new Table();
-        CheckBox regionOverlay = new CheckBox("region", uiSkin);
-        CheckBox greenOverlay  = new CheckBox("greenery", uiSkin);
+        Table overlayOptions = buildOverlayPanel();
+        this.networkPanel = buildNetworkPanel();
+        this.infoPanel = buildInfoPanel();
+        Table buildOptions = buildToolBar();
+        Table bottomButtons = buildBottomBar();
 
-        // 2. Create the ButtonGroup and add the buttons
-        ButtonGroup<CheckBox> radioGroup = new ButtonGroup<>();
-        radioGroup.add(regionOverlay, greenOverlay);
+        // Group top-right telemetry panels into a vertical stack so they align cleanly
+        Table rightSidebar = new Table();
+        rightSidebar.top().right();
+        rightSidebar.add(networkPanel).fillX().padBottom(10).row();
+        rightSidebar.add(infoPanel).fillX();
 
-        radioGroup.setMaxCheckCount(1);
-        radioGroup.setMinCheckCount(0);
-        radioGroup.setUncheckLast(true);
-        overlayOptions.add(regionOverlay).top().left();
-        overlayOptions.add(greenOverlay).top().left();
-        regionOverlay.setChecked(false);
-        greenOverlay.setChecked(false);
-
-        ChangeListener radioListener = new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                CheckBox checked = (CheckBox) actor;
-				OverlayChangeEvent overlayChangeEvent = EventFactory.instance().overlayChangeEventPool.obtain();
-
-                if (regionOverlay.isChecked()) {
-                    overlayChangeEvent.selectedOverlay = OverlayMap.REGION;
-                }
-                else if (greenOverlay.isChecked()){
-                    overlayChangeEvent.selectedOverlay = OverlayMap.GREEN;
-                }
-                else{
-                    overlayChangeEvent.selectedOverlay = OverlayMap.NONE;
-                }
-				EventBus.instance().publish(overlayChangeEvent);			
-            }
-        };
-        regionOverlay.addListener(radioListener);
-        greenOverlay.addListener(radioListener);
-
-
-        //group buttons in table
-        Table buildOptions = new Table();
-
-        TextButton buildExtractorButton = new TextButton("Extractor", uiSkin);
-        buildExtractorButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
-                toolChangeEvent.tool = ToolType.BUILD;
-                toolChangeEvent.buildTarget = BuildType.EXTRACTOR;
-				EventBus.instance().publish(toolChangeEvent);			
-            }
-        });
-
-        TextButton buildCleanserButton = new TextButton("Cleanser", uiSkin);
-        buildCleanserButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
-                toolChangeEvent.tool = ToolType.BUILD;
-                toolChangeEvent.buildTarget = BuildType.CLEANSER;
-				EventBus.instance().publish(toolChangeEvent);			
-            }
-        });
-
-        TextButton buildCultivatorButton = new TextButton("Cultivator", uiSkin);
-        buildCultivatorButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
-                toolChangeEvent.tool = ToolType.BUILD;
-                toolChangeEvent.buildTarget = BuildType.CULTIVATOR;
-				EventBus.instance().publish(toolChangeEvent);			
-            }
-        });
-
-        TextButton buildStorageButton = new TextButton("Storage", uiSkin);
-        buildStorageButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
-                toolChangeEvent.tool = ToolType.BUILD;
-                toolChangeEvent.buildTarget = BuildType.STORAGE;
-				EventBus.instance().publish(toolChangeEvent);			
-            }
-        });
-
-        TextButton buildDeleteButton = new TextButton("Delete", uiSkin);
-        buildDeleteButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-				ToolChangeEvent toolChangeEvent = EventFactory.instance().toolChangeEventPool.obtain();
-                toolChangeEvent.tool = ToolType.DELETE;
-                toolChangeEvent.buildTarget = null;
-				EventBus.instance().publish(toolChangeEvent);			
-            }
-        });
-
-        // 6. Assemble the Hierarchy: Add Button -> Table -> Stage
-        // The pad(10) adds 10 pixels of margin around the button
-        buildOptions.add(buildExtractorButton); 
-        buildOptions.add(buildCleanserButton); 
-        buildOptions.add(buildCultivatorButton); 
-        buildOptions.add(buildStorageButton); 
-        buildOptions.add(buildDeleteButton);
-        //put back together
-
-        Table bottomButtons = new Table();
-        // 4. Create your Actors (Widgets)
-        TextButton depthButton = new TextButton("Change Depth", uiSkin);
-        // 5. Add Input Listeners to the Actors
-        depthButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-				DepthChangeEvent depthChangeEvent = EventFactory.instance().depthChangeEventPool.obtain();
-				depthChangeEvent.newDepthDir = 1;
-				EventBus.instance().publish(depthChangeEvent);			
-            }
-        });
-
-
-        bottomButtons.add(depthButton).padRight(5); 
-        //put back together
+        // Row 1: Top Left (Overlays) & Top Right (Telemetry Sidebar)
         rootTable.add(overlayOptions).top().left().pad(10);
-        rootTable.add(networkPanel).top().right().pad(10);
-        rootTable.add(infoPanel).top().right().pad(10);
+        rootTable.add(rightSidebar).expandX().top().right().pad(10);
         rootTable.row();
-        rootTable.add(buildOptions).expand().bottom().left().pad(10);
+
+        // Row 2: Bottom Left (Build Tools) & Bottom Right (Depth Control)
+        rootTable.add(buildOptions).expandY().bottom().left().pad(10);
         rootTable.add(bottomButtons).bottom().right().pad(10);
 
-        //only add master root table
         stage.addActor(rootTable);
     }
 
+    private Table buildNetworkPanel() {
+        Table panel = createStyledPanel();
+        networkCarbonLabel = addLabelRow(panel, "Network Carbon: 0/0");
+        networkMineralLabel = addLabelRow(panel, "Network Mineral: 0/0");
+        return panel;
+    }
+
+    private Table buildInfoPanel() {
+        Table panel = createStyledPanel();
+        positionLabel = addLabelRow(panel, "q = 0, r = 0");
+
+        addHeaderRow(panel, "-- Mycelium --");
+        myceliumCarbonLabel = addLabelRow(panel, "Carbons: N/A");
+        myceliumMineralLabel = addLabelRow(panel, "Minerals: N/A");
+        directionLabel = addLabelRow(panel, "Direction: N/A");
+
+        addHeaderRow(panel, "-- Resource Node --");
+        nodeCarbonLabel = addLabelRow(panel, "Carbons: N/A");
+        nodeMineralLabel = addLabelRow(panel, "Minerals: N/A");
+        return panel;
+    }
+
+    private Table buildOverlayPanel() {
+        Table table = new Table();
+        ButtonGroup<CheckBox> radioGroup = new ButtonGroup<>();
+        radioGroup.setMaxCheckCount(1);
+        radioGroup.setMinCheckCount(0);
+        radioGroup.setUncheckLast(true);
+
+        // Easily add new overlays here with a single line
+        addOverlayCheckBox(table, radioGroup, "region", OverlayMap.REGION);
+        addOverlayCheckBox(table, radioGroup, "greenery", OverlayMap.GREEN);
+
+        return table;
+    }
+
+    private Table buildToolBar() {
+        Table table = new Table();
+        table.defaults().padRight(5); // Automatic spacing between all buttons in this bar
+
+        // Easily add new build or action tools here with a single line
+        addToolButton(table, "Extractor", ToolType.BUILD, BuildType.EXTRACTOR);
+        addToolButton(table, "Cleanser", ToolType.BUILD, BuildType.CLEANSER);
+        addToolButton(table, "Cultivator", ToolType.BUILD, BuildType.CULTIVATOR);
+        addToolButton(table, "Storage", ToolType.BUILD, BuildType.STORAGE);
+        addToolButton(table, "Delete", ToolType.DELETE, null);
+
+        return table;
+    }
+
+    private Table buildBottomBar() {
+        Table table = new Table();
+        table.defaults().padLeft(5);
+
+        addActionButton(table, "Change Depth", () -> {
+            DepthChangeEvent event = EventFactory.instance().depthChangeEventPool.obtain();
+            event.newDepthDir = 1;
+            EventBus.instance().publish(event);
+        });
+
+        return table;
+    }
+
+    // =========================================================================
+    // Reusable UI Factory Helpers
+    // =========================================================================
+
+    /** Creates a standard background panel with default padding and left-aligned defaults. */
+    private Table createStyledPanel() {
+        Table panel = new Table(uiSkin);
+        panel.setBackground("default-pane");
+        panel.pad(10);
+        panel.defaults().left();
+        return panel;
+    }
+
+    /** Creates a dynamic Label, adds it as a row to the parent table, and returns it. */
+    private Label addLabelRow(Table parent, String initialText) {
+        Label label = new Label(initialText, uiSkin);
+        parent.add(label).left().row();
+        return label;
+    }
+
+    /** Adds a centered section divider header to a panel. */
+    private void addHeaderRow(Table parent, String headerText) {
+        parent.add(new Label(headerText, uiSkin)).center().padTop(5).row();
+    }
+
+    /** Creates a generic button wired to any Runnable callback. */
+    private TextButton addActionButton(Table parent, String text, Runnable onClickAction) {
+        TextButton button = new TextButton(text, uiSkin);
+        button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                onClickAction.run();
+            }
+        });
+        parent.add(button);
+        return button;
+    }
+
+    /** Creates a tool selection button that publishes a ToolChangeEvent when clicked. */
+    private TextButton addToolButton(Table parent, String label, ToolType tool, BuildType buildTarget) {
+        return addActionButton(parent, label, () -> {
+            ToolChangeEvent event = EventFactory.instance().toolChangeEventPool.obtain();
+            event.tool = tool;
+            event.buildTarget = buildTarget;
+            EventBus.instance().publish(event);
+        });
+    }
+
+    /** Creates a mutually-exclusive overlay CheckBox and registers its event listener. */
+    private CheckBox addOverlayCheckBox(Table parent, ButtonGroup<CheckBox> group, String label, OverlayMap targetOverlay) {
+        CheckBox checkBox = new CheckBox(label, uiSkin);
+        checkBox.setChecked(false);
+        group.add(checkBox);
+        parent.add(checkBox).top().left().padRight(10);
+
+        checkBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                // Avoid firing duplicate events when ButtonGroup unchecks the previous box
+                if (group.getChecked() != null && !checkBox.isChecked()) {
+                    return;
+                }
+                OverlayChangeEvent overlayEvent = EventFactory.instance().overlayChangeEventPool.obtain();
+                overlayEvent.selectedOverlay = checkBox.isChecked() ? targetOverlay : OverlayMap.NONE;
+                EventBus.instance().publish(overlayEvent);
+            }
+        });
+        return checkBox;
+    }
+
+    // =========================================================================
+    // Frame Updates & Event Handling
+    // =========================================================================
 
     public void update() {
+        updateNetworkPanel();
+        updateInfoPanel();
+    }
 
-        //update network panel
-        // if(carbonRateWindow.size >= (int)CommonValues.DELTA_WINDOW_SIZE.value){
-        //     carbonRateWindow.removeIndex(0);
-        //     carbonRateWindow.add(networkNutrients.carbonDelta);
-        //     mineralRateWindow.removeIndex(0);
-        //     mineralRateWindow.add(networkNutrients.mineralDelta);
-        // }
-        // else{
-        //     carbonRateWindow.add(networkNutrients.carbonDelta);
-        //     mineralRateWindow.add(networkNutrients.mineralDelta);
-        // }
+    private void updateNetworkPanel() {
+        if (networkNutrients == null) return;
 
-        // float carbonSum = 0;
-        // float mineralSum = 0;
-        // for (int i =0; i < carbonRateWindow.size;i++){
-        //     carbonSum += carbonRateWindow.get(i);
-        //     mineralSum += mineralRateWindow.get(i);
-        // }
-
-
-        // float carbonMean = carbonSum / carbonRateWindow.size;
-        // float mineralMean = mineralSum / mineralRateWindow.size;
-
-        networkCarbonLabel.setText("Network Carbon: " + networkNutrients.carbons );
-        networkMineralLabel.setText("Network Mineral: " + networkNutrients.minerals);
-
-        //update info panel
-        if(selectedTilePosition != null){
-            positionLabel.setText("q = " + selectedTilePosition.q +", r = " + selectedTilePosition.r);
-
-            Entity selectedMycelium = Map.instance().getEntityAt(selectedTilePosition.q, selectedTilePosition.r, TilePosition.MYCELIUM);
-            Entity selectedResourceNode = Map.instance().getEntityAt(selectedTilePosition.q, selectedTilePosition.r, TilePosition.RESOURCE_NODE);
-            if(selectedMycelium != null && infoPanel.isVisible()){
-                Direction growthDirection = Mappers.directionCMap.get(selectedMycelium);
-                Nutrients selectedNutrients = Mappers.nutrientsCMap.get(selectedMycelium);
-
-                int dirQ = (growthDirection != null)? growthDirection.directionVector[0] : 0;
-                int dirR = (growthDirection != null)? growthDirection.directionVector[1] : 1;
-
-                carbonLabel.setText("Carbons: " + selectedNutrients.carbons);
-                mineralLabel.setText("Minerals: " + selectedNutrients.minerals);
-                directionLabel.setText("Direction: "+ dirQ +"," + dirR);
-
-            }
-            else{
-                carbonLabel.setText("Carbons: N/A");
-                mineralLabel.setText("Minerals: N/A");
-                directionLabel.setText("Direction: N/A");
-            }
-            if(selectedResourceNode != null && infoPanel.isVisible()){
-                Nutrients selectedNutrients = Mappers.nutrientsCMap.get(selectedResourceNode);
-
-                carbonLabel2.setText("Carbons: " + selectedNutrients.carbons);
-                mineralLabel2.setText("Minerals: " + selectedNutrients.minerals);
-
-            }
-            else{
-                carbonLabel2.setText("Carbons: N/A");
-                mineralLabel2.setText("Minerals: N/A");
-            }
+        if (networkCap != null) {
+            networkCarbonLabel.setText("Network Carbon: " + networkNutrients.carbons + "/" + networkCap.carbonCapacity);
+            networkMineralLabel.setText("Network Mineral: " + networkNutrients.minerals + "/" + networkCap.mineralCapacity);
+        } else {
+            networkCarbonLabel.setText("Network Carbon: " + networkNutrients.carbons);
+            networkMineralLabel.setText("Network Mineral: " + networkNutrients.minerals);
         }
     }
-        
-	@Override
-	public void onEvent(Event event){ //note w/poolable never store ref to event
 
-		switch (event.getType()){
-			case TILE_SELECTED:
-				TileSelectEvent tse = (TileSelectEvent) event;
+    private void updateInfoPanel() {
+        if (selectedTilePosition == null || !infoPanel.isVisible()) return;
+
+        int q = selectedTilePosition.q;
+        int r = selectedTilePosition.r;
+        positionLabel.setText("q = " + q + ", r = " + r);
+
+        Entity selectedMycelium = Map.instance().getEntityAt(q, r, TilePosition.MYCELIUM);
+        updateNutrientLabels(selectedMycelium, myceliumCarbonLabel, myceliumMineralLabel);
+
+        if (selectedMycelium != null) {
+            Direction growthDir = Mappers.directionCMap.get(selectedMycelium);
+            int dirQ = (growthDir != null) ? growthDir.directionVector[0] : 0;
+            int dirR = (growthDir != null) ? growthDir.directionVector[1] : 0;
+            directionLabel.setText("Direction: " + dirQ + "," + dirR);
+        } else {
+            directionLabel.setText("Direction: N/A");
+        }
+
+        Entity selectedResourceNode = Map.instance().getEntityAt(q, r, TilePosition.RESOURCE_NODE);
+        updateNutrientLabels(selectedResourceNode, nodeCarbonLabel, nodeMineralLabel);
+    }
+
+    /** Shared helper to populate Carbon/Mineral label pairs safely for any entity. */
+    private void updateNutrientLabels(Entity entity, Label carbonTarget, Label mineralTarget) {
+        Nutrients nutrients = (entity != null) ? Mappers.nutrientsCMap.get(entity) : null;
+        if (nutrients != null) {
+            carbonTarget.setText("Carbons: " + nutrients.carbons);
+            mineralTarget.setText("Minerals: " + nutrients.minerals);
+        } else {
+            carbonTarget.setText("Carbons: N/A");
+            mineralTarget.setText("Minerals: N/A");
+        }
+    }
+
+    @Override
+    public void onEvent(Event event) {
+        switch (event.getType()) {
+            case TILE_SELECTED:
+                TileSelectEvent tse = (TileSelectEvent) event;
                 this.selectedTilePosition = tse.position;
-				break;
-			default:
-				System.out.println("unknown event");
-		}
-	}
-    
-    // Call this in your Main resize() method to keep UI crisp
+                break;
+            default:
+                break;
+        }
+    }
+
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
-    // Call this to clean up memory when closing the game
     public void dispose() {
+        EventBus.instance().unsubscribe(EventType.TILE_SELECTED, this);
         stage.dispose();
-        uiSkin.dispose();
+        // Note: Do not dispose uiSkin here if it is owned globally by Registry.uiSkin
     }
 }

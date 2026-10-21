@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.IntArray;
 import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
-import io.github.ethanBostick.ecs.components.Cleanser;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Health;
 import io.github.ethanBostick.ecs.components.Mappers;

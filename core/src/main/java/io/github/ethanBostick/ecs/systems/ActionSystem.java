@@ -1,6 +1,7 @@
 package io.github.ethanBostick.ecs.systems;
 
 import io.github.ethanBostick.map.Map;
+import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
@@ -115,8 +116,13 @@ public class ActionSystem extends IteratingSystem{
 
             Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
             Entity obstacle = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.UNDERGROUND_TERRAIN);
+            Entity surfaceTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.SURFACE);
             //cant build on obstacle
             if(obstacle != null){
+                return;
+            }
+            //cannot build on mountain if surface mycelium (for now)
+            if(surfaceTile != null && Mappers.regionCMap.get(surfaceTile).regionType == RegionType.MOUNTAIN && targetBuild.surfaceSpritePath != null){
                 return;
             }
 
@@ -156,11 +162,21 @@ public class ActionSystem extends IteratingSystem{
 
         if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
 
-            Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
-            if(selectedTile != null){
+            int playerDepth = Mappers.depthCMap.get(Registry.player).depth;
+            TilePosition selectPosition = (playerDepth==0)? TilePosition.SURFACE_MYCELIUM : TilePosition.MYCELIUM;
+            Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, selectPosition);
+
+            if(selectedTile != null && selectPosition == TilePosition.MYCELIUM){
                 Map.instance().setEntityAt(mousePosition.q, mousePosition.r, null, TilePosition.MYCELIUM);       
+                Map.instance().setEntityAt(mousePosition.q, mousePosition.r, null, TilePosition.SURFACE_MYCELIUM);       
                 //queue for reclaim nutrients
-                EntityBuilder.instance().reclaim(selectedTile);
+                EntityBuilder.instance().reclaim(selectedTile); //automatically cleans up children
+            }
+            else if(selectedTile != null && selectPosition == TilePosition.SURFACE_MYCELIUM){
+                Entity underTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
+                Map.instance().setEntityAt(mousePosition.q, mousePosition.r, null, TilePosition.MYCELIUM);       
+                Map.instance().setEntityAt(mousePosition.q, mousePosition.r, null, TilePosition.SURFACE_MYCELIUM);       
+                EntityBuilder.instance().reclaim(underTile);
             }
         }
     }

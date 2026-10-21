@@ -7,7 +7,6 @@ import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.ecs.components.Sprite;
-import io.github.ethanBostick.ecs.components.ToxicWave;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
 

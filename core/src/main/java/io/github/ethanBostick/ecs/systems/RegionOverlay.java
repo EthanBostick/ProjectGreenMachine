@@ -1,9 +1,7 @@
 package io.github.ethanBostick.ecs.systems;
 
 import io.github.ethanBostick.ecs.components.Dead;
-import io.github.ethanBostick.ecs.components.Depth;
 import io.github.ethanBostick.ecs.components.Mappers;
-import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.Registry;
@@ -12,7 +10,6 @@ import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.ecs.components.ToxicWave;
 import io.github.ethanBostick.utils.HexUtils;
-import io.github.ethanBostick.utils.TextureUtils;
 
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.core.Entity;

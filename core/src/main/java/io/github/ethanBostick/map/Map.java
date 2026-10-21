@@ -124,12 +124,10 @@ public class Map{
 			for (int r = Math.max(-this.size, -q - this.size); r <= Math.min(this.size, -q + this.size); r ++){
 				
 				int index = this.getIndex(q, r);
-				double rDouble = this.random.nextDouble();
 
 				Entity tileEntity = null;
 				String tilePng = "hex_template.png";
 				String name = "";
-				String extraPng = null;
 				int renderLayer = 0;
 				RegionType bType = RegionType.BLANK;
 

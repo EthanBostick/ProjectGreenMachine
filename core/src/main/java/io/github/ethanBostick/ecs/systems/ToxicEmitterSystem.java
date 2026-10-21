@@ -3,7 +3,6 @@ package io.github.ethanBostick.ecs.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
-import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Dead;
@@ -11,7 +10,6 @@ import io.github.ethanBostick.ecs.components.Depth;
 import io.github.ethanBostick.ecs.components.FactoryEmitter;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Position;
-import io.github.ethanBostick.utils.HexUtils;
 
 public class ToxicEmitterSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
