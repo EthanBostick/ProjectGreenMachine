@@ -3,7 +3,6 @@ package io.github.ethanBostick.ecs.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.core.ColorSettings;
@@ -15,7 +14,6 @@ import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.Position;
-import io.github.ethanBostick.ecs.components.PriorityRole;
 import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.RegionType;
@@ -39,8 +37,6 @@ public class CleanserSystem extends IntervalIteratingSystem {
             Position position = Mappers.positionCMap.get(cleanserNode);
             Nutrients nutrients = Mappers.nutrientsCMap.get(cleanserNode);
             Cleanser cleanser = Mappers.cleanserCMap.get(cleanserNode);
-            NutrientFlow flow = Mappers.nutrientFlowCMap.get(cleanserNode);
-            int uncleanTiles = 0;
 
             //get radius vector
             int radius = cleanser.radius;
@@ -69,7 +65,6 @@ public class CleanserSystem extends IntervalIteratingSystem {
 
                 //node cleanser
                 if (nodeRegion.condition < 100){
-                    uncleanTiles ++;
                     if (carbonCost >= usableCarbons || mineralCost >= usableMinerals) continue;
                     
                     nutrients.carbonDelta -= carbonCost; 
@@ -116,12 +111,6 @@ public class CleanserSystem extends IntervalIteratingSystem {
                     ColorSettings.CARBON_LOSSES.color,
                     true
                 );
-            }
-
-
-            if(uncleanTiles == 0){
-                flow.carbonRoleOverride = PriorityRole.NONE;
-                flow.mineralRoleOverride = PriorityRole.NONE;
             }
         }
         catch(Exception e){

@@ -303,8 +303,9 @@ public class EntityBuilder {
 		MultiTileSprite waveSprite = this.engine.createComponent(MultiTileSprite.class);
 		Depth depth = this.engine.createComponent(Depth.class);
 
+		String texturePath = (hazardType == RegionType.RADIOACTIVE)? "radioactiveWave.png": (hazardType == RegionType.POLLUTED)? "pollutedWave.png": "barrenWave.png";
 		depth.depth = displayDepth;
-		waveSprite.textureHead = TextureUtils.pathToTexture("toxicWave.png");
+		waveSprite.textureHead = TextureUtils.pathToTexture(texturePath);
 		wavePosition.points = new IntArray(false,64);
 		emitterPosition.q = emitterQ;
 		emitterPosition.r = emitterR;

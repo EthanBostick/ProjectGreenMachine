@@ -47,6 +47,8 @@ public class ExtractionSystem extends IntervalIteratingSystem {
 
             int currentCarbon = nutrients.carbons + nutrients.carbonDelta;
             int currentMineral = nutrients.minerals + nutrients.mineralDelta;
+            int totalCarbonEx = 0;
+            int totalMineralEx =0;
 
             //look for and proccess resource nodes in area
             for (int i = 0; i < this.processingArray.size; i += 2) {
@@ -72,6 +74,7 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                     nodeNutrients.carbonDelta -= finalExtract;
                     nutrients.carbonDelta += finalExtract;
                     currentCarbon += finalExtract; // update local counter for subsequent nodes in loop
+                    totalCarbonEx += finalExtract;
                 }
 
                 // Mineral extraction
@@ -85,6 +88,7 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                     nodeNutrients.mineralDelta -= finalExtract;
                     nutrients.mineralDelta += finalExtract;
                     currentMineral += finalExtract;
+                    totalMineralEx += finalExtract;
                 }
 
                 // update node sprite 
@@ -118,24 +122,23 @@ public class ExtractionSystem extends IntervalIteratingSystem {
                     }
                 }
             }
-            int totalCarbonGain = currentCarbon - nutrients.carbons;
-            if (totalCarbonGain > 0) {
+
+            if (totalCarbonEx > 0) {
                 EntityBuilder.instance().createFloatingText(
                     position.q, 
                     position.r, 
                     1,
-                    "+" + totalCarbonGain + "C", 
+                    "+" + totalCarbonEx + "C", 
                     ColorSettings.CARBON_GAINS.color,
                     true
                 );
             }
-            int totalMineralGain = currentMineral - nutrients.minerals;
-            if (totalMineralGain > 0) {
+            if (totalMineralEx > 0) {
                 EntityBuilder.instance().createFloatingText(
                     position.q, 
                     position.r, 
                     1,
-                    "+" + totalMineralGain + "M", 
+                    "+" + totalMineralEx + "M", 
                     ColorSettings.MINERAL_GAINS.color,
                     true
                 );

@@ -3,11 +3,13 @@ package io.github.ethanBostick.ecs.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.Cleanser;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Health;
 import io.github.ethanBostick.ecs.components.Mappers;
@@ -26,6 +28,7 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
     private int[][] hexDirections;
     private final IntArray nextToxicWavefront = new IntArray(false, 64);
+    private final Array<Entity> tempNeighborArray = new Array<Entity>(false, 7);
     
     public ToxicWaveSystem(float interval, int priority) {
         super(Family.all( ToxicWave.class)
@@ -35,15 +38,27 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
     }
 
     private boolean isCoveredByActiveCleanser(int q, int r){
+        tempNeighborArray.clear();
+        boolean modified = false;
+
+        int centerQ = q;
+        int centerR = r;
+        Entity ownTile = Map.instance().getEntityAt(centerQ, centerR, TilePosition.MYCELIUM);
+        if(ownTile != null && Mappers.cleanserCMap.get(ownTile) != null){
+            tempNeighborArray.add(ownTile);
+            modified = true;
+        } 
+
         for (int[] dir : hexDirections){
             int targetQ = q + dir[0];
             int targetR = r + dir[1];
             Entity neighbor = Map.instance().getEntityAt(targetQ, targetR, TilePosition.MYCELIUM);
-            if(neighbor == null) continue;
-            if(Mappers.cleanserCMap.get(neighbor) == null) continue;
-            else return true;
+            if(neighbor != null && Mappers.cleanserCMap.get(neighbor) != null){
+                tempNeighborArray.add(neighbor);
+                modified = true;
+            } 
         } 
-        return false;
+        return modified;
     }
 
     // Checks if (nq, nr) sits diagonally behind a tile on currentRingDist that was blocked
@@ -106,10 +121,10 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
                 Nutrients greenNutrients = Mappers.nutrientsCMap.get(surfaceEntity);
                 int availableHealthLoss = Math.max(0, greenHealth.health-(int)CommonValues.TOXIC_WAVE_DMG.value);
 
-                int availableMinerals = Math.max(0, greenNutrients.minerals + greenNutrients.mineralDelta); //gets the true headroom of minerals including positive or negative deltas
+                int availableMinerals = greenNutrients.minerals + Math.min(0, greenNutrients.mineralDelta);                 
                 int mineralLeach = Math.min(availableMinerals, (int)CommonValues.TOXIC_WAVE_NUTRIENT_LEACH.value);
 
-                int availableCarbons = Math.max(0, greenNutrients.carbons + greenNutrients.carbonDelta);
+                int availableCarbons = greenNutrients.carbons + Math.min(0, greenNutrients.carbonDelta);
                 int carbonLeach = Math.min(availableCarbons, (int)CommonValues.TOXIC_WAVE_NUTRIENT_LEACH.value);
 
                 greenHealth.health -= availableHealthLoss;
@@ -196,10 +211,41 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
                         continue; // Do not add to nextToxicWavefront!
                     }
 
-                    // 4. DEFENSE CHECK: Active Cleanser shields block the wave
-                    // if (tryAbsorbWithCleanser(nq, nr)) {
-                    //     continue;
-                    // }
+                    //Active Cleanser shields block the wave
+                    if (this.isCoveredByActiveCleanser(nq, nr)) {
+                        int carbonCost = (int)CommonValues.TOXIC_WAVE_CARBON_BLOCK_COST.value;
+                        int mineralCost = (int)CommonValues.TOXIC_WAVE_MINERAL_BLOCK_COST.value;
+                        //check each cleanser
+                        for (int j = 0 ; j < this.tempNeighborArray.size; j++){
+                            Entity cleanserNode = this.tempNeighborArray.get(j);
+                            Nutrients nutrients = Mappers.nutrientsCMap.get(cleanserNode);
+                            Position position = Mappers.positionCMap.get(cleanserNode);
+
+                            int usableMinerals = nutrients.minerals + Math.min(0, nutrients.mineralDelta);
+                            int usableCarbons = nutrients.carbons + Math.min(0, nutrients.carbonDelta);
+
+                            int mineralBlock = Math.min(usableMinerals, mineralCost);
+                            int carbonBlock = Math.min(usableCarbons, carbonCost);
+                            
+                            nutrients.carbonDelta -= carbonBlock; 
+                            carbonCost -= carbonBlock;
+                            nutrients.mineralDelta -= mineralBlock; 
+                            mineralCost -= mineralBlock;
+
+                            if (carbonBlock > 0) {
+                                EntityBuilder.instance().createFloatingText(position.q, position.r, 0, "-" + carbonBlock + "C", ColorSettings.CARBON_LOSSES.color, true);
+                            }
+                            if (mineralBlock > 0) {
+                                EntityBuilder.instance().createFloatingText(position.q, position.r, 0, "-" + mineralBlock + "M", ColorSettings.MINERAL_LOSSES.color, true);
+                            }
+
+                            //wave stopped
+                            if(carbonCost <= 0 && mineralCost <= 0) break;
+                        }
+
+                        //blocked
+                        if(carbonCost <= 0 && mineralCost <= 0) continue;
+                    }
 
                     //unblocked
                     applySludgeDamage(nq, nr, surface, region, wave.hazardType);

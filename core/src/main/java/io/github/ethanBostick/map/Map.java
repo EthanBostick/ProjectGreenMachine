@@ -198,6 +198,21 @@ public class Map{
 					this.map[index][TilePosition.RESOURCE_NODE.value()] = resourceNode;
 				}
 
+				//factory gen
+				if(bType != RegionType.MOUNTAIN && bType != RegionType.RESTORED){
+					double factoryRoll = this.random.nextDouble();
+
+					if(factoryRoll < 0.005){ //about 0.5% chance a tile thats not a mountain has a factory on it
+						//hazard type is inherited from tile region type
+						float pulseDeviation = (float)(10 * Map.instance().random.nextGaussian());
+						int pulseRate = 20 + (int)pulseDeviation;
+
+						Entity factory = this.entityBuilder.createWaveEmitter(q, r,bType, 100, 7, pulseRate);
+						this.entityBuilder.addToEngine(factory);
+						this.map[index][TilePosition.SURFACE_ENTITY.value()] = factory;
+					}
+				}
+
 				double rockRoll = this.random.nextDouble();
 				double rockThreshold = (tilePng == "mountainTile.png") ? 0.75 : 0.13; // rock obstacle
 
@@ -213,9 +228,6 @@ public class Map{
 					this.entityBuilder.addToEngine(initMycelium);
 					this.map[index][TilePosition.MYCELIUM.value()] = initMycelium;
 
-					Entity factory = this.entityBuilder.createWaveEmitter(q, r,RegionType.BARREN, 100, 15, 10);
-					this.entityBuilder.addToEngine(factory);
-					this.map[index][TilePosition.SURFACE_ENTITY.value()] = factory;
 					//do not track, for visual only
 					// Entity center = entityBuilder.createRenderable(0,0, 3,0,null, "hexCenter.png");
 					// this.entityBuilder.addToEngine(center);
