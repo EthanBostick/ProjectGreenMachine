@@ -136,7 +136,7 @@ public class GameHUD implements Observer {
         table.defaults().padRight(5); // Automatic spacing
 
         addActionButton(table, "Adaptations", () -> {
-            this.adaptationTreeOverlay.setVisible(true);
+            toggleSkillTree(true);
         });
 
         return table;
@@ -242,7 +242,7 @@ public class GameHUD implements Observer {
         // Header Bar with a Close Button
         Table header = new Table();
         header.add(new Label("Mycelium Adaptations", uiSkin)).expandX().left();
-        addActionButton(header, "Close [X]", () -> modalOverlay.setVisible(false));
+        addActionButton(header, "Close [X]", () -> toggleSkillTree(false));
 
         // Pack the Header and the ScrollPane into the modal window
         modalOverlay.add(header).fillX().pad(20).row();
@@ -388,13 +388,13 @@ public class GameHUD implements Observer {
 
     private void toggleSkillTree(boolean open) {
         adaptationTreeOverlay.setVisible(open);
-        // if (open) {
-        //     stage.setKeyboardFocus(adaptationTreeOverlay); // Routes key events to modalOverlay!
-        //     //stage.setScrollFocus(adaptationTreeScrollPane); // Routes mouse wheel to ScrollPane!
-        // } else {
-        //     stage.setKeyboardFocus(null);
-        //     //stage.setScrollFocus(null);
-        // }
+        if (open) {
+            stage.setKeyboardFocus(adaptationTreeOverlay); // Routes key events to modalOverlay!
+            stage.setScrollFocus(adaptationTreeOverlay); // Routes mouse wheel to ScrollPane
+        } else {
+            stage.setKeyboardFocus(null);
+            stage.setScrollFocus(null);
+        }
     }
 
     @Override
