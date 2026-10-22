@@ -10,12 +10,11 @@ public final class HexUtils {
     public static final int[][] hexDirections = {
         {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}
     };
-    public static final float HEIGHT = 52f;
-    public static final float WIDTH = 64f;
-    public static final float SIZE = 30f;
-    private static final float SQRT_3 = 1.7320508f;
+    public static final float HEIGHT = 42f;
+    public static final float WIDTH = 60f;
+    public static final float SIZE = WIDTH / 2f;
     private static final float X_SCALE = 1.5f * SIZE;
-    private static final float Y_SCALE = SQRT_3 * SIZE;
+    private static final float Y_SCALE = 42f;
 
     public static int getPixelX(Position p) {
         return Math.round(X_SCALE * p.q);
