@@ -215,14 +215,14 @@ public class Map{
 				double rockThreshold = (tilePng == "mountainTile.png") ? 0.75 : 0.13; // rock obstacle
 
 				if (rockRoll < rockThreshold){
-					Entity rock = entityBuilder.createRenderable(q, r, 2, 1, TilePosition.UNDERGROUND_TERRAIN, "stone.png");	
+					Entity rock = entityBuilder.createRenderable(q, r, 3, 1, TilePosition.UNDERGROUND_TERRAIN, "stone.png");	
 					this.entityBuilder.addToEngine(rock);
 					this.map[index][TilePosition.UNDERGROUND_TERRAIN.value()] = rock;
 				}
 
 				//init mycelium network node
 				if (q == 0 && r == 0){
-					Entity initMycelium = entityBuilder.createMycelium(q, r, 3,30,15,15,7);
+                	Entity initMycelium = EntityBuilder.instance().createMyceliumStorage(q, r,45,30,5,2);
 					this.entityBuilder.addToEngine(initMycelium);
 					this.map[index][TilePosition.MYCELIUM.value()] = initMycelium;
 

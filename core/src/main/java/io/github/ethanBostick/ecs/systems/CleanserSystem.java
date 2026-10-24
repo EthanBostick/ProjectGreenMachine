@@ -96,7 +96,7 @@ public class CleanserSystem extends IntervalIteratingSystem {
             }
 
             //node cleansed
-            if (nodeRegion.condition >= 100){
+            if (nodeRegion.condition >= 100 && nodeRegion.regionType != RegionType.RESTORED){
                 nodeRegion.condition = 100;
                 nodeRegion.regionType = RegionType.RESTORED;
                 Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture("restoredTile.png");

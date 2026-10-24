@@ -77,6 +77,9 @@ public class GreenSystem extends IntervalIteratingSystem {
                 if(level.density == 0){
                     this.processingArray.clear();
                     Map.instance().setEntityAt(position.q, position.r, null, position.tilePosition);
+                    Entity surfaceNode = Map.instance().getEntityAt(position.q, position.r, TilePosition.SURFACE);
+                    Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture("growingTile.png");
+                    Mappers.regionCMap.get(surfaceNode).condition = 125;
                     EntityBuilder.instance().dead(greenNode);
                     return;
                 }
@@ -86,7 +89,7 @@ public class GreenSystem extends IntervalIteratingSystem {
             }
 
         //check for green upgrade & then reset
-            if (usableMinerals >= levelThreshold.mineralCapacity && level.density < 4){
+            if (usableMinerals >= levelThreshold.mineralCapacity && level.density < 3){
                 level.density ++;
                 green.carbonOutput = (int)(CommonValues.GREEN_BASE_CARBON_OUTPUT_PER_HEX_PER_TICK.value * level.density);
                 sprite.texture = TextureUtils.pathToTexture("greenS"+level.density+".png");
@@ -97,7 +100,7 @@ public class GreenSystem extends IntervalIteratingSystem {
         //carbon out step
             if(!withering){
                 //get radius vector
-                int radius = Math.min(0,level.density - 1);
+                int radius = Math.max(0,level.density - 1);
                 this.processingArray = HexUtils.getAreaAround(position, radius, processingArray);
                 int carbonOutput = (int)(green.carbonOutput * (this.interval/CommonValues.TICK_SPEED.value)); //output per system tick per hex
 

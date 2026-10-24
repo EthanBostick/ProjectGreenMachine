@@ -27,17 +27,7 @@ public class RenderSystem extends SortedIteratingSystem{
     private static class LayerComparator implements Comparator<Entity> {
         @Override
         public int compare(Entity e1, Entity e2) {
-            //invert the layer values so lowest renders first
-            int layer1 = -Mappers.positionCMap.get(e1).layer;
-            int layer2 = -Mappers.positionCMap.get(e2).layer;
-            
-            //primary sort by layer
-            int layerComparison = Integer.compare(layer2, layer1);
-            if (layerComparison != 0){
-                return layerComparison;
-            }
-
-            //secondary sort by y-value
+            //primary sort by y-value
             //inverted so lower sprites render first
             float groundY1 = -HexUtils.getPixelY(Mappers.positionCMap.get(e1));
             float groundY2 = -HexUtils.getPixelY(Mappers.positionCMap.get(e2));
@@ -46,6 +36,17 @@ public class RenderSystem extends SortedIteratingSystem{
             if(yComparison != 0){
                 return yComparison;
             }
+
+            //invert the layer values so lowest renders first
+            int layer1 = -Mappers.positionCMap.get(e1).layer;
+            int layer2 = -Mappers.positionCMap.get(e2).layer;
+            
+            //sec sort by layer
+            int layerComparison = Integer.compare(layer2, layer1);
+            if (layerComparison != 0){
+                return layerComparison;
+            }
+
 
             //tertiary row sort
             float groundX1 = HexUtils.getPixelX(Mappers.positionCMap.get(e1));

@@ -15,10 +15,12 @@ import io.github.ethanBostick.ecs.components.NutrientCapacity;
 import io.github.ethanBostick.ecs.components.Nutrients;
 import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.Position;
+import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.utils.HexUtils;
+import io.github.ethanBostick.utils.TextureUtils;
 
 public class CultivationSystem extends IntervalIteratingSystem {
     public final float interval; //seconds
@@ -56,17 +58,27 @@ public class CultivationSystem extends IntervalIteratingSystem {
                         r, 
                         TilePosition.SURFACE);
                     if (surfaceNode == null) continue;
-                    if (Mappers.regionCMap.get(surfaceNode).regionType != RegionType.RESTORED) continue;
+                    Region surfaceRegion = Mappers.regionCMap.get(surfaceNode);
+                    if (surfaceRegion.regionType != RegionType.RESTORED) continue;
 
                     //check for surface greenery
                     Entity terrainNode = Map.instance().getEntityAt(
                         q,
                         r,
                         TilePosition.SURFACE_ENTITY);
-                    //if none, make one
-                    if (terrainNode == null){
+
+                    if (terrainNode == null && surfaceRegion.condition <= 150 && surfaceRegion.condition >= 100){
                         nutrients.mineralDelta -= (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
-                        totalMineralOutput -= (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
+                        totalMineralOutput += (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
+                        surfaceRegion.condition += (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value * 5;
+
+                        Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture("growingTile.png");
+                    }
+                    //if none, make one
+                    else if (terrainNode == null && surfaceRegion.condition >= 150){
+                        nutrients.mineralDelta -= (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
+                        totalMineralOutput += (int)CommonValues.CULTIVATE_MINERAL_PER_TILE.value;
+                        Mappers.spriteCMap.get(surfaceNode).texture = TextureUtils.pathToTexture("greenTile.png");
                         Entity newGreenNode = EntityBuilder.instance().createGreen(q, r, 1);
 
                         Map.instance().setEntityAt(q, r, newGreenNode, TilePosition.SURFACE_ENTITY);
