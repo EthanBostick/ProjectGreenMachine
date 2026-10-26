@@ -14,11 +14,13 @@ import io.github.ethanBostick.ecs.systems.CleanserSystem;
 import io.github.ethanBostick.ecs.systems.CultivationSystem;
 import io.github.ethanBostick.ecs.systems.DegenerationSystem;
 import io.github.ethanBostick.ecs.systems.FlowGradientSystem;
+import io.github.ethanBostick.ecs.systems.GreenOverlay;
 import io.github.ethanBostick.ecs.systems.GreenSystem;
 import io.github.ethanBostick.ecs.systems.MultiRenderSystem;
 import io.github.ethanBostick.ecs.systems.NetworkFlowSystem;
 import io.github.ethanBostick.ecs.systems.NetworkGrowthSystem;
 import io.github.ethanBostick.ecs.systems.PlayerStateSystem;
+import io.github.ethanBostick.ecs.systems.PriorityOverlay;
 import io.github.ethanBostick.ecs.systems.StateCommitSystem;
 import io.github.ethanBostick.ecs.systems.SynthesisSystem;
 import io.github.ethanBostick.ecs.systems.SystemUpdater;
@@ -85,6 +87,8 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new RenderSystem(96));
 		this.engine.addSystem(new MultiRenderSystem(97));
 		this.engine.addSystem(new RegionOverlay(98));
+		this.engine.addSystem(new GreenOverlay(98));
+		this.engine.addSystem(new PriorityOverlay(98));
 		this.engine.addSystem(new FloatingTextSystem(99));
 		this.engine.addSystem(new VectorRenderSystem(100)); //99 so it renders on top
 		this.engine.addSystem(new EntityManagementSystem(101));

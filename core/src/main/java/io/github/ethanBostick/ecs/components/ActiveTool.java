@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Component;
 public class ActiveTool implements Component, Poolable{
 
     public ToolType tool = ToolType.DEFAULT;
+    public int priorityTarget = -1;
     public BuildType buildTarget = null;
 
     public ActiveTool(){}

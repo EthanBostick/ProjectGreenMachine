@@ -6,6 +6,7 @@ import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventType;
+import io.github.ethanBostick.events.OverlayChangeEvent;
 import io.github.ethanBostick.events.ToolChangeEvent;
 import io.github.ethanBostick.events.DepthChangeEvent;
 

@@ -1,10 +1,12 @@
 package io.github.ethanBostick.input;
 
+import io.github.ethanBostick.core.OverlayMap;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.events.DepthChangeEvent;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventFactory;
+import io.github.ethanBostick.events.OverlayChangeEvent;
 import io.github.ethanBostick.utils.HexUtils;
 
 import com.badlogic.gdx.Gdx;
@@ -151,6 +153,9 @@ public class GameController extends InputAdapter{
 		switch(keycode){
 			case Input.Keys.ESCAPE:
                 Mappers.mouseStateCMap.get(this.mouse).clearSelect = true;
+                OverlayChangeEvent overlayEvent = EventFactory.instance().overlayChangeEventPool.obtain();
+                overlayEvent.selectedOverlay = OverlayMap.NONE;
+                EventBus.instance().publish(overlayEvent);
 		        return true;
             case Input.Keys.E:
 				DepthChangeEvent depthChangeEvent = EventFactory.instance().depthChangeEventPool.obtain();

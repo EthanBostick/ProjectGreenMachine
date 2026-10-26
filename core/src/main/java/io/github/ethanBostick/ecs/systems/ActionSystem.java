@@ -11,8 +11,10 @@ import io.github.ethanBostick.ecs.components.BuildType;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
+import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.Child;
 import io.github.ethanBostick.ecs.components.Position;
+import io.github.ethanBostick.ecs.components.PriorityRole;
 import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.ecs.components.ToolType;
@@ -189,6 +191,34 @@ public class ActionSystem extends IteratingSystem{
         }
     }
 
+    private void priorityAction(Entity mouse){
+        Position mousePosition = Mappers.positionCMap.get(mouse);
+        MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
+
+        if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
+
+            int playerDepth = Mappers.depthCMap.get(Registry.player).depth;
+            TilePosition selectPosition = (playerDepth==0)? TilePosition.SURFACE_MYCELIUM : TilePosition.MYCELIUM;
+            Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, selectPosition);
+
+            if(selectedTile != null && selectPosition == TilePosition.MYCELIUM){
+                NutrientFlow flow = Mappers.nutrientFlowCMap.get(selectedTile);
+                int carbonCurrentPrior = flow.carbonRoleOverride.index;
+                flow.carbonRoleOverride = flow.carbonRoleOverride.intToRole((carbonCurrentPrior + 1) % 5);
+                int mineralCurrentPrior = flow.mineralRoleOverride.index;
+                flow.mineralRoleOverride = flow.mineralRoleOverride.intToRole((mineralCurrentPrior + 1) % 5);
+            }
+            else if(selectedTile != null && selectPosition == TilePosition.SURFACE_MYCELIUM){
+                Entity underTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
+                NutrientFlow flow = Mappers.nutrientFlowCMap.get(underTile);
+                int carbonCurrentPrior = flow.carbonRoleOverride.index;
+                flow.carbonRoleOverride = flow.carbonRoleOverride.intToRole((carbonCurrentPrior + 1) % 5);
+                int mineralCurrentPrior = flow.mineralRoleOverride.index;
+                flow.mineralRoleOverride = flow.mineralRoleOverride.intToRole((mineralCurrentPrior + 1) % 5);
+            }
+        }
+    }
+
     @Override
     protected void processEntity(Entity mouse, float deltaTime) {
         ActiveTool activeTool = Mappers.activeToolCMap.get(Registry.player);
@@ -218,9 +248,9 @@ public class ActionSystem extends IteratingSystem{
                 Mappers.VectorArrowCMap.get(mouse).arrowTexture = null;
                 this.deleteAction(mouse);
                 break;
-            case DEACTIVATE:
+            case PRIORITY:
                 break;
-            case ACTIVATE:
+            case ACTIVATION:
                 break;
         }
 

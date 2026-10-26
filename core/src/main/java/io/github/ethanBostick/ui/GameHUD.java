@@ -191,10 +191,20 @@ public class GameHUD implements Observer {
         Table table = new Table();
         table.defaults().padLeft(5);
 
-        addActionButton(table, "Change Depth", () -> {
+        addActionButton(table, "Depth", () -> {
             DepthChangeEvent event = EventFactory.instance().depthChangeEventPool.obtain();
             event.newDepthDir = 1;
             EventBus.instance().publish(event);
+        });
+
+        addActionButton(table, "Priority", () -> {
+            ToolChangeEvent event = EventFactory.instance().toolChangeEventPool.obtain();
+            event.tool = ToolType.PRIORITY;
+            EventBus.instance().publish(event);
+
+            OverlayChangeEvent overlayEvent = EventFactory.instance().overlayChangeEventPool.obtain();
+            overlayEvent.selectedOverlay = OverlayMap.PRIORITY;
+            EventBus.instance().publish(overlayEvent);
         });
 
         return table;
