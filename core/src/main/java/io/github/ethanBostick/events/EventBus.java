@@ -67,5 +67,8 @@ public class EventBus{
 		else if (event instanceof OverlayChangeEvent){
 			EventFactory.instance().overlayChangeEventPool.free((OverlayChangeEvent)event);
 		}
+		else if (event instanceof UnlockEvent){
+			EventFactory.instance().unlockEventPool.free((UnlockEvent)event);
+		}
 	}
 }

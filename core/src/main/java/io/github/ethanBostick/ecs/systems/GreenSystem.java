@@ -126,8 +126,8 @@ public class GreenSystem extends IntervalIteratingSystem {
 
                     if (finalOutput > 0) {
                         EntityBuilder.instance().createFloatingText(
-                            position.q, 
-                            position.r, 
+                            q, 
+                            r, 
                             1,
                             "+" + finalOutput + "C", 
                             ColorSettings.CARBON_GAINS.color,

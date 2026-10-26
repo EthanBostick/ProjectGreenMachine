@@ -177,6 +177,8 @@ public class GameHUD implements Observer {
 
         // Easily add new build or action tools here with a single line
         addToolButton(table, "Extractor", ToolType.BUILD, BuildType.EXTRACTOR);
+        addToolButton(table, "Transport", ToolType.BUILD, BuildType.CONDUIT);
+        addToolButton(table, "Carbon Synthesizer", ToolType.BUILD, BuildType.CARBON_SYPHON);
         addToolButton(table, "Cleanser", ToolType.BUILD, BuildType.CLEANSER);
         addToolButton(table, "Cultivator", ToolType.BUILD, BuildType.CULTIVATOR);
         addToolButton(table, "Storage", ToolType.BUILD, BuildType.STORAGE);

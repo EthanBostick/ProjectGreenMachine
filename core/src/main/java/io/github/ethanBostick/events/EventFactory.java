@@ -40,6 +40,14 @@ public class EventFactory {
             return new OverlayChangeEvent();
         }
     };
+
+    public final Pool<UnlockEvent> unlockEventPool = new Pool<UnlockEvent>() {
+        @Override
+        protected UnlockEvent newObject() {
+            return new UnlockEvent();
+        }
+    };
+
 	private EventFactory(){}
 
 	public static EventFactory instance(){

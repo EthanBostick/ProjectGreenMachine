@@ -20,6 +20,7 @@ import io.github.ethanBostick.ecs.systems.NetworkFlowSystem;
 import io.github.ethanBostick.ecs.systems.NetworkGrowthSystem;
 import io.github.ethanBostick.ecs.systems.PlayerStateSystem;
 import io.github.ethanBostick.ecs.systems.StateCommitSystem;
+import io.github.ethanBostick.ecs.systems.SynthesisSystem;
 import io.github.ethanBostick.ecs.systems.SystemUpdater;
 import io.github.ethanBostick.ecs.systems.ToxicEmitterSystem;
 import io.github.ethanBostick.ecs.systems.ToxicWaveSystem;
@@ -65,6 +66,7 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 5));
 		//producers
 		this.engine.addSystem(new ExtractionSystem(tickRate*2,6));
+		this.engine.addSystem(new SynthesisSystem(tickRate*2, 7));
 		this.engine.addSystem(new GreenSystem(tickRate*2, 7));
 		//consumers
 		this.engine.addSystem(new CleanserSystem(tickRate*2,8));

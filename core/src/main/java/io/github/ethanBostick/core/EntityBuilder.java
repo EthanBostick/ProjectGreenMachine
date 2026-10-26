@@ -36,9 +36,11 @@ import io.github.ethanBostick.ecs.components.Reclaim;
 import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.Resource;
 import io.github.ethanBostick.ecs.components.Sprite;
+import io.github.ethanBostick.ecs.components.Synthesizer;
 import io.github.ethanBostick.ecs.components.ToxicWave;
 import io.github.ethanBostick.ecs.components.VectorArrow;
 import io.github.ethanBostick.ecs.components.Vision;
+import io.github.ethanBostick.ecs.systems.SynthesisSystem;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.ResourceType;
@@ -171,6 +173,33 @@ public class EntityBuilder {
 
 		e.add(child);
 		e.add(cultivatorComp);
+
+        return e;
+    }
+
+    public Entity createTransportNode(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
+        Entity e = createBaseMycelium(q, r, "hyperNode.png", 4,
+                6, 6, 6,
+                initCarbon, initMineral, carbonReclaim, mineralReclaim);
+
+        return e;
+    }
+
+
+    public Entity createCarbonSyphon(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
+        Entity e = createBaseMycelium(q, r, "carbonSyphon.png", 4,
+                15, 5, 2,
+                initCarbon, initMineral, carbonReclaim, mineralReclaim);
+
+		Synthesizer synthesizer = this.engine.createComponent(Synthesizer.class);
+		synthesizer.resourceType = ResourceType.CARBON;
+
+		Child child = this.engine.createComponent(Child.class);
+		Entity surfaceNode = createRenderable(q, r, 2, 0, TilePosition.SURFACE_MYCELIUM, "carbonSyphonSurface.png");
+		child.child = surfaceNode;
+
+		e.add(child);
+        e.add(synthesizer);
 
         return e;
     }
