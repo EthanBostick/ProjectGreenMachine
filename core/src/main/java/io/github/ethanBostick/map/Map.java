@@ -242,4 +242,11 @@ public class Map{
 		}
 		return Map.theInstance;
 	}
+
+	public void dispose(){
+		this.map = null;
+		this.revealedMap = null;
+		this.entityBuilder = null;
+		theInstance = null;
+	}
 }

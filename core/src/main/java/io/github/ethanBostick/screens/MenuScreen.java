@@ -19,12 +19,12 @@ public class MenuScreen implements Screen {
 
 	@Override
 	public void show() {
-        //init Input and UI
-		this.multiplexer = new InputMultiplexer();
-		this.menuHUD = new MenuHUD();
-		this.multiplexer.addProcessor(0,this.menuHUD.stage); 
-		this.multiplexer.addProcessor(new MenuInputAdapter());
-		Gdx.input.setInputProcessor(this.multiplexer);
+        this.multiplexer = new InputMultiplexer();
+        this.menuHUD = new MenuHUD();
+        this.menuHUD.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        this.multiplexer.addProcessor(0, this.menuHUD.stage); 
+        this.multiplexer.addProcessor(new MenuInputAdapter());
+        Gdx.input.setInputProcessor(this.multiplexer);
 	}
 
     @Override

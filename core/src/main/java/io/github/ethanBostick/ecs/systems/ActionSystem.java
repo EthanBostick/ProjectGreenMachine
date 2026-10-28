@@ -223,13 +223,18 @@ public class ActionSystem extends IteratingSystem{
     protected void processEntity(Entity mouse, float deltaTime) {
         ActiveTool activeTool = Mappers.activeToolCMap.get(Registry.player);
         MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
+        Position selectedPosition = Mappers.positionCMap.get(this.highlighter);
+
 
         // esc key clears selection 
         if(mouseState.clearSelect){
-            activeTool.tool = ToolType.DEFAULT;    
-            activeTool.buildTarget = null;    
             mouseState.clearSelect = false;
+            selectedPosition.q = Integer.MAX_VALUE;
+            selectedPosition.r = Integer.MAX_VALUE;
             Mappers.spriteCMap.get(this.highlighter).texture = null;
+            TileSelectEvent selectEvent = EventFactory.instance().tileSelectEventPool.obtain();
+            selectEvent.position = selectedPosition;
+            EventBus.instance().publish(selectEvent);			
             return;
         }
 
@@ -249,6 +254,8 @@ public class ActionSystem extends IteratingSystem{
                 this.deleteAction(mouse);
                 break;
             case PRIORITY:
+                Mappers.VectorArrowCMap.get(mouse).arrowTexture = null;
+                this.priorityAction(mouse);
                 break;
             case ACTIVATION:
                 break;

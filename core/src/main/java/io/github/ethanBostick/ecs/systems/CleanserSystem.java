@@ -136,7 +136,7 @@ public class CleanserSystem extends IntervalIteratingSystem {
                 EntityBuilder.instance().createFloatingText(
                     position.q, 
                     position.r, 
-                    1,
+                    -1,
                     "-"+totalMineralOutput+"M", 
                     ColorSettings.MINERAL_LOSSES.color,
                     true
@@ -146,7 +146,7 @@ public class CleanserSystem extends IntervalIteratingSystem {
                 EntityBuilder.instance().createFloatingText(
                     position.q, 
                     position.r, 
-                    1,
+                    -1,
                     "-"+totalCarbonOutput+"C", 
                     ColorSettings.CARBON_LOSSES.color,
                     true

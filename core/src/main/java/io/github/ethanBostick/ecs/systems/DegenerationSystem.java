@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.Child;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Density;
 import io.github.ethanBostick.ecs.components.Health;
@@ -65,9 +66,9 @@ public class DegenerationSystem extends IntervalIteratingSystem {
                 //flow.needsMinerals = true;
                 flow.carbonRoleOverride = PriorityRole.TOP;
 
-                String texturePath = "myceliumD" + density.density + "Dying.png";
+                //String texturePath = "myceliumD" + density.density + "Dying.png";
                 //DD-1
-                sprite.texture = TextureUtils.pathToTexture(texturePath);
+                //sprite.texture = TextureUtils.pathToTexture(texturePath);
             }
             else if(health.health > 75){
                 flow.carbonRoleOverride = null;
@@ -86,6 +87,12 @@ public class DegenerationSystem extends IntervalIteratingSystem {
             //mycelium death
             if(health.health <= 0){
                 Map.instance().setEntityAt(position.q, position.r, null, TilePosition.MYCELIUM);
+
+                Child child = Mappers.childCMap.get(entity);
+                if(child != null){
+                    Map.instance().setEntityAt(position.q, position.r, null, TilePosition.SURFACE_MYCELIUM);
+                    EntityBuilder.instance().dead(child.child);
+                }
                 EntityBuilder.instance().dead(entity);
             }
         }

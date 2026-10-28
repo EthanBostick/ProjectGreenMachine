@@ -1,5 +1,7 @@
 package io.github.ethanBostick.core;
 
+import javax.swing.text.Highlighter.Highlight;
+
 import com.badlogic.ashley.core.Entity;
 //libGDX stuff
 import com.badlogic.ashley.core.PooledEngine;
@@ -21,6 +23,7 @@ import io.github.ethanBostick.ecs.components.FactoryEmitter;
 import io.github.ethanBostick.ecs.components.FloatingText;
 import io.github.ethanBostick.ecs.components.Green;
 import io.github.ethanBostick.ecs.components.Health;
+import io.github.ethanBostick.ecs.components.Highlighter;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
 import io.github.ethanBostick.ecs.components.MultiTileSprite;
@@ -40,7 +43,6 @@ import io.github.ethanBostick.ecs.components.Synthesizer;
 import io.github.ethanBostick.ecs.components.ToxicWave;
 import io.github.ethanBostick.ecs.components.VectorArrow;
 import io.github.ethanBostick.ecs.components.Vision;
-import io.github.ethanBostick.ecs.systems.SynthesisSystem;
 import io.github.ethanBostick.map.Map;
 import io.github.ethanBostick.map.RegionType;
 import io.github.ethanBostick.map.ResourceType;
@@ -150,7 +152,6 @@ public class EntityBuilder {
         Extraction extraction = this.engine.createComponent(Extraction.class);
         extraction.carbonRate = 5;
         extraction.mineralRate = 1;
-        extraction.radius = 0;
         e.add(extraction);
 
         return e;
@@ -408,12 +409,14 @@ public class EntityBuilder {
 		Entity entity = this.engine.createEntity();
 		Sprite s = this.engine.createComponent(Sprite.class);
 		Position p = this.engine.createComponent(Position.class);
+		Highlighter h = this.engine.createComponent(Highlighter.class);
 		p.q = 0;
 		p.r = 0;
 		p.layer = 99;
 		s.revealed = true;
 		p.tilePosition = TilePosition.SURFACE;
 
+		entity.add(h);
 		entity.add(p);
 		entity.add(s);
 
@@ -533,5 +536,10 @@ public class EntityBuilder {
 	}
 	public static EntityBuilder instance(){
 		return EntityBuilder.theInstance;
+	}
+
+	public void dispose(){
+		this.engine = null;
+		theInstance = null;
 	}
 }

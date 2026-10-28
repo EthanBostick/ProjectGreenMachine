@@ -29,7 +29,7 @@ public class SystemUpdater extends EntitySystem implements Observer{
     @Override
     public void removedFromEngine(Engine engine) {
         // Executes when the system is removed or the engine is destroyed.
-        // Crucial for unsubscribing from Event Buses to prevent memory leaks.
+        EventBus.instance().unsubscribeAll(this);
     } 
 
     private void hideAll(){

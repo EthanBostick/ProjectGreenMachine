@@ -7,6 +7,8 @@ import io.github.ethanBostick.events.DepthChangeEvent;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventFactory;
 import io.github.ethanBostick.events.OverlayChangeEvent;
+import io.github.ethanBostick.events.ScreenChangeEvent;
+import io.github.ethanBostick.screens.MenuScreen;
 import io.github.ethanBostick.utils.HexUtils;
 
 import com.badlogic.gdx.Gdx;
@@ -152,11 +154,17 @@ public class GameController extends InputAdapter{
 
 		switch(keycode){
 			case Input.Keys.ESCAPE:
+				ScreenChangeEvent screenChangeEvent = EventFactory.instance().screenChangeEventPool.obtain();
+				screenChangeEvent.targetScreen = new MenuScreen();
+				EventBus.instance().publish(screenChangeEvent);			
+                return true;
+            case Input.Keys.Q:
                 Mappers.mouseStateCMap.get(this.mouse).clearSelect = true;
                 OverlayChangeEvent overlayEvent = EventFactory.instance().overlayChangeEventPool.obtain();
                 overlayEvent.selectedOverlay = OverlayMap.NONE;
                 EventBus.instance().publish(overlayEvent);
 		        return true;
+
             case Input.Keys.E:
 				DepthChangeEvent depthChangeEvent = EventFactory.instance().depthChangeEventPool.obtain();
 				depthChangeEvent.newDepthDir = 1;

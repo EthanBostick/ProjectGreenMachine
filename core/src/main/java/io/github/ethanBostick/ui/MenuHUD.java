@@ -27,6 +27,10 @@ public class MenuHUD {
         // 1. Initialize the Stage with a viewport locked to the screen
         stage = new Stage(new ScreenViewport());
 
+        //reset focus
+        stage.setKeyboardFocus(null);
+        stage.setScrollFocus(null);
+
         // 2. Load your styling (Requires a JSON file, texture atlas, and font in your assets)
         uiSkin = new Skin(Gdx.files.internal("uiskin.json"));
 

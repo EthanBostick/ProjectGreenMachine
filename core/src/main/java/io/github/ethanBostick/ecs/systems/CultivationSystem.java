@@ -100,7 +100,7 @@ public class CultivationSystem extends IntervalIteratingSystem {
                     EntityBuilder.instance().createFloatingText(
                         position.q, 
                         position.r, 
-                        1,
+                        -1,
                         "-" + totalMineralOutput + "M", 
                         ColorSettings.MINERAL_LOSSES.color,
                         true

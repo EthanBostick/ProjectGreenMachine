@@ -2,6 +2,7 @@ package io.github.ethanBostick.ecs.systems;
 
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Depth;
+import io.github.ethanBostick.ecs.components.Highlighter;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Registry;
@@ -11,6 +12,8 @@ import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
 
 import java.util.Comparator;
+
+import javax.swing.text.Highlighter.Highlight;
 
 import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.ashley.core.Entity;
@@ -64,7 +67,7 @@ public class RenderSystem extends SortedIteratingSystem{
 
     public RenderSystem(int priority) {
         super(Family.all(Position.class, Sprite.class)
-            .exclude(Dead.class).get(), new LayerComparator(), priority);
+            .exclude(Dead.class, Highlighter.class).get(), new LayerComparator(), priority);
         this.batch = Registry.spriteBatch;
         this.camera = Registry.camera;
     }

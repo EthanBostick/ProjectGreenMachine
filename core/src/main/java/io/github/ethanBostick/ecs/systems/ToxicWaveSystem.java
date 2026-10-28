@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.IntArray;
 import io.github.ethanBostick.core.ColorSettings;
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
+import io.github.ethanBostick.ecs.components.Child;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Health;
 import io.github.ethanBostick.ecs.components.Mappers;
@@ -159,6 +160,12 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
         Entity underMycelium = Map.instance().getEntityAt(q, r, TilePosition.MYCELIUM);
         if(surfaceMycelium != null && underMycelium != null){
             Health myceliumHealth = Mappers.healthCMap.get(underMycelium);
+
+            //build do nothing
+            if (myceliumHealth == null && Mappers.buildCMap.get(underMycelium) != null){
+                return true;
+            }
+
             Nutrients myceliumNutrients = Mappers.nutrientsCMap.get(underMycelium);
             int availableHealthLoss = Math.max(0, myceliumHealth.health-(int)CommonValues.TOXIC_WAVE_DMG.value);
 
@@ -203,6 +210,11 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
                 wavefront.points.add(emitterQ);
                 wavefront.points.add(emitterR);
                 wave.visitedHexes.add(Map.instance().getIndex(emitterQ, emitterR));
+            }
+            //wave end
+            else if (wave.currentStep >= wave.maxSteps || wavefront.points.size == 0) {
+                wavefront.points.clear();
+                EntityBuilder.instance().dead(toxicWave);
             }
 
             nextToxicWavefront.clear();
@@ -291,10 +303,6 @@ public class ToxicWaveSystem extends IntervalIteratingSystem {
             wavefront.points.addAll(nextToxicWavefront);
 
             wave.currentStep++;
-            if (wave.currentStep >= wave.maxSteps || wavefront.points.size == 0) {
-                wavefront.points.clear();
-                EntityBuilder.instance().dead(toxicWave);
-            }
         } catch (Exception e) {
             System.out.println("ToxicWaveError: " + e.getMessage());
         }
