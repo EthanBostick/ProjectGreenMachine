@@ -14,7 +14,7 @@ public enum PriorityRole {
         this.value = value;
         this.index = index;
     }
-    public PriorityRole intToRole(int i){
+    public static PriorityRole intToRole(int i){
         switch(i){
             case 0:
                 return NONE;

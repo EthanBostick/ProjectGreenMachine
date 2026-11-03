@@ -70,7 +70,7 @@ public class DegenerationSystem extends IntervalIteratingSystem {
                 //DD-1
                 //sprite.texture = TextureUtils.pathToTexture(texturePath);
             }
-            else if(health.health > 75){
+            else if(health.health > 75 && health.health < 100){
                 flow.carbonRoleOverride = null;
             }
 

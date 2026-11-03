@@ -1,5 +1,6 @@
 package io.github.ethanBostick.ecs.systems;
 
+import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Density;
 import io.github.ethanBostick.ecs.components.Green;
@@ -8,6 +9,7 @@ import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.map.Map;
+import io.github.ethanBostick.map.TilePosition;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
@@ -43,6 +45,33 @@ public class SelectionOverlay extends IteratingSystem{
         this.batch.end();
     }
 
+    private void drawArea(Position p, int area, Texture display){
+		for (int q = -area ; q <= area ; q ++){
+			for (int r = Math.max(-area, -q - area); r <= Math.min(area, -q + area); r ++){
+                int pixelX = HexUtils.getPixelX(q + p.q);
+                int pixelY = HexUtils.getPixelY(q + p.q, r + p.r);
+                if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {
+                    batch.draw(display, pixelX, pixelY);
+                }
+            }
+        }
+    }
+
+    private void displayArea(Entity entity){
+        int playerDepth = Mappers.depthCMap.get(Registry.player).depth;
+        Position position = Mappers.positionCMap.get(entity);
+        if (Mappers.extractionCMap.get(entity) != null && playerDepth == 1){
+            System.out.println("area highlight");
+            drawArea(position, (int)CommonValues.EXTRACTION_RADIUS.value, TextureUtils.pathToTexture("areaOverlay.png"));
+        }
+        else if (Mappers.cleanserCMap.get(entity) != null){
+            drawArea(position, Mappers.cleanserCMap.get(entity).radius, TextureUtils.pathToTexture("areaOverlay.png"));
+        }
+        else if (Mappers.cultivatorCMap.get(entity) != null){
+            drawArea(position, Mappers.cultivatorCMap.get(entity).radius, TextureUtils.pathToTexture("areaOverlay.png"));
+        }
+    }
+
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
 
@@ -52,6 +81,12 @@ public class SelectionOverlay extends IteratingSystem{
         if (sprite.texture != null){
             float pixelX = HexUtils.getPixelX(position);
             float pixelY = HexUtils.getPixelY(position);
+
+            //selected mycelium has area
+            Entity mycelium = Map.instance().getEntityAt(position.q, position.r, TilePosition.MYCELIUM); 
+            if(mycelium != null){
+                displayArea(mycelium);
+            }
 
             // Only draw if the sprite's bounding box intersects the camera's view
             if (camera.frustum.boundsInFrustum(pixelX + HexUtils.WIDTH/2f, pixelY + HexUtils.HEIGHT/2f, 0, HexUtils.WIDTH/2f, HexUtils.HEIGHT/2f, 0)) {

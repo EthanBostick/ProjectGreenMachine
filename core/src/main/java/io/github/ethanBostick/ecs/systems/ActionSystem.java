@@ -197,24 +197,16 @@ public class ActionSystem extends IteratingSystem{
 
         if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
 
-            int playerDepth = Mappers.depthCMap.get(Registry.player).depth;
-            TilePosition selectPosition = (playerDepth==0)? TilePosition.SURFACE_MYCELIUM : TilePosition.MYCELIUM;
-            Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, selectPosition);
+            Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
 
-            if(selectedTile != null && selectPosition == TilePosition.MYCELIUM){
+            if(selectedTile != null){
                 NutrientFlow flow = Mappers.nutrientFlowCMap.get(selectedTile);
-                int carbonCurrentPrior = flow.carbonRoleOverride.index;
-                flow.carbonRoleOverride = flow.carbonRoleOverride.intToRole((carbonCurrentPrior + 1) % 5);
-                int mineralCurrentPrior = flow.mineralRoleOverride.index;
-                flow.mineralRoleOverride = flow.mineralRoleOverride.intToRole((mineralCurrentPrior + 1) % 5);
-            }
-            else if(selectedTile != null && selectPosition == TilePosition.SURFACE_MYCELIUM){
-                Entity underTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
-                NutrientFlow flow = Mappers.nutrientFlowCMap.get(underTile);
-                int carbonCurrentPrior = flow.carbonRoleOverride.index;
-                flow.carbonRoleOverride = flow.carbonRoleOverride.intToRole((carbonCurrentPrior + 1) % 5);
-                int mineralCurrentPrior = flow.mineralRoleOverride.index;
-                flow.mineralRoleOverride = flow.mineralRoleOverride.intToRole((mineralCurrentPrior + 1) % 5);
+                int carbonCurrentPrior = (flow.carbonRoleOverride == null)? flow.carbonRole.index : flow.carbonRoleOverride.index;
+                flow.carbonRoleOverride = (flow.carbonRoleOverride != null &&
+                     flow.carbonRoleOverride.index == flow.carbonRole.index)? null : PriorityRole.intToRole((carbonCurrentPrior + 1) % 5);
+                int mineralCurrentPrior = (flow.mineralRoleOverride == null)? flow.mineralRole.index : flow.mineralRoleOverride.index;
+                flow.mineralRoleOverride = (flow.mineralRoleOverride != null &&
+                     flow.mineralRoleOverride.index == flow.mineralRole.index)? null : PriorityRole.intToRole((mineralCurrentPrior + 1) % 5);
             }
         }
     }

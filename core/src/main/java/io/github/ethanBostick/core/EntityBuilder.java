@@ -452,6 +452,8 @@ public class EntityBuilder {
 		MutagenMass mMass = this.engine.createComponent(MutagenMass.class);
 		Entity entity = this.engine.createEntity();
 
+		//TODO
+		mMass.amount = 100;
 		entity.add(mMass);
 		entity.add(maxNutrients);
 		entity.add(nutrients);
