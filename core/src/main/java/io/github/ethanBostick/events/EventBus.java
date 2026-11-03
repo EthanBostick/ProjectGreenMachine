@@ -43,6 +43,14 @@ public class EventBus{
 		listeners.removeValue(observer,true);
 	}
 
+	public void unsubscribeAll(Observer observer) {
+		if (observer == null) return;
+
+		for (Array<Observer> list : observers.values()) {
+			list.removeValue(observer, true);
+		}
+	}
+
 	public void publish(Event event){
 		Array<Observer> listeners = this.observers.get(event.getType()); 
 
@@ -66,6 +74,9 @@ public class EventBus{
 		}
 		else if (event instanceof OverlayChangeEvent){
 			EventFactory.instance().overlayChangeEventPool.free((OverlayChangeEvent)event);
+		}
+		else if (event instanceof UnlockEvent){
+			EventFactory.instance().unlockEventPool.free((UnlockEvent)event);
 		}
 	}
 }

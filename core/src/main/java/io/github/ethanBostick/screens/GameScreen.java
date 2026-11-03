@@ -1,7 +1,9 @@
 package io.github.ethanBostick.screens;
 
 import io.github.ethanBostick.ui.GameHUD;
+import io.github.ethanBostick.utils.TextureUtils;
 import io.github.ethanBostick.input.GameController;
+import io.github.ethanBostick.core.Adaptations;
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Registry;
@@ -14,24 +16,30 @@ import io.github.ethanBostick.ecs.systems.CleanserSystem;
 import io.github.ethanBostick.ecs.systems.CultivationSystem;
 import io.github.ethanBostick.ecs.systems.DegenerationSystem;
 import io.github.ethanBostick.ecs.systems.FlowGradientSystem;
+import io.github.ethanBostick.ecs.systems.GreenOverlay;
 import io.github.ethanBostick.ecs.systems.GreenSystem;
 import io.github.ethanBostick.ecs.systems.MultiRenderSystem;
 import io.github.ethanBostick.ecs.systems.NetworkFlowSystem;
 import io.github.ethanBostick.ecs.systems.NetworkGrowthSystem;
 import io.github.ethanBostick.ecs.systems.PlayerStateSystem;
+import io.github.ethanBostick.ecs.systems.PriorityOverlay;
 import io.github.ethanBostick.ecs.systems.StateCommitSystem;
+import io.github.ethanBostick.ecs.systems.SynthesisSystem;
 import io.github.ethanBostick.ecs.systems.SystemUpdater;
 import io.github.ethanBostick.ecs.systems.ToxicEmitterSystem;
 import io.github.ethanBostick.ecs.systems.ToxicWaveSystem;
+import io.github.ethanBostick.ecs.systems.UpgradeSystem;
 import io.github.ethanBostick.ecs.systems.RenderSystem;
 import io.github.ethanBostick.ecs.systems.RevealSystem;
 import io.github.ethanBostick.ecs.systems.RunnerSystem;
+import io.github.ethanBostick.ecs.systems.SelectionOverlay;
 import io.github.ethanBostick.ecs.systems.VectorRenderSystem;
 import io.github.ethanBostick.ecs.systems.ReclaimSystem;
 import io.github.ethanBostick.ecs.systems.RegionOverlay;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.InputMultiplexer;
 
@@ -65,6 +73,7 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new NetworkFlowSystem(tickRate*2, 5));
 		//producers
 		this.engine.addSystem(new ExtractionSystem(tickRate*2,6));
+		this.engine.addSystem(new SynthesisSystem(tickRate*2, 7));
 		this.engine.addSystem(new GreenSystem(tickRate*2, 7));
 		//consumers
 		this.engine.addSystem(new CleanserSystem(tickRate*2,8));
@@ -83,10 +92,14 @@ public class GameScreen implements Screen {
 		this.engine.addSystem(new RenderSystem(96));
 		this.engine.addSystem(new MultiRenderSystem(97));
 		this.engine.addSystem(new RegionOverlay(98));
+		this.engine.addSystem(new GreenOverlay(98));
+		this.engine.addSystem(new PriorityOverlay(98));
 		this.engine.addSystem(new FloatingTextSystem(99));
-		this.engine.addSystem(new VectorRenderSystem(100)); //99 so it renders on top
-		this.engine.addSystem(new EntityManagementSystem(101));
+		this.engine.addSystem(new SelectionOverlay(100));
+		this.engine.addSystem(new VectorRenderSystem(101)); //99 so it renders on top
+		this.engine.addSystem(new EntityManagementSystem(102));
 
+		this.engine.addSystem(new UpgradeSystem(0));
 		this.engine.addSystem(new SystemUpdater(0)); //must be added after Overlays
 
 
@@ -152,6 +165,27 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
+
+		TextureUtils.dispose();
+		Adaptations.dispose();
+		CommonValues.dispose();
+
+		if (engine != null) {
+			engine.removeAllEntities(); // Clears all active entities
+			engine.clearPools();        // Empties PooledEngine component pools
+			for (EntitySystem system : engine.getSystems()) {
+				engine.removeSystem(system);
+			}
+    	}
+		
+		if (Map.instance() != null){
+			Map.instance().dispose();
+		}
+		if (EntityBuilder.instance() != null){
+			EntityBuilder.instance().dispose();
+		}
+
+		if (this.gameHUD != null) this.gameHUD.dispose();
 		Registry.dispose();
     }
 }

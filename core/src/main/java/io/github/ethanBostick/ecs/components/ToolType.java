@@ -4,6 +4,6 @@ public enum ToolType {
     DEFAULT,
     BUILD,
     DELETE,
-    DEACTIVATE,
-    ACTIVATE
+    ACTIVATION,
+    PRIORITY
 }

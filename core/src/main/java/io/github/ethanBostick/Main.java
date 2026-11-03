@@ -45,10 +45,6 @@ public class Main extends Game implements Observer {
 		Gdx.gl.glClearColor(0.1f,0.1f,0.1f,1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		//dont render entities until on the gamescreen
-		if (!(this.getScreen() instanceof MenuScreen)){
-		}
-
 		super.render(); //delegates rendering to active screen
     }
 
@@ -64,13 +60,15 @@ public class Main extends Game implements Observer {
 
 		switch (event.getType()){
 			case SCREEN_CHANGE:
-				Screen oldScreen = this.getScreen();
-				ScreenChangeEvent sce = (ScreenChangeEvent) event;
-				this.setScreen(sce.targetScreen); 
+				Screen target = ((ScreenChangeEvent) event).targetScreen;
 
-				if (oldScreen != null) {
-					oldScreen.dispose();
-				}
+				Gdx.app.postRunnable(() -> {
+					Screen oldScreen = this.getScreen();
+					this.setScreen(target);
+					if (oldScreen != null) {
+						oldScreen.dispose();
+					}
+				});
 				break;
 			default:
 				System.out.println("unknown event");

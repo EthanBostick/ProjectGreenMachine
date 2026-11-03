@@ -2,6 +2,7 @@ package io.github.ethanBostick.ecs.systems;
 
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Depth;
+import io.github.ethanBostick.ecs.components.Highlighter;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Position;
 import io.github.ethanBostick.ecs.components.Registry;
@@ -11,6 +12,8 @@ import io.github.ethanBostick.utils.HexUtils;
 import io.github.ethanBostick.utils.TextureUtils;
 
 import java.util.Comparator;
+
+import javax.swing.text.Highlighter.Highlight;
 
 import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.ashley.core.Entity;
@@ -27,17 +30,7 @@ public class RenderSystem extends SortedIteratingSystem{
     private static class LayerComparator implements Comparator<Entity> {
         @Override
         public int compare(Entity e1, Entity e2) {
-            //invert the layer values so lowest renders first
-            int layer1 = -Mappers.positionCMap.get(e1).layer;
-            int layer2 = -Mappers.positionCMap.get(e2).layer;
-            
-            //primary sort by layer
-            int layerComparison = Integer.compare(layer2, layer1);
-            if (layerComparison != 0){
-                return layerComparison;
-            }
-
-            //secondary sort by y-value
+            //primary sort by y-value
             //inverted so lower sprites render first
             float groundY1 = -HexUtils.getPixelY(Mappers.positionCMap.get(e1));
             float groundY2 = -HexUtils.getPixelY(Mappers.positionCMap.get(e2));
@@ -46,6 +39,17 @@ public class RenderSystem extends SortedIteratingSystem{
             if(yComparison != 0){
                 return yComparison;
             }
+
+            //invert the layer values so lowest renders first
+            int layer1 = -Mappers.positionCMap.get(e1).layer;
+            int layer2 = -Mappers.positionCMap.get(e2).layer;
+            
+            //sec sort by layer
+            int layerComparison = Integer.compare(layer2, layer1);
+            if (layerComparison != 0){
+                return layerComparison;
+            }
+
 
             //tertiary row sort
             float groundX1 = HexUtils.getPixelX(Mappers.positionCMap.get(e1));
@@ -63,7 +67,7 @@ public class RenderSystem extends SortedIteratingSystem{
 
     public RenderSystem(int priority) {
         super(Family.all(Position.class, Sprite.class)
-            .exclude(Dead.class).get(), new LayerComparator(), priority);
+            .exclude(Dead.class, Highlighter.class).get(), new LayerComparator(), priority);
         this.batch = Registry.spriteBatch;
         this.camera = Registry.camera;
     }

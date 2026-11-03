@@ -8,7 +8,7 @@ import io.github.ethanBostick.ecs.components.Direction;
 import com.badlogic.gdx.Gdx;
 
 public class TextureUtils {
-    private static ObjectMap<String, Texture> textureMap = new ObjectMap<>(10); //argue estimated size
+    private static ObjectMap<String, Texture> textureMap = new ObjectMap<>(64); //argue estimated size
 	private static String[] dragToolSpriteHeads = {"arrowNE.png","arrowSE.png","arrowS.png","arrowSW.png","arrowNW.png","arrowN.png"};
 	private static String[] dragToolSprites = {"topRightPath.png","topLeftPath.png","topPath.png","topRightPath.png","topLeftPath.png","topPath.png"};
 
@@ -61,4 +61,7 @@ public class TextureUtils {
 		}
 		return rtn;
     }
+	public static void dispose(){
+		textureMap.clear();
+	}
 }

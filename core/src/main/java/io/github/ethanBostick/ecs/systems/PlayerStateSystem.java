@@ -6,6 +6,7 @@ import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.events.Event;
 import io.github.ethanBostick.events.EventBus;
 import io.github.ethanBostick.events.EventType;
+import io.github.ethanBostick.events.OverlayChangeEvent;
 import io.github.ethanBostick.events.ToolChangeEvent;
 import io.github.ethanBostick.events.DepthChangeEvent;
 
@@ -36,7 +37,7 @@ public class PlayerStateSystem extends EntitySystem implements Observer{
     @Override
     public void removedFromEngine(Engine engine) {
         // Executes when the system is removed or the engine is destroyed.
-        // Crucial for unsubscribing from Event Buses to prevent memory leaks.
+        EventBus.instance().unsubscribeAll(this);
     } 
 
     @Override 

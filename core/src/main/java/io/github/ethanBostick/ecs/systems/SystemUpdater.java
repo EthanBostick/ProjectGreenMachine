@@ -18,7 +18,7 @@ public class SystemUpdater extends EntitySystem implements Observer{
 
     @Override
     public void addedToEngine(Engine engine) {
-        getEngine().getSystem(RegionOverlay.class).setProcessing(false);;
+        hideAll();
     }
 
     @Override
@@ -29,21 +29,32 @@ public class SystemUpdater extends EntitySystem implements Observer{
     @Override
     public void removedFromEngine(Engine engine) {
         // Executes when the system is removed or the engine is destroyed.
-        // Crucial for unsubscribing from Event Buses to prevent memory leaks.
+        EventBus.instance().unsubscribeAll(this);
     } 
+
+    private void hideAll(){
+        Engine theEngine = this.getEngine();
+        theEngine.getSystem(RegionOverlay.class).setProcessing(false);
+        theEngine.getSystem(GreenOverlay.class).setProcessing(false);
+        theEngine.getSystem(PriorityOverlay.class).setProcessing(false);
+    }
 
     private void switchToOverlay(OverlayChangeEvent event){
         Engine theEngine = this.getEngine(); //PooledEngine extends Engine, this is a pooled engine
-        theEngine.getSystem(RegionOverlay.class).setProcessing(false);;
+        hideAll();
 
         switch(event.selectedOverlay){
             case NONE:
-                theEngine.getSystem(RegionOverlay.class).setProcessing(false);;
+                hideAll();
                 break;
             case REGION:
                 theEngine.getSystem(RegionOverlay.class).setProcessing(true);;
                 break;
             case GREEN:
+                theEngine.getSystem(GreenOverlay.class).setProcessing(true);;
+                break;
+            case PRIORITY:
+                theEngine.getSystem(PriorityOverlay.class).setProcessing(true);;
                 break;
         }
     }

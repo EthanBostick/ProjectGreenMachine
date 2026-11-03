@@ -1,5 +1,7 @@
 package io.github.ethanBostick.core;
 
+import javax.swing.text.Highlighter.Highlight;
+
 import com.badlogic.ashley.core.Entity;
 //libGDX stuff
 import com.badlogic.ashley.core.PooledEngine;
@@ -21,6 +23,7 @@ import io.github.ethanBostick.ecs.components.FactoryEmitter;
 import io.github.ethanBostick.ecs.components.FloatingText;
 import io.github.ethanBostick.ecs.components.Green;
 import io.github.ethanBostick.ecs.components.Health;
+import io.github.ethanBostick.ecs.components.Highlighter;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
 import io.github.ethanBostick.ecs.components.MultiTileSprite;
@@ -36,6 +39,7 @@ import io.github.ethanBostick.ecs.components.Reclaim;
 import io.github.ethanBostick.ecs.components.Region;
 import io.github.ethanBostick.ecs.components.Resource;
 import io.github.ethanBostick.ecs.components.Sprite;
+import io.github.ethanBostick.ecs.components.Synthesizer;
 import io.github.ethanBostick.ecs.components.ToxicWave;
 import io.github.ethanBostick.ecs.components.VectorArrow;
 import io.github.ethanBostick.ecs.components.Vision;
@@ -148,7 +152,6 @@ public class EntityBuilder {
         Extraction extraction = this.engine.createComponent(Extraction.class);
         extraction.carbonRate = 5;
         extraction.mineralRate = 1;
-        extraction.radius = 0;
         e.add(extraction);
 
         return e;
@@ -171,6 +174,33 @@ public class EntityBuilder {
 
 		e.add(child);
 		e.add(cultivatorComp);
+
+        return e;
+    }
+
+    public Entity createTransportNode(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
+        Entity e = createBaseMycelium(q, r, "hyperNode.png", 4,
+                6, 6, 6,
+                initCarbon, initMineral, carbonReclaim, mineralReclaim);
+
+        return e;
+    }
+
+
+    public Entity createCarbonSyphon(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
+        Entity e = createBaseMycelium(q, r, "carbonSyphon.png", 4,
+                15, 5, 2,
+                initCarbon, initMineral, carbonReclaim, mineralReclaim);
+
+		Synthesizer synthesizer = this.engine.createComponent(Synthesizer.class);
+		synthesizer.resourceType = ResourceType.CARBON;
+
+		Child child = this.engine.createComponent(Child.class);
+		Entity surfaceNode = createRenderable(q, r, 2, 0, TilePosition.SURFACE_MYCELIUM, "carbonSyphonSurface.png");
+		child.child = surfaceNode;
+
+		e.add(child);
+        e.add(synthesizer);
 
         return e;
     }
@@ -379,12 +409,14 @@ public class EntityBuilder {
 		Entity entity = this.engine.createEntity();
 		Sprite s = this.engine.createComponent(Sprite.class);
 		Position p = this.engine.createComponent(Position.class);
+		Highlighter h = this.engine.createComponent(Highlighter.class);
 		p.q = 0;
 		p.r = 0;
 		p.layer = 99;
 		s.revealed = true;
 		p.tilePosition = TilePosition.SURFACE;
 
+		entity.add(h);
 		entity.add(p);
 		entity.add(s);
 
@@ -420,6 +452,8 @@ public class EntityBuilder {
 		MutagenMass mMass = this.engine.createComponent(MutagenMass.class);
 		Entity entity = this.engine.createEntity();
 
+		//TODO
+		mMass.amount = 100;
 		entity.add(mMass);
 		entity.add(maxNutrients);
 		entity.add(nutrients);
@@ -504,5 +538,10 @@ public class EntityBuilder {
 	}
 	public static EntityBuilder instance(){
 		return EntityBuilder.theInstance;
+	}
+
+	public void dispose(){
+		this.engine = null;
+		theInstance = null;
 	}
 }

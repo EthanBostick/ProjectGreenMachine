@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.badlogic.gdx.utils.IntArray;
 
 import io.github.ethanBostick.core.ColorSettings;
+import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.core.EntityBuilder;
 import io.github.ethanBostick.ecs.components.Dead;
 import io.github.ethanBostick.ecs.components.Extraction;
@@ -41,7 +42,7 @@ public class ExtractionSystem extends IntervalIteratingSystem {
             Extraction extraction = Mappers.extractionCMap.get(extractor);
 
             //get radius vector
-            int radius = extraction.radius;
+            int radius = (int)CommonValues.EXTRACTION_RADIUS.value;
             this.processingArray = HexUtils.getAreaAround(position, radius, processingArray);
 
             int currentCarbon = nutrients.carbons + nutrients.carbonDelta;

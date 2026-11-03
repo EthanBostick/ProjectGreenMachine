@@ -11,8 +11,10 @@ import io.github.ethanBostick.ecs.components.BuildType;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
+import io.github.ethanBostick.ecs.components.NutrientFlow;
 import io.github.ethanBostick.ecs.components.Child;
 import io.github.ethanBostick.ecs.components.Position;
+import io.github.ethanBostick.ecs.components.PriorityRole;
 import io.github.ethanBostick.ecs.components.Registry;
 import io.github.ethanBostick.ecs.components.Sprite;
 import io.github.ethanBostick.ecs.components.ToolType;
@@ -189,17 +191,42 @@ public class ActionSystem extends IteratingSystem{
         }
     }
 
+    private void priorityAction(Entity mouse){
+        Position mousePosition = Mappers.positionCMap.get(mouse);
+        MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
+
+        if (mouseState.pressedDown && mouseState.pressedUp && !Map.instance().outOfMapBounds(mousePosition.q, mousePosition.r)){
+
+            Entity selectedTile = Map.instance().getEntityAt(mousePosition.q, mousePosition.r, TilePosition.MYCELIUM);
+
+            if(selectedTile != null){
+                NutrientFlow flow = Mappers.nutrientFlowCMap.get(selectedTile);
+                int carbonCurrentPrior = (flow.carbonRoleOverride == null)? flow.carbonRole.index : flow.carbonRoleOverride.index;
+                flow.carbonRoleOverride = (flow.carbonRoleOverride != null &&
+                     flow.carbonRoleOverride.index == flow.carbonRole.index)? null : PriorityRole.intToRole((carbonCurrentPrior + 1) % 5);
+                int mineralCurrentPrior = (flow.mineralRoleOverride == null)? flow.mineralRole.index : flow.mineralRoleOverride.index;
+                flow.mineralRoleOverride = (flow.mineralRoleOverride != null &&
+                     flow.mineralRoleOverride.index == flow.mineralRole.index)? null : PriorityRole.intToRole((mineralCurrentPrior + 1) % 5);
+            }
+        }
+    }
+
     @Override
     protected void processEntity(Entity mouse, float deltaTime) {
         ActiveTool activeTool = Mappers.activeToolCMap.get(Registry.player);
         MouseState mouseState = Mappers.mouseStateCMap.get(mouse);
+        Position selectedPosition = Mappers.positionCMap.get(this.highlighter);
+
 
         // esc key clears selection 
         if(mouseState.clearSelect){
-            activeTool.tool = ToolType.DEFAULT;    
-            activeTool.buildTarget = null;    
             mouseState.clearSelect = false;
+            selectedPosition.q = Integer.MAX_VALUE;
+            selectedPosition.r = Integer.MAX_VALUE;
             Mappers.spriteCMap.get(this.highlighter).texture = null;
+            TileSelectEvent selectEvent = EventFactory.instance().tileSelectEventPool.obtain();
+            selectEvent.position = selectedPosition;
+            EventBus.instance().publish(selectEvent);			
             return;
         }
 
@@ -218,9 +245,11 @@ public class ActionSystem extends IteratingSystem{
                 Mappers.VectorArrowCMap.get(mouse).arrowTexture = null;
                 this.deleteAction(mouse);
                 break;
-            case DEACTIVATE:
+            case PRIORITY:
+                Mappers.VectorArrowCMap.get(mouse).arrowTexture = null;
+                this.priorityAction(mouse);
                 break;
-            case ACTIVATE:
+            case ACTIVATION:
                 break;
         }
 

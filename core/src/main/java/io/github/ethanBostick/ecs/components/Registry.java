@@ -42,6 +42,7 @@ public class Registry {
         //worldFont = null; 
         uiSkin = null;
         camera = null;
+        spriteBatch.dispose();
 		spriteBatch = null;
         highlighter = null;
         mouse = null;
