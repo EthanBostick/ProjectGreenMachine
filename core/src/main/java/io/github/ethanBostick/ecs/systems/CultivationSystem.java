@@ -109,7 +109,7 @@ public class CultivationSystem extends IntervalIteratingSystem {
             }
         }
         catch(Exception e){
-            System.out.println("CleanserError: " + e.getMessage());
+            System.out.println("CultivationError: " + e.getMessage());
         }
         finally{
             this.processingArray.clear();
