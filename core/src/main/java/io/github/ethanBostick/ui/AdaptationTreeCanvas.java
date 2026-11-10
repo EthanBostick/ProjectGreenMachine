@@ -221,7 +221,7 @@ public class AdaptationTreeCanvas extends WidgetGroup {
                 lineRegion,
                 startX, startY,
                 0, 2f,          // Origin at left-center of the line thickness
-                dist, 4f,       // Stretched length = dist, thickness = 4px
+                dist, 10f,       // Stretched length = dist, thickness = 4px
                 1f, 1f,
                 angle
             );

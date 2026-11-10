@@ -211,7 +211,7 @@ public class GameHUD implements Observer {
         addUnlockableToolButton(table, "Transport", ToolType.BUILD, BuildType.CONDUIT, Adaptations.TRANSPORT_HYPHAE);
 
         // Always-unlocked tools:
-        addToolToggleButton(table, "Carbon Synthesizer", ToolType.BUILD, BuildType.CARBON_SYPHON);
+        addToolToggleButton(table, "Mushroom", ToolType.BUILD, BuildType.PROPAGATOR);
         addToolToggleButton(table, "Cleanser", ToolType.BUILD, BuildType.CLEANSER);
         addToolToggleButton(table, "Cultivator", ToolType.BUILD, BuildType.CULTIVATOR);
         addToolToggleButton(table, "Storage", ToolType.BUILD, BuildType.STORAGE);

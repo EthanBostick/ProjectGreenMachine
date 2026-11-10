@@ -19,6 +19,7 @@ import io.github.ethanBostick.ecs.systems.FlowGradientSystem;
 import io.github.ethanBostick.ecs.systems.GreenOverlay;
 import io.github.ethanBostick.ecs.systems.GreenSystem;
 import io.github.ethanBostick.ecs.systems.MultiRenderSystem;
+import io.github.ethanBostick.ecs.systems.MushroomSystem;
 import io.github.ethanBostick.ecs.systems.NetworkFlowSystem;
 import io.github.ethanBostick.ecs.systems.NetworkGrowthSystem;
 import io.github.ethanBostick.ecs.systems.PlayerStateSystem;
@@ -85,8 +86,9 @@ public class GameScreen implements Screen {
 
 		//commits and final calculations
 		this.engine.addSystem(new BuildSystem(tickRate,13));
-		this.engine.addSystem(new ReclaimSystem(14));
-		this.engine.addSystem(new StateCommitSystem(tickRate, 15));
+		this.engine.addSystem(new MushroomSystem(tickRate, 14));
+		this.engine.addSystem(new ReclaimSystem(15));
+		this.engine.addSystem(new StateCommitSystem(tickRate, 16));
 
 		this.engine.addSystem(new RevealSystem(tickRate,95));
 		this.engine.addSystem(new RenderSystem(96));
