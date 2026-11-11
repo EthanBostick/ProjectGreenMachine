@@ -476,7 +476,7 @@ public class EntityBuilder {
 		Entity entity = this.engine.createEntity();
 
 		//TODO
-		mMass.amount = 100;
+		mMass.amount = 200;
 		entity.add(mMass);
 		entity.add(maxNutrients);
 		entity.add(nutrients);
