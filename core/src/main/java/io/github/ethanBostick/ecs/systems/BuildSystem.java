@@ -48,8 +48,8 @@ public class BuildSystem extends IntervalIteratingSystem{
             case CULTIVATOR:
                 creation = EntityBuilder.instance().createMyceliumCultivator(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
                 break;
-            case CARBON_SYPHON:
-                creation = EntityBuilder.instance().createCarbonSyphon(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
+            case PROPAGATOR:
+                creation = EntityBuilder.instance().createMushroom(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);
                 break;
             case CONDUIT:
                 creation = EntityBuilder.instance().createTransportNode(p.q, p.r,0,0,target.carbonCost/2,target.mineralCost/2);

@@ -7,7 +7,7 @@ public enum BuildType {
     CLEANSER("cleanserBuild.png","cleanserSurfaceBuild.png", 6, 2),
     CULTIVATOR("cultivatorMyceliumBuild.png","cleanserSurfaceBuild.png", 6, 2),
     EXTRACTOR("extractorMyceliumBuild.png",null, 9, 3),
-    CARBON_SYPHON("carbonSyphonBuild.png","carbonSyphonSurfaceBuild.png", 12, 6),
+    PROPAGATOR("carbonSyphonBuild.png","carbonSyphonSurfaceBuild.png", 9, 6),
     CONDUIT("hyperNodeBuild.png",null, 6, 2),
     STORAGE("storageMyceliumBuild.png",null, 9, 3);
 

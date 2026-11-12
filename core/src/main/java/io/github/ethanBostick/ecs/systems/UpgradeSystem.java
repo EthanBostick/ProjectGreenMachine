@@ -61,10 +61,12 @@ public class UpgradeSystem extends EntitySystem implements Observer{
                 break;
             case EXTRACTOR_RANGE:
                 CommonValues.EXTRACTION_RADIUS.value += 1;
+                Adaptations.EXTRACTOR_RANGE.unlocked = true;
                 break;
             case TRANSPORT_HYPHAE: 
                 break;
             case HARSH_CHEMICALS:    
+                Adaptations.HARSH_CHEMICALS.unlocked = true;
                 break;
         }
     }

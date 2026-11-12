@@ -216,6 +216,7 @@ public class Map{
 
 				if (rockRoll < rockThreshold){
 					Entity rock = entityBuilder.createRenderable(q, r, 3, 1, TilePosition.UNDERGROUND_TERRAIN, "stone.png");	
+					EntityBuilder.instance().addNutrients(rock, 0, 50);
 					this.entityBuilder.addToEngine(rock);
 					this.map[index][TilePosition.UNDERGROUND_TERRAIN.value()] = rock;
 				}

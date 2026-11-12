@@ -27,6 +27,7 @@ import io.github.ethanBostick.ecs.components.Highlighter;
 import io.github.ethanBostick.ecs.components.MouseState;
 import io.github.ethanBostick.ecs.components.MultiTilePosition;
 import io.github.ethanBostick.ecs.components.MultiTileSprite;
+import io.github.ethanBostick.ecs.components.Mushroom;
 import io.github.ethanBostick.ecs.components.MutagenMass;
 import io.github.ethanBostick.ecs.components.Name;
 import io.github.ethanBostick.ecs.components.NutrientCapacity;
@@ -186,6 +187,28 @@ public class EntityBuilder {
         return e;
     }
 
+    public Entity createMushroom(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
+		int sporeNumber = (int)CommonValues.SPORES_PER_MUSHROOM.value;
+        Entity e = createBaseMycelium(q, r, "carbonSyphon.png", 4,
+                BuildType.EXTRACTOR.carbonCost*sporeNumber, BuildType.EXTRACTOR.mineralCost*sporeNumber, 1,
+                initCarbon, initMineral, carbonReclaim, mineralReclaim);
+
+
+        NutrientFlow flow = e.getComponent(NutrientFlow.class);
+		flow.mineralRole = PriorityRole.TOP;
+		flow.carbonRole = PriorityRole.TOP;
+
+		Mushroom mushroom = this.engine.createComponent(Mushroom.class);
+
+		Child child = this.engine.createComponent(Child.class);
+		Entity surfaceNode = createRenderable(q, r, 2, 0, TilePosition.SURFACE_MYCELIUM, "carbonSyphonSurface.png");
+		child.child = surfaceNode;
+
+		e.add(child);
+		e.add(mushroom);
+
+        return e;
+    }
 
     public Entity createCarbonSyphon(int q, int r, int initCarbon, int initMineral, int carbonReclaim, int mineralReclaim) {
         Entity e = createBaseMycelium(q, r, "carbonSyphon.png", 4,
@@ -453,7 +476,7 @@ public class EntityBuilder {
 		Entity entity = this.engine.createEntity();
 
 		//TODO
-		mMass.amount = 100;
+		mMass.amount = 200;
 		entity.add(mMass);
 		entity.add(maxNutrients);
 		entity.add(nutrients);

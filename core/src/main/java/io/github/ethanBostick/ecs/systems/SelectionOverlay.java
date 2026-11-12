@@ -2,8 +2,6 @@ package io.github.ethanBostick.ecs.systems;
 
 import io.github.ethanBostick.core.CommonValues;
 import io.github.ethanBostick.ecs.components.Dead;
-import io.github.ethanBostick.ecs.components.Density;
-import io.github.ethanBostick.ecs.components.Green;
 import io.github.ethanBostick.ecs.components.Highlighter;
 import io.github.ethanBostick.ecs.components.Mappers;
 import io.github.ethanBostick.ecs.components.Position;
@@ -61,7 +59,6 @@ public class SelectionOverlay extends IteratingSystem{
         int playerDepth = Mappers.depthCMap.get(Registry.player).depth;
         Position position = Mappers.positionCMap.get(entity);
         if (Mappers.extractionCMap.get(entity) != null && playerDepth == 1){
-            System.out.println("area highlight");
             drawArea(position, (int)CommonValues.EXTRACTION_RADIUS.value, TextureUtils.pathToTexture("areaOverlay.png"));
         }
         else if (Mappers.cleanserCMap.get(entity) != null){
