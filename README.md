@@ -3,10 +3,14 @@
 This project is part of a 16 week independent study with the aim of producing and publishing a game onto the Steam store page. 
 Due to the 16 week constraint for publishing, the scope and time need to be carefully considered during development; for those reasons the game is built on the LibGDX Java framework to maintain low-level development while avoiding building a complete game engine from scratch. 
 
+## Update (Nov 12th 2026)
+Reevaluated to have a to have a demo out by the end of the 16 weeks and take extra time to polish before publishing
+- this is also the last week of updates to the public branch to protect my project.
+
 ## Devlog
 https://www.youtube.com/@Etonkabonk
 
-### PROJECTED PUBLISH DATE: *Nov 27-28th, 2026* *(subject to change)*
+### PROJECTED PUBLISH DATE: *unknown* *(subject to change)*
 
 ## Running The Project
 
