@@ -1,4 +1,5 @@
-# GreenMachine
+# GreenMachine 
+#### (This is a public branch of the project containing major architecture but not final features or alterations)
 
 This project is part of a 16 week independent study with the aim of producing and publishing a game onto the Steam store page. 
 Due to the 16 week constraint for publishing, the scope and time need to be carefully considered during development; for those reasons the game is built on the LibGDX Java framework to maintain low-level development while avoiding building a complete game engine from scratch. 
